@@ -1,0 +1,2312 @@
+{
+  "nodes": [
+    {
+      "id": "biology",
+      "label": "Biology",
+      "count": 98,
+      "size": 45.9511985013459,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "genome",
+      "label": "Genome",
+      "count": 91,
+      "size": 45.217885770490405,
+      "category": "methods",
+      "avgYear": 2020.7
+    },
+    {
+      "id": "bacteria",
+      "label": "Bacteria",
+      "count": 90,
+      "size": 45.1085950651685,
+      "category": "microbiology",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "virus",
+      "label": "Virus",
+      "count": 82,
+      "size": 44.18840607796598,
+      "category": "virology",
+      "avgYear": 2021.7
+    },
+    {
+      "id": "metagenomics",
+      "label": "Metagenomics",
+      "count": 62,
+      "size": 41.43134726391533,
+      "category": "methods",
+      "avgYear": 2021.0
+    },
+    {
+      "id": "evolution",
+      "label": "Evolution",
+      "count": 62,
+      "size": 41.43134726391533,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "host",
+      "label": "Host",
+      "count": 50,
+      "size": 39.318256327243255,
+      "category": "other",
+      "avgYear": 2020.8
+    },
+    {
+      "id": "diversity",
+      "label": "Diversity",
+      "count": 49,
+      "size": 39.12023005428146,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "computational biology",
+      "label": "Computational Biology",
+      "count": 45,
+      "size": 38.286413964890954,
+      "category": "other",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "phylogenetics",
+      "label": "Phylogenetics",
+      "count": 36,
+      "size": 36.10917912644224,
+      "category": "methods",
+      "avgYear": 2019.8
+    },
+    {
+      "id": "giant virus",
+      "label": "Giant Virus",
+      "count": 34,
+      "size": 35.553480614894134,
+      "category": "virology",
+      "avgYear": 2022.3
+    },
+    {
+      "id": "infection",
+      "label": "Infection",
+      "count": 31,
+      "size": 34.657359027997266,
+      "category": "other",
+      "avgYear": 2020.4
+    },
+    {
+      "id": "genetics",
+      "label": "Genetics",
+      "count": 29,
+      "size": 34.011973816621555,
+      "category": "other",
+      "avgYear": 2019.8
+    },
+    {
+      "id": "ocean",
+      "label": "Ocean",
+      "count": 28,
+      "size": 33.67295829986474,
+      "category": "environment",
+      "avgYear": 2020.5
+    },
+    {
+      "id": "metabolism",
+      "label": "Metabolism",
+      "count": 28,
+      "size": 33.67295829986474,
+      "category": "other",
+      "avgYear": 2021.0
+    },
+    {
+      "id": "protist",
+      "label": "Protist",
+      "count": 27,
+      "size": 33.32204510175204,
+      "category": "other",
+      "avgYear": 2021.7
+    },
+    {
+      "id": "microbiome",
+      "label": "Microbiome",
+      "count": 27,
+      "size": 33.32204510175204,
+      "category": "microbiology",
+      "avgYear": 2020.7
+    },
+    {
+      "id": "archaea",
+      "label": "Archaea",
+      "count": 26,
+      "size": 32.95836866004329,
+      "category": "microbiology",
+      "avgYear": 2019.9
+    },
+    {
+      "id": "ecology",
+      "label": "Ecology",
+      "count": 25,
+      "size": 32.58096538021482,
+      "category": "other",
+      "avgYear": 2022.4
+    },
+    {
+      "id": "sequencing",
+      "label": "Sequencing",
+      "count": 25,
+      "size": 32.58096538021482,
+      "category": "methods",
+      "avgYear": 2019.8
+    },
+    {
+      "id": "chlamydiae",
+      "label": "Chlamydiae",
+      "count": 24,
+      "size": 32.18875824868201,
+      "category": "other",
+      "avgYear": 2021.0
+    },
+    {
+      "id": "detection",
+      "label": "Detection",
+      "count": 23,
+      "size": 31.780538303479457,
+      "category": "biothreat",
+      "avgYear": 2019.8
+    },
+    {
+      "id": "gene",
+      "label": "Gene",
+      "count": 23,
+      "size": 31.780538303479457,
+      "category": "other",
+      "avgYear": 2021.1
+    },
+    {
+      "id": "distribution",
+      "label": "Distribution",
+      "count": 23,
+      "size": 31.780538303479457,
+      "category": "other",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "symbiosis",
+      "label": "Symbiosis",
+      "count": 22,
+      "size": 31.354942159291497,
+      "category": "microbiology",
+      "avgYear": 2020.1
+    },
+    {
+      "id": "community",
+      "label": "Community",
+      "count": 18,
+      "size": 29.444389791664403,
+      "category": "other",
+      "avgYear": 2018.9
+    },
+    {
+      "id": "amoeba",
+      "label": "Amoeba",
+      "count": 16,
+      "size": 28.33213344056216,
+      "category": "other",
+      "avgYear": 2020.4
+    },
+    {
+      "id": "soil",
+      "label": "Soil",
+      "count": 14,
+      "size": 27.0805020110221,
+      "category": "environment",
+      "avgYear": 2019.9
+    },
+    {
+      "id": "freshwater",
+      "label": "Freshwater",
+      "count": 13,
+      "size": 26.390573296152585,
+      "category": "environment",
+      "avgYear": 2021.5
+    },
+    {
+      "id": "quality",
+      "label": "Quality",
+      "count": 13,
+      "size": 26.390573296152585,
+      "category": "other",
+      "avgYear": 2020.7
+    },
+    {
+      "id": "some",
+      "label": "Some",
+      "count": 13,
+      "size": 26.390573296152585,
+      "category": "other",
+      "avgYear": 2020.4
+    },
+    {
+      "id": "here we report",
+      "label": "Here We Report",
+      "count": 12,
+      "size": 25.649493574615366,
+      "category": "other",
+      "avgYear": 2020.6
+    },
+    {
+      "id": "classification",
+      "label": "Classification",
+      "count": 12,
+      "size": 25.649493574615366,
+      "category": "other",
+      "avgYear": 2020.6
+    },
+    {
+      "id": "carbon cycle",
+      "label": "Carbon Cycle",
+      "count": 12,
+      "size": 25.649493574615366,
+      "category": "other",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "pathogen",
+      "label": "Pathogen",
+      "count": 11,
+      "size": 24.849066497880003,
+      "category": "biothreat",
+      "avgYear": 2018.5
+    },
+    {
+      "id": "environment",
+      "label": "Environment",
+      "count": 11,
+      "size": 24.849066497880003,
+      "category": "other",
+      "avgYear": 2018.5
+    },
+    {
+      "id": "more than",
+      "label": "More Than",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2021.5
+    },
+    {
+      "id": "information",
+      "label": "Information",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2020.3
+    },
+    {
+      "id": "as well as",
+      "label": "As Well As",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2021.3
+    },
+    {
+      "id": "assessment",
+      "label": "Assessment",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2018.9
+    },
+    {
+      "id": "phylum",
+      "label": "Phylum",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2021.5
+    },
+    {
+      "id": "prediction",
+      "label": "Prediction",
+      "count": 10,
+      "size": 23.978952727983707,
+      "category": "other",
+      "avgYear": 2017.9
+    },
+    {
+      "id": "bacteriophage",
+      "label": "Bacteriophage",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "virology",
+      "avgYear": 2020.8
+    },
+    {
+      "id": "algae",
+      "label": "Algae",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2023.2
+    },
+    {
+      "id": "activity",
+      "label": "Activity",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2021.6
+    },
+    {
+      "id": "function",
+      "label": "Function",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "our findings",
+      "label": "Our Findings",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2022.3
+    },
+    {
+      "id": "characterization",
+      "label": "Characterization",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2020.1
+    },
+    {
+      "id": "cyanobacteria",
+      "label": "Cyanobacteria",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "microbiology",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "is available at",
+      "label": "Is Available At",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2019.1
+    },
+    {
+      "id": "available at https",
+      "label": "Available At Https",
+      "count": 9,
+      "size": 23.02585092994046,
+      "category": "other",
+      "avgYear": 2019.1
+    },
+    {
+      "id": "identification",
+      "label": "Identification",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2022.6
+    },
+    {
+      "id": "adaptation",
+      "label": "Adaptation",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2020.8
+    },
+    {
+      "id": "cultivation",
+      "label": "Cultivation",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2021.9
+    },
+    {
+      "id": "complement",
+      "label": "Complement",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2020.6
+    },
+    {
+      "id": "virology",
+      "label": "Virology",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "clostridia",
+      "label": "Clostridia",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2023.5
+    },
+    {
+      "id": "association",
+      "label": "Association",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2019.6
+    },
+    {
+      "id": "obligate",
+      "label": "Obligate",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2019.0
+    },
+    {
+      "id": "combination",
+      "label": "Combination",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2018.8
+    },
+    {
+      "id": "microbiology",
+      "label": "Microbiology",
+      "count": 8,
+      "size": 21.972245773362197,
+      "category": "other",
+      "avgYear": 2017.4
+    },
+    {
+      "id": "species level",
+      "label": "Species Level",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.6
+    },
+    {
+      "id": "here we present",
+      "label": "Here We Present",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.9
+    },
+    {
+      "id": "publicly available",
+      "label": "Publicly Available",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2022.0
+    },
+    {
+      "id": "isolation",
+      "label": "Isolation",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.0
+    },
+    {
+      "id": "development",
+      "label": "Development",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2021.1
+    },
+    {
+      "id": "resolution",
+      "label": "Resolution",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.1
+    },
+    {
+      "id": "amino acid",
+      "label": "Amino Acid",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2022.1
+    },
+    {
+      "id": "ability",
+      "label": "Ability",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2019.9
+    },
+    {
+      "id": "collection",
+      "label": "Collection",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2021.1
+    },
+    {
+      "id": "closely related",
+      "label": "Closely Related",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2021.6
+    },
+    {
+      "id": "groundwater",
+      "label": "Groundwater",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "environment",
+      "avgYear": 2020.6
+    },
+    {
+      "id": "computer science",
+      "label": "Computer Science",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2019.9
+    },
+    {
+      "id": "annotation",
+      "label": "Annotation",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.9
+    },
+    {
+      "id": "exploration",
+      "label": "Exploration",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2020.4
+    },
+    {
+      "id": "in order to",
+      "label": "In Order To",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2017.7
+    },
+    {
+      "id": "similarity",
+      "label": "Similarity",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2019.6
+    },
+    {
+      "id": "did not",
+      "label": "Did Not",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2019.4
+    },
+    {
+      "id": "relative abundance",
+      "label": "Relative Abundance",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "other",
+      "avgYear": 2016.9
+    },
+    {
+      "id": "patescibacteria",
+      "label": "Patescibacteria",
+      "count": 7,
+      "size": 20.79441541679836,
+      "category": "microbiology",
+      "avgYear": 2020
+    },
+    {
+      "id": "poorly understood",
+      "label": "Poorly Understood",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.3
+    },
+    {
+      "id": "dynamics",
+      "label": "Dynamics",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.2
+    },
+    {
+      "id": "our knowledge",
+      "label": "Our Knowledge",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.7
+    },
+    {
+      "id": "synthesis",
+      "label": "Synthesis",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.5
+    },
+    {
+      "id": "gene content",
+      "label": "Gene Content",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2022.2
+    },
+    {
+      "id": "microbial ecology",
+      "label": "Microbial Ecology",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2020.2
+    },
+    {
+      "id": "of the phylum",
+      "label": "Of The Phylum",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.8
+    },
+    {
+      "id": "production",
+      "label": "Production",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.2
+    },
+    {
+      "id": "fermentation",
+      "label": "Fermentation",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2020.8
+    },
+    {
+      "id": "majority",
+      "label": "Majority",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2019.8
+    },
+    {
+      "id": "a wide range",
+      "label": "A Wide Range",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.2
+    },
+    {
+      "id": "wide range of",
+      "label": "Wide Range Of",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.2
+    },
+    {
+      "id": "wide range",
+      "label": "Wide Range",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2021.2
+    },
+    {
+      "id": "a combination of",
+      "label": "A Combination Of",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2019.7
+    },
+    {
+      "id": "need to be",
+      "label": "Need To Be",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2017.8
+    },
+    {
+      "id": "report the discovery",
+      "label": "Report The Discovery",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2019.0
+    },
+    {
+      "id": "obligate intracellular",
+      "label": "Obligate Intracellular",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2017.7
+    },
+    {
+      "id": "rrna gene",
+      "label": "Rrna Gene",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2018.8
+    },
+    {
+      "id": "lysis",
+      "label": "Lysis",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2017.8
+    },
+    {
+      "id": "heterogeneity",
+      "label": "Heterogeneity",
+      "count": 6,
+      "size": 19.45910149055313,
+      "category": "other",
+      "avgYear": 2017.5
+    }
+  ],
+  "edges": [
+    {
+      "source": "biology",
+      "target": "genome",
+      "weight": 85
+    },
+    {
+      "source": "bacteria",
+      "target": "biology",
+      "weight": 65
+    },
+    {
+      "source": "biology",
+      "target": "evolution",
+      "weight": 60
+    },
+    {
+      "source": "genome",
+      "target": "metagenomics",
+      "weight": 60
+    },
+    {
+      "source": "bacteria",
+      "target": "genome",
+      "weight": 56
+    },
+    {
+      "source": "biology",
+      "target": "metagenomics",
+      "weight": 56
+    },
+    {
+      "source": "evolution",
+      "target": "genome",
+      "weight": 55
+    },
+    {
+      "source": "biology",
+      "target": "host",
+      "weight": 46
+    },
+    {
+      "source": "diversity",
+      "target": "genome",
+      "weight": 46
+    },
+    {
+      "source": "biology",
+      "target": "diversity",
+      "weight": 46
+    },
+    {
+      "source": "biology",
+      "target": "computational biology",
+      "weight": 45
+    },
+    {
+      "source": "genome",
+      "target": "host",
+      "weight": 43
+    },
+    {
+      "source": "computational biology",
+      "target": "genome",
+      "weight": 42
+    },
+    {
+      "source": "bacteria",
+      "target": "evolution",
+      "weight": 37
+    },
+    {
+      "source": "evolution",
+      "target": "metagenomics",
+      "weight": 37
+    },
+    {
+      "source": "biology",
+      "target": "virus",
+      "weight": 36
+    },
+    {
+      "source": "genome",
+      "target": "virus",
+      "weight": 36
+    },
+    {
+      "source": "biology",
+      "target": "phylogenetics",
+      "weight": 35
+    },
+    {
+      "source": "bacteria",
+      "target": "metagenomics",
+      "weight": 35
+    },
+    {
+      "source": "diversity",
+      "target": "evolution",
+      "weight": 35
+    },
+    {
+      "source": "diversity",
+      "target": "metagenomics",
+      "weight": 34
+    },
+    {
+      "source": "genome",
+      "target": "phylogenetics",
+      "weight": 33
+    },
+    {
+      "source": "host",
+      "target": "metagenomics",
+      "weight": 33
+    },
+    {
+      "source": "metagenomics",
+      "target": "virus",
+      "weight": 33
+    },
+    {
+      "source": "bacteria",
+      "target": "host",
+      "weight": 32
+    },
+    {
+      "source": "computational biology",
+      "target": "evolution",
+      "weight": 30
+    },
+    {
+      "source": "evolution",
+      "target": "host",
+      "weight": 29
+    },
+    {
+      "source": "bacteria",
+      "target": "diversity",
+      "weight": 29
+    },
+    {
+      "source": "biology",
+      "target": "genetics",
+      "weight": 29
+    },
+    {
+      "source": "host",
+      "target": "virus",
+      "weight": 28
+    },
+    {
+      "source": "computational biology",
+      "target": "metagenomics",
+      "weight": 28
+    },
+    {
+      "source": "computational biology",
+      "target": "diversity",
+      "weight": 27
+    },
+    {
+      "source": "genetics",
+      "target": "genome",
+      "weight": 27
+    },
+    {
+      "source": "biology",
+      "target": "ocean",
+      "weight": 26
+    },
+    {
+      "source": "evolution",
+      "target": "virus",
+      "weight": 26
+    },
+    {
+      "source": "biology",
+      "target": "metabolism",
+      "weight": 26
+    },
+    {
+      "source": "evolution",
+      "target": "phylogenetics",
+      "weight": 25
+    },
+    {
+      "source": "genome",
+      "target": "metabolism",
+      "weight": 25
+    },
+    {
+      "source": "bacteria",
+      "target": "computational biology",
+      "weight": 25
+    },
+    {
+      "source": "bacteria",
+      "target": "phylogenetics",
+      "weight": 24
+    },
+    {
+      "source": "biology",
+      "target": "protist",
+      "weight": 24
+    },
+    {
+      "source": "diversity",
+      "target": "virus",
+      "weight": 24
+    },
+    {
+      "source": "genome",
+      "target": "microbiome",
+      "weight": 24
+    },
+    {
+      "source": "biology",
+      "target": "microbiome",
+      "weight": 24
+    },
+    {
+      "source": "biology",
+      "target": "ecology",
+      "weight": 23
+    },
+    {
+      "source": "diversity",
+      "target": "host",
+      "weight": 23
+    },
+    {
+      "source": "genome",
+      "target": "sequencing",
+      "weight": 23
+    },
+    {
+      "source": "biology",
+      "target": "gene",
+      "weight": 23
+    },
+    {
+      "source": "gene",
+      "target": "genome",
+      "weight": 23
+    },
+    {
+      "source": "bacteria",
+      "target": "metabolism",
+      "weight": 23
+    },
+    {
+      "source": "biology",
+      "target": "distribution",
+      "weight": 23
+    },
+    {
+      "source": "bacteria",
+      "target": "ocean",
+      "weight": 22
+    },
+    {
+      "source": "ecology",
+      "target": "genome",
+      "weight": 22
+    },
+    {
+      "source": "metagenomics",
+      "target": "phylogenetics",
+      "weight": 22
+    },
+    {
+      "source": "archaea",
+      "target": "biology",
+      "weight": 22
+    },
+    {
+      "source": "distribution",
+      "target": "genome",
+      "weight": 22
+    },
+    {
+      "source": "biology",
+      "target": "sequencing",
+      "weight": 22
+    },
+    {
+      "source": "genome",
+      "target": "giant virus",
+      "weight": 21
+    },
+    {
+      "source": "genome",
+      "target": "ocean",
+      "weight": 21
+    },
+    {
+      "source": "genome",
+      "target": "protist",
+      "weight": 21
+    },
+    {
+      "source": "giant virus",
+      "target": "virus",
+      "weight": 21
+    },
+    {
+      "source": "ecology",
+      "target": "metagenomics",
+      "weight": 21
+    },
+    {
+      "source": "detection",
+      "target": "genome",
+      "weight": 21
+    },
+    {
+      "source": "diversity",
+      "target": "phylogenetics",
+      "weight": 21
+    },
+    {
+      "source": "metagenomics",
+      "target": "microbiome",
+      "weight": 21
+    },
+    {
+      "source": "biology",
+      "target": "detection",
+      "weight": 21
+    },
+    {
+      "source": "biology",
+      "target": "giant virus",
+      "weight": 20
+    },
+    {
+      "source": "host",
+      "target": "phylogenetics",
+      "weight": 20
+    },
+    {
+      "source": "host",
+      "target": "protist",
+      "weight": 20
+    },
+    {
+      "source": "biology",
+      "target": "symbiosis",
+      "weight": 20
+    },
+    {
+      "source": "metabolism",
+      "target": "metagenomics",
+      "weight": 19
+    },
+    {
+      "source": "archaea",
+      "target": "genome",
+      "weight": 19
+    },
+    {
+      "source": "computational biology",
+      "target": "genetics",
+      "weight": 19
+    },
+    {
+      "source": "bacteria",
+      "target": "virus",
+      "weight": 18
+    },
+    {
+      "source": "ecology",
+      "target": "evolution",
+      "weight": 18
+    },
+    {
+      "source": "giant virus",
+      "target": "metagenomics",
+      "weight": 18
+    },
+    {
+      "source": "metagenomics",
+      "target": "ocean",
+      "weight": 18
+    },
+    {
+      "source": "evolution",
+      "target": "metabolism",
+      "weight": 18
+    },
+    {
+      "source": "bacteria",
+      "target": "microbiome",
+      "weight": 18
+    },
+    {
+      "source": "bacteria",
+      "target": "symbiosis",
+      "weight": 18
+    },
+    {
+      "source": "genome",
+      "target": "symbiosis",
+      "weight": 18
+    },
+    {
+      "source": "archaea",
+      "target": "bacteria",
+      "weight": 18
+    },
+    {
+      "source": "diversity",
+      "target": "genetics",
+      "weight": 18
+    },
+    {
+      "source": "computational biology",
+      "target": "virus",
+      "weight": 18
+    },
+    {
+      "source": "bacteria",
+      "target": "distribution",
+      "weight": 18
+    },
+    {
+      "source": "bacteria",
+      "target": "protist",
+      "weight": 17
+    },
+    {
+      "source": "host",
+      "target": "ocean",
+      "weight": 17
+    },
+    {
+      "source": "evolution",
+      "target": "giant virus",
+      "weight": 17
+    },
+    {
+      "source": "detection",
+      "target": "diversity",
+      "weight": 17
+    },
+    {
+      "source": "diversity",
+      "target": "ecology",
+      "weight": 17
+    },
+    {
+      "source": "diversity",
+      "target": "sequencing",
+      "weight": 17
+    },
+    {
+      "source": "bacteria",
+      "target": "genetics",
+      "weight": 17
+    },
+    {
+      "source": "evolution",
+      "target": "genetics",
+      "weight": 17
+    },
+    {
+      "source": "biology",
+      "target": "community",
+      "weight": 17
+    },
+    {
+      "source": "distribution",
+      "target": "metagenomics",
+      "weight": 17
+    },
+    {
+      "source": "bacteria",
+      "target": "sequencing",
+      "weight": 17
+    },
+    {
+      "source": "bacteria",
+      "target": "ecology",
+      "weight": 16
+    },
+    {
+      "source": "biology",
+      "target": "infection",
+      "weight": 16
+    },
+    {
+      "source": "ecology",
+      "target": "virus",
+      "weight": 16
+    },
+    {
+      "source": "evolution",
+      "target": "ocean",
+      "weight": 16
+    },
+    {
+      "source": "host",
+      "target": "infection",
+      "weight": 16
+    },
+    {
+      "source": "community",
+      "target": "genome",
+      "weight": 16
+    },
+    {
+      "source": "metagenomics",
+      "target": "protist",
+      "weight": 16
+    },
+    {
+      "source": "host",
+      "target": "symbiosis",
+      "weight": 16
+    },
+    {
+      "source": "genetics",
+      "target": "metagenomics",
+      "weight": 16
+    },
+    {
+      "source": "giant virus",
+      "target": "host",
+      "weight": 15
+    },
+    {
+      "source": "ecology",
+      "target": "host",
+      "weight": 15
+    },
+    {
+      "source": "evolution",
+      "target": "protist",
+      "weight": 15
+    },
+    {
+      "source": "diversity",
+      "target": "microbiome",
+      "weight": 15
+    },
+    {
+      "source": "archaea",
+      "target": "metagenomics",
+      "weight": 15
+    },
+    {
+      "source": "distribution",
+      "target": "evolution",
+      "weight": 15
+    },
+    {
+      "source": "genetics",
+      "target": "host",
+      "weight": 15
+    },
+    {
+      "source": "protist",
+      "target": "virus",
+      "weight": 14
+    },
+    {
+      "source": "detection",
+      "target": "sequencing",
+      "weight": 14
+    },
+    {
+      "source": "evolution",
+      "target": "sequencing",
+      "weight": 14
+    },
+    {
+      "source": "host",
+      "target": "metabolism",
+      "weight": 14
+    },
+    {
+      "source": "bacteria",
+      "target": "gene",
+      "weight": 14
+    },
+    {
+      "source": "distribution",
+      "target": "host",
+      "weight": 14
+    },
+    {
+      "source": "computational biology",
+      "target": "host",
+      "weight": 14
+    },
+    {
+      "source": "computational biology",
+      "target": "phylogenetics",
+      "weight": 14
+    },
+    {
+      "source": "gene",
+      "target": "genetics",
+      "weight": 14
+    },
+    {
+      "source": "evolution",
+      "target": "microbiome",
+      "weight": 14
+    },
+    {
+      "source": "distribution",
+      "target": "diversity",
+      "weight": 14
+    },
+    {
+      "source": "community",
+      "target": "computational biology",
+      "weight": 14
+    },
+    {
+      "source": "giant virus",
+      "target": "protist",
+      "weight": 13
+    },
+    {
+      "source": "ocean",
+      "target": "protist",
+      "weight": 13
+    },
+    {
+      "source": "ocean",
+      "target": "virus",
+      "weight": 13
+    },
+    {
+      "source": "bacteria",
+      "target": "infection",
+      "weight": 13
+    },
+    {
+      "source": "biology",
+      "target": "quality",
+      "weight": 13
+    },
+    {
+      "source": "genome",
+      "target": "quality",
+      "weight": 13
+    },
+    {
+      "source": "detection",
+      "target": "evolution",
+      "weight": 13
+    },
+    {
+      "source": "diversity",
+      "target": "metabolism",
+      "weight": 13
+    },
+    {
+      "source": "genome",
+      "target": "soil",
+      "weight": 13
+    },
+    {
+      "source": "metagenomics",
+      "target": "sequencing",
+      "weight": 13
+    },
+    {
+      "source": "host",
+      "target": "microbiome",
+      "weight": 13
+    },
+    {
+      "source": "bacteria",
+      "target": "community",
+      "weight": 13
+    },
+    {
+      "source": "gene",
+      "target": "host",
+      "weight": 13
+    },
+    {
+      "source": "diversity",
+      "target": "gene",
+      "weight": 13
+    },
+    {
+      "source": "computational biology",
+      "target": "microbiome",
+      "weight": 13
+    },
+    {
+      "source": "computational biology",
+      "target": "detection",
+      "weight": 13
+    },
+    {
+      "source": "computational biology",
+      "target": "sequencing",
+      "weight": 13
+    },
+    {
+      "source": "bacteria",
+      "target": "detection",
+      "weight": 13
+    },
+    {
+      "source": "biology",
+      "target": "freshwater",
+      "weight": 12
+    },
+    {
+      "source": "phylogenetics",
+      "target": "virus",
+      "weight": 12
+    },
+    {
+      "source": "genome",
+      "target": "infection",
+      "weight": 12
+    },
+    {
+      "source": "community",
+      "target": "metagenomics",
+      "weight": 12
+    },
+    {
+      "source": "community",
+      "target": "sequencing",
+      "weight": 12
+    },
+    {
+      "source": "detection",
+      "target": "host",
+      "weight": 12
+    },
+    {
+      "source": "diversity",
+      "target": "giant virus",
+      "weight": 12
+    },
+    {
+      "source": "diversity",
+      "target": "ocean",
+      "weight": 12
+    },
+    {
+      "source": "metabolism",
+      "target": "phylogenetics",
+      "weight": 12
+    },
+    {
+      "source": "biology",
+      "target": "here we report",
+      "weight": 12
+    },
+    {
+      "source": "gene",
+      "target": "metagenomics",
+      "weight": 12
+    },
+    {
+      "source": "biology",
+      "target": "classification",
+      "weight": 12
+    },
+    {
+      "source": "microbiome",
+      "target": "ocean",
+      "weight": 12
+    },
+    {
+      "source": "archaea",
+      "target": "evolution",
+      "weight": 12
+    },
+    {
+      "source": "freshwater",
+      "target": "genome",
+      "weight": 11
+    },
+    {
+      "source": "ocean",
+      "target": "phylogenetics",
+      "weight": 11
+    },
+    {
+      "source": "phylogenetics",
+      "target": "protist",
+      "weight": 11
+    },
+    {
+      "source": "ecology",
+      "target": "ocean",
+      "weight": 11
+    },
+    {
+      "source": "infection",
+      "target": "metagenomics",
+      "weight": 11
+    },
+    {
+      "source": "metagenomics",
+      "target": "quality",
+      "weight": 11
+    },
+    {
+      "source": "community",
+      "target": "diversity",
+      "weight": 11
+    },
+    {
+      "source": "detection",
+      "target": "metagenomics",
+      "weight": 11
+    },
+    {
+      "source": "bacteria",
+      "target": "some",
+      "weight": 11
+    },
+    {
+      "source": "genome",
+      "target": "some",
+      "weight": 11
+    },
+    {
+      "source": "biology",
+      "target": "environment",
+      "weight": 11
+    },
+    {
+      "source": "computational biology",
+      "target": "gene",
+      "weight": 11
+    },
+    {
+      "source": "computational biology",
+      "target": "ecology",
+      "weight": 11
+    },
+    {
+      "source": "computational biology",
+      "target": "metabolism",
+      "weight": 11
+    },
+    {
+      "source": "genetics",
+      "target": "virus",
+      "weight": 11
+    },
+    {
+      "source": "classification",
+      "target": "genome",
+      "weight": 11
+    },
+    {
+      "source": "biology",
+      "target": "some",
+      "weight": 11
+    },
+    {
+      "source": "biology",
+      "target": "soil",
+      "weight": 11
+    },
+    {
+      "source": "evolution",
+      "target": "symbiosis",
+      "weight": 11
+    },
+    {
+      "source": "archaea",
+      "target": "diversity",
+      "weight": 11
+    },
+    {
+      "source": "bacteria",
+      "target": "freshwater",
+      "weight": 10
+    },
+    {
+      "source": "bacteria",
+      "target": "giant virus",
+      "weight": 10
+    },
+    {
+      "source": "giant virus",
+      "target": "phylogenetics",
+      "weight": 10
+    },
+    {
+      "source": "freshwater",
+      "target": "metagenomics",
+      "weight": 10
+    },
+    {
+      "source": "infection",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "community",
+      "target": "evolution",
+      "weight": 10
+    },
+    {
+      "source": "detection",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "diversity",
+      "target": "protist",
+      "weight": 10
+    },
+    {
+      "source": "host",
+      "target": "soil",
+      "weight": 10
+    },
+    {
+      "source": "metabolism",
+      "target": "ocean",
+      "weight": 10
+    },
+    {
+      "source": "genome",
+      "target": "more than",
+      "weight": 10
+    },
+    {
+      "source": "microbiome",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "bacteria",
+      "target": "environment",
+      "weight": 10
+    },
+    {
+      "source": "as well as",
+      "target": "biology",
+      "weight": 10
+    },
+    {
+      "source": "biology",
+      "target": "pathogen",
+      "weight": 10
+    },
+    {
+      "source": "distribution",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "gene",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "genome",
+      "target": "here we report",
+      "weight": 10
+    },
+    {
+      "source": "host",
+      "target": "pathogen",
+      "weight": 10
+    },
+    {
+      "source": "computational biology",
+      "target": "giant virus",
+      "weight": 10
+    },
+    {
+      "source": "assessment",
+      "target": "biology",
+      "weight": 10
+    },
+    {
+      "source": "assessment",
+      "target": "genome",
+      "weight": 10
+    },
+    {
+      "source": "biology",
+      "target": "phylum",
+      "weight": 10
+    },
+    {
+      "source": "classification",
+      "target": "computational biology",
+      "weight": 10
+    },
+    {
+      "source": "genome",
+      "target": "phylum",
+      "weight": 10
+    },
+    {
+      "source": "gene",
+      "target": "phylogenetics",
+      "weight": 10
+    },
+    {
+      "source": "genetics",
+      "target": "phylogenetics",
+      "weight": 10
+    },
+    {
+      "source": "archaea",
+      "target": "host",
+      "weight": 10
+    },
+    {
+      "source": "archaea",
+      "target": "virus",
+      "weight": 10
+    },
+    {
+      "source": "computational biology",
+      "target": "distribution",
+      "weight": 10
+    },
+    {
+      "source": "biology",
+      "target": "prediction",
+      "weight": 10
+    },
+    {
+      "source": "genome",
+      "target": "prediction",
+      "weight": 10
+    },
+    {
+      "source": "freshwater",
+      "target": "ocean",
+      "weight": 9
+    },
+    {
+      "source": "bacteria",
+      "target": "quality",
+      "weight": 9
+    },
+    {
+      "source": "bacteriophage",
+      "target": "biology",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "quality",
+      "weight": 9
+    },
+    {
+      "source": "host",
+      "target": "quality",
+      "weight": 9
+    },
+    {
+      "source": "community",
+      "target": "detection",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "soil",
+      "weight": 9
+    },
+    {
+      "source": "function",
+      "target": "genome",
+      "weight": 9
+    },
+    {
+      "source": "metagenomics",
+      "target": "some",
+      "weight": 9
+    },
+    {
+      "source": "genome",
+      "target": "information",
+      "weight": 9
+    },
+    {
+      "source": "amoeba",
+      "target": "biology",
+      "weight": 9
+    },
+    {
+      "source": "archaea",
+      "target": "computational biology",
+      "weight": 9
+    },
+    {
+      "source": "environment",
+      "target": "genome",
+      "weight": 9
+    },
+    {
+      "source": "infection",
+      "target": "protist",
+      "weight": 9
+    },
+    {
+      "source": "assessment",
+      "target": "computational biology",
+      "weight": 9
+    },
+    {
+      "source": "assessment",
+      "target": "evolution",
+      "weight": 9
+    },
+    {
+      "source": "classification",
+      "target": "host",
+      "weight": 9
+    },
+    {
+      "source": "classification",
+      "target": "virus",
+      "weight": 9
+    },
+    {
+      "source": "biology",
+      "target": "characterization",
+      "weight": 9
+    },
+    {
+      "source": "metagenomics",
+      "target": "phylum",
+      "weight": 9
+    },
+    {
+      "source": "ecology",
+      "target": "microbiome",
+      "weight": 9
+    },
+    {
+      "source": "assessment",
+      "target": "diversity",
+      "weight": 9
+    },
+    {
+      "source": "biology",
+      "target": "more than",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "here we report",
+      "weight": 9
+    },
+    {
+      "source": "biology",
+      "target": "information",
+      "weight": 9
+    },
+    {
+      "source": "diversity",
+      "target": "environment",
+      "weight": 9
+    },
+    {
+      "source": "available at https",
+      "target": "biology",
+      "weight": 9
+    },
+    {
+      "source": "available at https",
+      "target": "computational biology",
+      "weight": 9
+    },
+    {
+      "source": "available at https",
+      "target": "diversity",
+      "weight": 9
+    },
+    {
+      "source": "available at https",
+      "target": "genome",
+      "weight": 9
+    },
+    {
+      "source": "available at https",
+      "target": "is available at",
+      "weight": 9
+    },
+    {
+      "source": "biology",
+      "target": "is available at",
+      "weight": 9
+    },
+    {
+      "source": "computational biology",
+      "target": "is available at",
+      "weight": 9
+    },
+    {
+      "source": "detection",
+      "target": "genetics",
+      "weight": 9
+    },
+    {
+      "source": "diversity",
+      "target": "is available at",
+      "weight": 9
+    },
+    {
+      "source": "genetics",
+      "target": "sequencing",
+      "weight": 9
+    },
+    {
+      "source": "genome",
+      "target": "is available at",
+      "weight": 9
+    },
+    {
+      "source": "bacteria",
+      "target": "soil",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "gene",
+      "weight": 9
+    },
+    {
+      "source": "distribution",
+      "target": "phylogenetics",
+      "weight": 9
+    },
+    {
+      "source": "bacteria",
+      "target": "pathogen",
+      "weight": 9
+    },
+    {
+      "source": "computational biology",
+      "target": "prediction",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "prediction",
+      "weight": 9
+    },
+    {
+      "source": "evolution",
+      "target": "freshwater",
+      "weight": 8
+    },
+    {
+      "source": "evolution",
+      "target": "infection",
+      "weight": 8
+    },
+    {
+      "source": "quality",
+      "target": "virus",
+      "weight": 8
+    },
+    {
+      "source": "diversity",
+      "target": "soil",
+      "weight": 8
+    },
+    {
+      "source": "ecology",
+      "target": "metabolism",
+      "weight": 8
+    },
+    {
+      "source": "ecology",
+      "target": "protist",
+      "weight": 8
+    },
+    {
+      "source": "host",
+      "target": "sequencing",
+      "weight": 8
+    },
+    {
+      "source": "metagenomics",
+      "target": "soil",
+      "weight": 8
+    },
+    {
+      "source": "phylogenetics",
+      "target": "soil",
+      "weight": 8
+    },
+    {
+      "source": "activity",
+      "target": "bacteria",
+      "weight": 8
+    },
+    {
+      "source": "amoeba",
+      "target": "genome",
+      "weight": 8
+    },
+    {
+      "source": "cultivation",
+      "target": "genome",
+      "weight": 8
+    },
+    {
+      "source": "cultivation",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "function",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "metagenomics",
+      "target": "symbiosis",
+      "weight": 8
+    },
+    {
+      "source": "protist",
+      "target": "symbiosis",
+      "weight": 8
+    },
+    {
+      "source": "diversity",
+      "target": "information",
+      "weight": 8
+    },
+    {
+      "source": "information",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "our findings",
+      "weight": 8
+    },
+    {
+      "source": "computational biology",
+      "target": "environment",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "complement",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "function",
+      "weight": 8
+    },
+    {
+      "source": "complement",
+      "target": "genome",
+      "weight": 8
+    },
+    {
+      "source": "complement",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "virology",
+      "weight": 8
+    },
+    {
+      "source": "distribution",
+      "target": "protist",
+      "weight": 8
+    },
+    {
+      "source": "genome",
+      "target": "virology",
+      "weight": 8
+    },
+    {
+      "source": "here we report",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "here we report",
+      "target": "virus",
+      "weight": 8
+    },
+    {
+      "source": "metagenomics",
+      "target": "virology",
+      "weight": 8
+    },
+    {
+      "source": "virology",
+      "target": "virus",
+      "weight": 8
+    },
+    {
+      "source": "classification",
+      "target": "evolution",
+      "weight": 8
+    },
+    {
+      "source": "computational biology",
+      "target": "quality",
+      "weight": 8
+    },
+    {
+      "source": "bacteria",
+      "target": "phylum",
+      "weight": 8
+    },
+    {
+      "source": "metabolism",
+      "target": "symbiosis",
+      "weight": 8
+    },
+    {
+      "source": "association",
+      "target": "biology",
+      "weight": 8
+    },
+    {
+      "source": "environment",
+      "target": "evolution",
+      "weight": 8
+    },
+    {
+      "source": "available at https",
+      "target": "detection",
+      "weight": 8
+    },
+    {
+      "source": "classification",
+      "target": "diversity",
+      "weight": 8
+    },
+    {
+      "source": "detection",
+      "target": "is available at",
+      "weight": 8
+    },
+    {
+      "source": "classification",
+      "target": "metagenomics",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "obligate",
+      "weight": 8
+    },
+    {
+      "source": "biology",
+      "target": "combination",
+      "weight": 8
+    },
+    {
+      "source": "combination",
+      "target": "diversity",
+      "weight": 8
+    },
+    {
+      "source": "phylogenetics",
+      "target": "symbiosis",
+      "weight": 8
+    },
+    {
+      "source": "community",
+      "target": "distribution",
+      "weight": 8
+    },
+    {
+      "source": "computational biology",
+      "target": "ocean",
+      "weight": 8
+    },
+    {
+      "source": "diversity",
+      "target": "prediction",
+      "weight": 8
+    },
+    {
+      "source": "distribution",
+      "target": "sequencing",
+      "weight": 8
+    }
+  ],
+  "generated_at": "2025-12-12T14:44:26.618758",
+  "stats": {
+    "total_publications": 106,
+    "total_keywords": 595,
+    "total_edges": 300
+  }
+}

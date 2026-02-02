@@ -17,7 +17,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=9">
+    <link rel="stylesheet" href="css/styles.css?v=10">
+
+    <!-- D3.js for network visualization -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -26,10 +29,12 @@
             <a href="#hero" class="nav-logo">Frederik Schulz</a>
             <div class="nav-items">
                 <a href="#about" class="nav-item">About</a>
+                <a href="#connect" class="nav-item">Connect</a>
                 <a href="#research" class="nav-item">Research</a>
-                <a href="#publications" class="nav-item">Publications</a>
+                <a href="#organizations" class="nav-item">Organizations</a>
                 <a href="#projects" class="nav-item">Projects</a>
-                <a href="#contact" class="nav-item">Contact</a>
+                <a href="#publications" class="nav-item">Publications</a>
+                <a href="#network" class="nav-item">Network</a>
             </div>
         </div>
     </nav>
@@ -84,6 +89,45 @@
                         <li>Biosecurity</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Connect Section -->
+    <section id="connect" class="contact fade-in-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Connect</h2>
+            </div>
+            <div class="social-grid">
+                <a href="https://newlineages.com" target="_blank" class="social-link">
+                    <span class="social-icon">🧬</span>
+                    New Lineages
+                </a>
+                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="social-link">
+                    <span class="social-icon">in</span>
+                    LinkedIn
+                </a>
+                <a href="https://github.com/fschjgi" target="_blank" class="social-link">
+                    <span class="social-icon">gh</span>
+                    GitHub
+                </a>
+                <a href="https://github.com/NeLLi-team" target="_blank" class="social-link">
+                    <span class="social-icon">gh</span>
+                    NeLLi Team
+                </a>
+                <a href="https://twitter.com/fmschulz" target="_blank" class="social-link">
+                    <span class="social-icon">X</span>
+                    Twitter/X
+                </a>
+                <a href="https://scholar.google.com/citations?user=your-scholar-id" target="_blank" class="social-link">
+                    <span class="social-icon">📚</span>
+                    Google Scholar
+                </a>
+            </div>
+            <div class="contact-info">
+                <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
+                <p>Email: <strong>fmschulz@gmail.com</strong></p>
             </div>
         </div>
     </section>
@@ -295,38 +339,15 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact fade-in-section">
+    <!-- Keyword Network Visualization Section -->
+    <section id="network" class="network-section fade-in-section">
         <div class="container">
             <div class="section-header">
-                <h2>Connect</h2>
+                <h2>Research Topics Network</h2>
+                <p>Interactive visualization of key research topics and their connections across publications</p>
             </div>
-            <div class="social-grid">
-                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">in</span>
-                    LinkedIn
-                </a>
-                <a href="https://github.com/fschjgi" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    GitHub
-                </a>
-                <a href="https://github.com/NeLLi-team" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    NeLLi Team
-                </a>
-                <a href="https://twitter.com/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">X</span>
-                    Twitter/X
-                </a>
-                <a href="https://scholar.google.com/citations?user=your-scholar-id" target="_blank" class="social-link">
-                    <span class="social-icon">📚</span>
-                    Google Scholar
-                </a>
-            </div>
-            <div class="contact-info">
-                <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
-                <p>Email: <strong>fmschulz@gmail.com</strong></p>
-            </div>
+            <div id="network-stats"></div>
+            <div id="network-container"></div>
         </div>
     </section>
 
@@ -338,5 +359,6 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script src="js/keyword-network.js"></script>
 </body>
 </html>
