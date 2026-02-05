@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=10">
+    <link rel="stylesheet" href="css/styles.css?v=11">
 
     <!-- D3.js for network visualization -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -29,12 +29,10 @@
             <a href="#hero" class="nav-logo">Frederik Schulz</a>
             <div class="nav-items">
                 <a href="#about" class="nav-item">About</a>
-                <a href="#connect" class="nav-item">Connect</a>
-                <a href="#research" class="nav-item">Research</a>
-                <a href="#organizations" class="nav-item">Organizations</a>
                 <a href="#projects" class="nav-item">Projects</a>
                 <a href="#publications" class="nav-item">Publications</a>
                 <a href="#network" class="nav-item">Network</a>
+                <a href="#connect" class="nav-item">Connect</a>
             </div>
         </div>
     </nav>
@@ -43,12 +41,10 @@
     <section id="hero" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Frederik Schulz<span class="accent-dot">.</span></h1>
-                <div class="hero-subtitle">PhD</div>
+                <h1 class="hero-title">Frederik Schulz, PhD<span class="accent-dot">.</span></h1>
                 <div class="hero-location">Berkeley, San Francisco Bay Area</div>
                 <p class="hero-description">
-                    Microbiome Data Scientist & AI/ML Researcher chasing new lineages of life
-                    and advancing biosecurity through computational biology and machine learning.
+                    Discovering new lineages of life and advancing biosecurity through computational biology and machine learning.
                 </p>
                 <div class="hero-roles">
                     <div class="role-box">Staff Scientist & PI at DOE JGI</div>
@@ -58,7 +54,7 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About Section (merged with Research Overview) -->
     <section id="about" class="about fade-in-section">
         <div class="container">
             <div class="section-header">
@@ -90,55 +86,7 @@
                     </ul>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Connect Section -->
-    <section id="connect" class="contact fade-in-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Connect</h2>
-            </div>
-            <div class="social-grid">
-                <a href="https://newlineages.com" target="_blank" class="social-link">
-                    <span class="social-icon">🧬</span>
-                    New Lineages
-                </a>
-                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">in</span>
-                    LinkedIn
-                </a>
-                <a href="https://github.com/fschjgi" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    GitHub
-                </a>
-                <a href="https://github.com/NeLLi-team" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    NeLLi Team
-                </a>
-                <a href="https://twitter.com/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">X</span>
-                    Twitter/X
-                </a>
-                <a href="https://scholar.google.com/citations?user=your-scholar-id" target="_blank" class="social-link">
-                    <span class="social-icon">📚</span>
-                    Google Scholar
-                </a>
-            </div>
-            <div class="contact-info">
-                <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
-                <p>Email: <strong>fmschulz@gmail.com</strong></p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Research Overview Section -->
-    <section id="research" class="research fade-in-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Research Overview</h2>
-            </div>
-            <div class="research-grid">
+            <div class="research-grid" style="margin-top: var(--space-xl);">
                 <div class="research-card">
                     <h3>Giant Virus Biology</h3>
                     <p>
@@ -173,11 +121,50 @@
         </div>
     </section>
 
-    <!-- Organizations Section -->
-    <section id="organizations" class="organizations fade-in-section">
+    <!-- Connect Section -->
+    <section id="connect" class="contact fade-in-section">
         <div class="container">
             <div class="section-header">
-                <h2>Organizations & Initiatives</h2>
+                <h2>Connect</h2>
+            </div>
+            <div class="social-grid">
+                <a href="https://newlineages.com" target="_blank" class="social-link">
+                    <span class="social-icon">🧬</span>
+                    New Lineages
+                </a>
+                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="social-link">
+                    <span class="social-icon">in</span>
+                    LinkedIn
+                </a>
+                <a href="https://github.com/fschjgi" target="_blank" class="social-link">
+                    <span class="social-icon">gh</span>
+                    GitHub
+                </a>
+                <a href="https://github.com/NeLLi-team" target="_blank" class="social-link">
+                    <span class="social-icon">gh</span>
+                    NeLLi Team
+                </a>
+                <a href="https://twitter.com/fmschulz" target="_blank" class="social-link">
+                    <span class="social-icon">X</span>
+                    Twitter/X
+                </a>
+                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="social-link">
+                    <span class="social-icon">📚</span>
+                    Google Scholar
+                </a>
+            </div>
+            <div class="contact-info">
+                <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
+                <p>Email: <strong>fmschulz@gmail.com</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects & Ventures Section (merged Orgs + Projects) -->
+    <section id="projects" class="projects fade-in-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Projects & Ventures</h2>
             </div>
             <div class="links-grid">
                 <a href="https://newlineages.com" target="_blank" class="link-card primary">
@@ -191,28 +178,17 @@
                     <p>AI-powered biological sample analysis and characterization platform</p>
                 </a>
             </div>
-        </div>
-    </section>
-
-    <!-- AI Tools & Software Section -->
-    <section id="projects" class="projects fade-in-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>AI/ML Tools & Software</h2>
-            </div>
             <div class="project-grid">
                 <div class="project-card">
                     <h3>gvclass</h3>
                     <p>Machine learning tool for classification and phylogenetic placement of giant virus genomes from metagenomic data.</p>
                     <a href="https://github.com/fschjgi/gvclass" target="_blank" class="project-link">View on GitHub →</a>
                 </div>
-
                 <div class="project-card">
                     <h3>symclatron</h3>
                     <p>Neural network-based classification system for identifying and characterizing microbial symbionts in genomic datasets.</p>
                     <a href="https://github.com/fschjgi/symclatron" target="_blank" class="project-link">View on GitHub →</a>
                 </div>
-
                 <div class="project-card">
                     <h3>nsgtree</h3>
                     <p>Neural network-guided phylogenetic inference for improved evolutionary analysis of novel microbial lineages.</p>
@@ -227,18 +203,18 @@
         <div class="container">
             <div class="pub-header">
                 <h2>Selected Publications</h2>
-                <a href="https://scholar.google.com/citations?user=your-scholar-id" target="_blank" class="scholar-link">
+                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="scholar-link">
                     View all on Google Scholar →
                 </a>
             </div>
 
             <div class="pub-metrics">
                 <div class="pub-metric">
-                    <span class="pub-metric-value">73+</span>
+                    <span class="pub-metric-value">100+</span>
                     <span class="pub-metric-label">Publications</span>
                 </div>
                 <div class="pub-metric">
-                    <span class="pub-metric-value">38</span>
+                    <span class="pub-metric-value">40</span>
                     <span class="pub-metric-label">h-index</span>
                 </div>
                 <div class="pub-metric">
@@ -293,43 +269,10 @@
                 </div>
 
                 <div class="pub-card">
-                    <div class="pub-year">2020</div>
-                    <div class="pub-title">Advantages and limits of metagenomic assembly and binning of a giant virus</div>
-                    <div class="pub-journal">mSystems</div>
-                    <div class="pub-impact">Systematic analysis of computational approaches for giant virus genome recovery</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2016</div>
-                    <div class="pub-title">Life in an unusual intracellular niche: a bacterial symbiont infecting the nucleus of amoebae</div>
-                    <div class="pub-journal">Environmental Microbiology</div>
-                    <div class="pub-impact">Discovery and characterization of novel Rickettsiales symbiont with unique nuclear lifestyle</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
                     <div class="pub-year">2015</div>
                     <div class="pub-title">Marine amoebae with cytoplasmic and perinuclear symbionts</div>
                     <div class="pub-journal">ISME Journal</div>
                     <div class="pub-impact">Characterization of diverse bacterial symbionts in marine protists</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2017</div>
-                    <div class="pub-title">Towards a balanced view of the bacterial tree of life</div>
-                    <div class="pub-journal">Microbiome</div>
-                    <div class="pub-impact">Framework for improving bacterial phylogeny through expanded genome sampling</div>
                     <div class="pub-links">
                         <a href="#" class="pub-link">DOI</a>
                         <a href="#" class="pub-link">Citation</a>
@@ -354,7 +297,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Frederik Schulz. Professional academic portfolio.</p>
+            <p>&copy; 2026 Frederik Schulz. Professional academic portfolio.</p>
         </div>
     </footer>
 
