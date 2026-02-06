@@ -536,11 +536,30 @@
         });
     }
 
+    // --- Click hero to cycle accent color ---
+    function initColorCycle() {
+        const hero = document.querySelector('.hero');
+        if (!hero) return;
+
+        const PALETTE = [
+            '#0d7377', '#4834d4', '#b71540',
+            '#0c2461', '#6f1e51', '#1e8449',
+        ];
+        let idx = 0;
+
+        hero.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return;
+            idx = (idx + 1) % PALETTE.length;
+            document.documentElement.style.setProperty('--color-accent', PALETTE[idx]);
+        });
+    }
+
     // --- Init ---
     function init() {
         createMasterTimeline();
         initHeroGrid();
         initMagneticChars();
+        initColorCycle();
         initScrollReveals();
         initWorkGallery();
         initSeparators();

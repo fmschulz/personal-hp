@@ -18,10 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=15">
-
-    <!-- D3.js for network visualization -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css?v=16">
 
     <!-- GSAP + ScrollTrigger -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
@@ -45,7 +42,6 @@
             <div class="nav-seg nav-seg--links">
                 <a href="#about" class="nav-link"><span>About</span></a>
                 <a href="#work" class="nav-link"><span>Work</span></a>
-                <a href="#network" class="nav-link"><span>Network</span></a>
                 <a href="#connect" class="nav-link"><span>Connect</span></a>
             </div>
             <div class="nav-seg">
@@ -63,6 +59,14 @@
                 <div class="hero-roles">
                     <span class="role-tag">Staff Scientist & PI at DOE JGI</span>
                     <span class="role-tag">CEO at SampleX</span>
+                </div>
+                <div class="connect-grid">
+                    <a href="https://newlineages.com" target="_blank" class="connect-link"><span>New Lineages</span></a>
+                    <a href="https://linkedin.com/in/fmschulz" target="_blank" class="connect-link"><span>LinkedIn</span></a>
+                    <a href="https://github.com/fschjgi" target="_blank" class="connect-link"><span>GitHub</span></a>
+                    <a href="https://github.com/NeLLi-team" target="_blank" class="connect-link"><span>NeLLi Team</span></a>
+                    <a href="https://twitter.com/fmschulz" target="_blank" class="connect-link"><span>X / Twitter</span></a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="connect-link"><span>Google Scholar</span></a>
                 </div>
             </div>
         </div>
@@ -257,36 +261,10 @@
         </div>
     </section>
 
-    <!-- Separator -->
-    <div class="separator" aria-hidden="true">
-        <div class="separator-track">
-            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
-            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
-        </div>
-    </div>
-
-    <!-- Keyword Network Visualization Section -->
-    <section id="network" class="network-section">
-        <div class="container">
-            <div class="section-label reveal-el">Research Network</div>
-            <p class="network-intro reveal-el">Interactive visualization of key research topics and their connections across publications</p>
-            <div id="network-stats" class="reveal-el"></div>
-            <div id="network-container" data-lenis-prevent></div>
-        </div>
-    </section>
-
     <!-- Connect Section -->
     <section id="connect" class="connect">
         <div class="container">
             <div class="section-label reveal-el">Connect</div>
-            <div class="connect-grid reveal-el">
-                <a href="https://newlineages.com" target="_blank" class="connect-link"><span>New Lineages</span></a>
-                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="connect-link"><span>LinkedIn</span></a>
-                <a href="https://github.com/fschjgi" target="_blank" class="connect-link"><span>GitHub</span></a>
-                <a href="https://github.com/NeLLi-team" target="_blank" class="connect-link"><span>NeLLi Team</span></a>
-                <a href="https://twitter.com/fmschulz" target="_blank" class="connect-link"><span>X / Twitter</span></a>
-                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="connect-link"><span>Google Scholar</span></a>
-            </div>
             <div class="connect-info reveal-el">
                 <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
                 <p>Email: <strong>fmschulz@gmail.com</strong></p>
@@ -303,6 +281,5 @@
     </footer>
 
     <script src="js/animations.js"></script>
-    <script src="js/keyword-network.js"></script>
 </body>
 </html>
