@@ -471,6 +471,25 @@
             mouse.y = -9999;
         });
 
+        hero.addEventListener('click', (e) => {
+            if (e.target.closest('a')) return;
+            const rect = hero.getBoundingClientRect();
+            const cx = e.clientX - rect.left;
+            const cy = e.clientY - rect.top;
+
+            for (let i = 0; i < points.length; i++) {
+                const pt = points[i];
+                const dx = pt.ox - cx;
+                const dy = pt.oy - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0 && dist < 500) {
+                    const force = (1 - dist / 500) * 30;
+                    pt.vx += (dx / dist) * force;
+                    pt.vy += (dy / dist) * force;
+                }
+            }
+        });
+
         gsap.ticker.add(tick);
 
         const observer = new IntersectionObserver(
@@ -542,8 +561,8 @@
         if (!hero) return;
 
         const PALETTE = [
-            '#0d7377', '#4834d4', '#b71540',
-            '#0c2461', '#6f1e51', '#1e8449',
+            '#0d7377', '#4834d4', '#d35400',
+            '#0c2461', '#7d6608', '#1e8449',
         ];
         let idx = 0;
 
