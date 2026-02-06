@@ -405,7 +405,7 @@
             smooth.x += (mouse.x - smooth.x) * 0.1;
             smooth.y += (mouse.y - smooth.y) * 0.1;
 
-            const t = time * 0.001;
+            const t = time;
 
             for (let i = 0; i < points.length; i++) {
                 const pt = points[i];
