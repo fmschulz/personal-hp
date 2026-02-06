@@ -217,17 +217,18 @@ strong { font-weight: 700; }
     color: var(--color-accent-text);
 }
 
-/* Perspective grid overlay */
-.hero::before {
-    content: '';
+/* SVG reactive grid overlay (replaces static CSS grid) */
+.hero-grid {
     position: absolute;
     inset: 0;
-    background-image:
-        linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
     z-index: 0;
+    pointer-events: none;
+}
+
+.hero-grid path {
+    fill: none;
+    stroke: rgba(255,255,255,0.07);
+    stroke-width: 1;
 }
 
 .hero .container {
