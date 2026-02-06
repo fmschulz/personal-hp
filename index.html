@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frederik Schulz, PhD - Microbiome Data Scientist & AI/ML Researcher</title>
     <meta name="description" content="Frederik Schulz, PhD - Staff Scientist & PI at DOE Joint Genome Institute, CEO at SampleX. Microbiome Data Science, AI/ML, Giant Viruses, Biosecurity.">
+    <meta name="theme-color" content="#1a1a1a">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Frederik Schulz, PhD - Microbiome Data Scientist">
@@ -14,10 +15,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=12">
+    <link rel="stylesheet" href="css/styles.css?v=13">
 
     <!-- D3.js for network visualization -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -30,19 +31,26 @@
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 </head>
 <body>
+    <!-- Loader -->
+    <div class="loader" aria-hidden="true">
+        <div class="loader-inner">FS</div>
+    </div>
+
     <!-- Navigation -->
     <nav class="nav">
-        <div class="nav-container">
-            <a href="#hero" class="nav-logo">FS</a>
-            <div class="nav-items">
-                <a href="#about" class="nav-item">About</a>
-                <a href="#work" class="nav-item">Work</a>
-                <a href="#network" class="nav-item">Network</a>
-                <a href="#connect" class="nav-item">Connect</a>
+        <div class="nav-inner">
+            <div class="nav-seg">
+                <a href="#hero" class="nav-logo">FS</a>
             </div>
-            <button class="contrast-toggle" aria-label="Toggle high contrast mode">
-                <span class="contrast-toggle-icon"></span>
-            </button>
+            <div class="nav-seg nav-seg--links">
+                <a href="#about" class="nav-link"><span>About</span></a>
+                <a href="#work" class="nav-link"><span>Work</span></a>
+                <a href="#network" class="nav-link"><span>Network</span></a>
+                <a href="#connect" class="nav-link"><span>Connect</span></a>
+            </div>
+            <div class="nav-seg">
+                <button class="contrast-toggle" aria-label="Toggle high contrast mode"></button>
+            </div>
         </div>
     </nav>
 
@@ -50,38 +58,18 @@
     <section id="hero" class="hero">
         <div class="container">
             <div class="hero-content">
-                <div class="hero-star">*</div>
-                <h1 class="hero-title">
-                    <span class="hero-word">Frederik</span>
-                    <span class="hero-word">Schulz,</span>
-                    <span class="hero-word">PhD</span>
-                </h1>
-                <p class="hero-subtitle">
-                    <span class="hero-word">Discovering</span>
-                    <span class="hero-word">new</span>
-                    <span class="hero-word">lineages</span>
-                    <span class="hero-word">of</span>
-                    <span class="hero-word">life</span>
-                    <span class="hero-word">and</span>
-                    <span class="hero-word">advancing</span>
-                    <span class="hero-word">biosecurity</span>
-                    <span class="hero-word">through</span>
-                    <span class="hero-word">computational</span>
-                    <span class="hero-word">biology</span>
-                    <span class="hero-word">and</span>
-                    <span class="hero-word">machine</span>
-                    <span class="hero-word">learning.</span>
-                </p>
+                <h1 class="hero-title">FREDERIK <span class="hero-star" aria-hidden="true">*</span> SCHULZ, PHD</h1>
+                <p class="hero-subtitle">Discovering new lineages of life and advancing biosecurity through computational biology and machine learning.</p>
                 <div class="hero-roles">
-                    <span class="hero-word role-tag">Staff Scientist & PI at DOE JGI</span>
-                    <span class="hero-word role-tag">CEO at SampleX</span>
+                    <span class="role-tag">Staff Scientist & PI at DOE JGI</span>
+                    <span class="role-tag">CEO at SampleX</span>
                 </div>
             </div>
         </div>
-        <div class="dna-strip" aria-hidden="true">
-            <div class="dna-track">
-                <span>ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG</span>
-                <span>ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG</span>
+        <div class="separator hero-sep" aria-hidden="true">
+            <div class="separator-track">
+                <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
+                <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
             </div>
         </div>
     </section>
@@ -89,9 +77,9 @@
     <!-- About Section -->
     <section id="about" class="about">
         <div class="container">
-            <div class="section-label reveal-element">About</div>
+            <div class="section-label reveal-el">About</div>
             <div class="about-grid">
-                <div class="about-bio reveal-element">
+                <div class="about-bio reveal-el">
                     <p>
                         I lead the <strong>New Lineages of Life Group</strong> at Lawrence Berkeley National Laboratory (DOE JGI/LBNL),
                         where we discover novel bacterial, archaeal, eukaryotic microbes, and viruses in environmental sequence data.
@@ -105,7 +93,7 @@
                         threat detection and characterization.
                     </p>
                 </div>
-                <div class="about-stats reveal-element">
+                <div class="about-stats reveal-el">
                     <div class="stat-block">
                         <span class="stat-value">100+</span>
                         <span class="stat-label">Publications</span>
@@ -120,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            <div class="interest-tags reveal-element">
+            <div class="interest-tags reveal-el">
                 <span class="tag">Microbiome Data Science</span>
                 <span class="tag">AI/ML in Biology</span>
                 <span class="tag">Giant Virus Biology</span>
@@ -131,15 +119,22 @@
         </div>
     </section>
 
-    <!-- Work Gallery Section -->
+    <!-- Separator -->
+    <div class="separator" aria-hidden="true">
+        <div class="separator-track">
+            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
+            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
+        </div>
+    </div>
+
+    <!-- Work Gallery Section (dark) -->
     <section id="work" class="work">
         <div class="container">
-            <div class="section-label reveal-element">Selected Work</div>
+            <div class="section-label reveal-el">Selected Work</div>
         </div>
         <div class="work-gallery">
             <div class="work-track">
-                <!-- Publications -->
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0001/10</span>
                         <span class="work-year">2022</span>
@@ -148,10 +143,10 @@
                     <h3 class="work-card-title">Giant virus biology and diversity in the era of genome-resolved metagenomics</h3>
                     <p class="work-card-venue">Nature Reviews Microbiology</p>
                     <p class="work-card-desc">Comprehensive review synthesizing current understanding of giant virus diversity and evolution</p>
-                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link"><span>Read more</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0002/10</span>
                         <span class="work-year">2020</span>
@@ -160,10 +155,10 @@
                     <h3 class="work-card-title">Massive diversity of giant viruses in global metagenomes</h3>
                     <p class="work-card-venue">Nature</p>
                     <p class="work-card-desc">Expanded known giant virus diversity by 11-fold through global metagenomic analysis</p>
-                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link"><span>Read more</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0003/10</span>
                         <span class="work-year">2017</span>
@@ -172,10 +167,10 @@
                     <h3 class="work-card-title">Giant viruses with an expanded complement of translation system components</h3>
                     <p class="work-card-venue">Science</p>
                     <p class="work-card-desc">Discovery of giant viruses encoding unprecedented translation machinery components</p>
-                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link"><span>Read more</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0004/10</span>
                         <span class="work-year">2018</span>
@@ -184,10 +179,10 @@
                     <h3 class="work-card-title">Hidden diversity of soil giant viruses</h3>
                     <p class="work-card-venue">Nature Communications</p>
                     <p class="work-card-desc">Revealed extensive diversity of terrestrial giant viruses in soil environments</p>
-                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link"><span>Read more</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0005/10</span>
                         <span class="work-year">2015</span>
@@ -196,11 +191,10 @@
                     <h3 class="work-card-title">Marine amoebae with cytoplasmic and perinuclear symbionts</h3>
                     <p class="work-card-venue">ISME Journal</p>
                     <p class="work-card-desc">Characterization of diverse bacterial symbionts in marine protists</p>
-                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link"><span>Read more</span></a>
                 </article>
 
-                <!-- GitHub Tools -->
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0006/10</span>
                         <span class="work-year">2024</span>
@@ -209,10 +203,10 @@
                     <h3 class="work-card-title">gvclass</h3>
                     <p class="work-card-venue">GitHub</p>
                     <p class="work-card-desc">Machine learning tool for classification and phylogenetic placement of giant virus genomes from metagenomic data</p>
-                    <a href="https://github.com/fschjgi/gvclass" target="_blank" class="work-card-link">View on GitHub</a>
+                    <a href="https://github.com/fschjgi/gvclass" target="_blank" class="work-card-link"><span>View on GitHub</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0007/10</span>
                         <span class="work-year">2024</span>
@@ -221,10 +215,10 @@
                     <h3 class="work-card-title">symclatron</h3>
                     <p class="work-card-venue">GitHub</p>
                     <p class="work-card-desc">Neural network-based classification system for identifying and characterizing microbial symbionts in genomic datasets</p>
-                    <a href="https://github.com/fschjgi/symclatron" target="_blank" class="work-card-link">View on GitHub</a>
+                    <a href="https://github.com/fschjgi/symclatron" target="_blank" class="work-card-link"><span>View on GitHub</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0008/10</span>
                         <span class="work-year">2024</span>
@@ -233,11 +227,10 @@
                     <h3 class="work-card-title">nsgtree</h3>
                     <p class="work-card-venue">GitHub</p>
                     <p class="work-card-desc">Neural network-guided phylogenetic inference for improved evolutionary analysis of novel microbial lineages</p>
-                    <a href="https://github.com/fschjgi/nsgtree" target="_blank" class="work-card-link">View on GitHub</a>
+                    <a href="https://github.com/fschjgi/nsgtree" target="_blank" class="work-card-link"><span>View on GitHub</span></a>
                 </article>
 
-                <!-- Ventures -->
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0009/10</span>
                         <span class="work-year">2023</span>
@@ -246,10 +239,10 @@
                     <h3 class="work-card-title">New Lineages of Life</h3>
                     <p class="work-card-venue">DOE JGI / LBNL</p>
                     <p class="work-card-desc">Research group discovering novel microbial diversity through large-scale genomics and multi-omics approaches</p>
-                    <a href="https://newlineages.com" target="_blank" class="work-card-link">Visit site</a>
+                    <a href="https://newlineages.com" target="_blank" class="work-card-link"><span>Visit site</span></a>
                 </article>
 
-                <article class="work-card reveal-element">
+                <article class="work-card">
                     <div class="work-card-meta">
                         <span class="work-ref">#WORK-0010/10</span>
                         <span class="work-year">2024</span>
@@ -258,18 +251,26 @@
                     <h3 class="work-card-title">SampleX</h3>
                     <p class="work-card-venue">AI Startup</p>
                     <p class="work-card-desc">AI-powered biological sample analysis and characterization platform for rapid pathogen identification</p>
-                    <a href="https://samplex.ai" target="_blank" class="work-card-link">Visit site</a>
+                    <a href="https://samplex.ai" target="_blank" class="work-card-link"><span>Visit site</span></a>
                 </article>
             </div>
         </div>
     </section>
 
+    <!-- Separator -->
+    <div class="separator" aria-hidden="true">
+        <div class="separator-track">
+            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
+            <span>&#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656; 01101 TTAA &#9656; 10010 CCGG &#9656; 01001 ATCG &#9656; 10110 GCTA &#9656;</span>
+        </div>
+    </div>
+
     <!-- Keyword Network Visualization Section -->
     <section id="network" class="network-section">
         <div class="container">
-            <div class="section-label reveal-element">Research Network</div>
-            <p class="network-intro reveal-element">Interactive visualization of key research topics and their connections across publications</p>
-            <div id="network-stats" class="reveal-element"></div>
+            <div class="section-label reveal-el">Research Network</div>
+            <p class="network-intro reveal-el">Interactive visualization of key research topics and their connections across publications</p>
+            <div id="network-stats" class="reveal-el"></div>
             <div id="network-container" data-lenis-prevent></div>
         </div>
     </section>
@@ -277,16 +278,16 @@
     <!-- Connect Section -->
     <section id="connect" class="connect">
         <div class="container">
-            <div class="section-label reveal-element">Connect</div>
-            <div class="connect-grid reveal-element">
-                <a href="https://newlineages.com" target="_blank" class="connect-link">New Lineages</a>
-                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="connect-link">LinkedIn</a>
-                <a href="https://github.com/fschjgi" target="_blank" class="connect-link">GitHub</a>
-                <a href="https://github.com/NeLLi-team" target="_blank" class="connect-link">NeLLi Team</a>
-                <a href="https://twitter.com/fmschulz" target="_blank" class="connect-link">X / Twitter</a>
-                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="connect-link">Google Scholar</a>
+            <div class="section-label reveal-el">Connect</div>
+            <div class="connect-grid reveal-el">
+                <a href="https://newlineages.com" target="_blank" class="connect-link"><span>New Lineages</span></a>
+                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="connect-link"><span>LinkedIn</span></a>
+                <a href="https://github.com/fschjgi" target="_blank" class="connect-link"><span>GitHub</span></a>
+                <a href="https://github.com/NeLLi-team" target="_blank" class="connect-link"><span>NeLLi Team</span></a>
+                <a href="https://twitter.com/fmschulz" target="_blank" class="connect-link"><span>X / Twitter</span></a>
+                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="connect-link"><span>Google Scholar</span></a>
             </div>
-            <div class="connect-info reveal-element">
+            <div class="connect-info reveal-el">
                 <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
                 <p>Email: <strong>fmschulz@gmail.com</strong></p>
             </div>
@@ -295,7 +296,8 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
+        <div class="container footer-inner">
+            <span class="footer-logo">FS</span>
             <p>&copy; 2026 Frederik Schulz</p>
         </div>
     </footer>
