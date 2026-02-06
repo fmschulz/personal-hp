@@ -17,23 +17,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=11">
+    <link rel="stylesheet" href="css/styles.css?v=12">
 
     <!-- D3.js for network visualization -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+    <!-- Lenis smooth scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="nav-brutalist">
+    <nav class="nav">
         <div class="nav-container">
-            <a href="#hero" class="nav-logo">Frederik Schulz</a>
+            <a href="#hero" class="nav-logo">FS</a>
             <div class="nav-items">
                 <a href="#about" class="nav-item">About</a>
-                <a href="#projects" class="nav-item">Projects</a>
-                <a href="#publications" class="nav-item">Publications</a>
+                <a href="#work" class="nav-item">Work</a>
                 <a href="#network" class="nav-item">Network</a>
                 <a href="#connect" class="nav-item">Connect</a>
             </div>
+            <button class="contrast-toggle" aria-label="Toggle high contrast mode">
+                <span class="contrast-toggle-icon"></span>
+            </button>
         </div>
     </nav>
 
@@ -41,31 +50,53 @@
     <section id="hero" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Frederik Schulz, PhD<span class="accent-dot">.</span></h1>
-                <div class="hero-location">Berkeley, San Francisco Bay Area</div>
-                <p class="hero-description">
-                    Discovering new lineages of life and advancing biosecurity through computational biology and machine learning.
+                <div class="hero-star">*</div>
+                <h1 class="hero-title">
+                    <span class="hero-word">Frederik</span>
+                    <span class="hero-word">Schulz,</span>
+                    <span class="hero-word">PhD</span>
+                </h1>
+                <p class="hero-subtitle">
+                    <span class="hero-word">Discovering</span>
+                    <span class="hero-word">new</span>
+                    <span class="hero-word">lineages</span>
+                    <span class="hero-word">of</span>
+                    <span class="hero-word">life</span>
+                    <span class="hero-word">and</span>
+                    <span class="hero-word">advancing</span>
+                    <span class="hero-word">biosecurity</span>
+                    <span class="hero-word">through</span>
+                    <span class="hero-word">computational</span>
+                    <span class="hero-word">biology</span>
+                    <span class="hero-word">and</span>
+                    <span class="hero-word">machine</span>
+                    <span class="hero-word">learning.</span>
                 </p>
                 <div class="hero-roles">
-                    <div class="role-box">Staff Scientist & PI at DOE JGI</div>
-                    <div class="role-box">CEO at SampleX</div>
+                    <span class="hero-word role-tag">Staff Scientist & PI at DOE JGI</span>
+                    <span class="hero-word role-tag">CEO at SampleX</span>
                 </div>
+            </div>
+        </div>
+        <div class="dna-strip" aria-hidden="true">
+            <div class="dna-track">
+                <span>ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG</span>
+                <span>ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG ATCG GCTA TTAA CCGG</span>
             </div>
         </div>
     </section>
 
-    <!-- About Section (merged with Research Overview) -->
-    <section id="about" class="about fade-in-section">
+    <!-- About Section -->
+    <section id="about" class="about">
         <div class="container">
-            <div class="section-header">
-                <h2>About</h2>
-            </div>
+            <div class="section-label reveal-element">About</div>
             <div class="about-grid">
-                <div class="about-card">
-                    <h3>Research Leadership</h3>
+                <div class="about-bio reveal-element">
                     <p>
                         I lead the <strong>New Lineages of Life Group</strong> at Lawrence Berkeley National Laboratory (DOE JGI/LBNL),
                         where we discover novel bacterial, archaeal, eukaryotic microbes, and viruses in environmental sequence data.
+                    </p>
+                    <p>
                         My work combines cutting-edge machine learning with multi-omics approaches to expand our understanding of
                         microbial diversity and develop pathogen-agnostic detection systems for biosecurity applications.
                     </p>
@@ -74,234 +105,202 @@
                         threat detection and characterization.
                     </p>
                 </div>
-                <div class="about-card highlight">
-                    <h3>Research Interests</h3>
-                    <ul class="tech-list">
-                        <li>Microbiome Data Science</li>
-                        <li>AI/ML in Biology</li>
-                        <li>Giant Virus Biology</li>
-                        <li>Novel Microbial Diversity</li>
-                        <li>Pathogen Detection</li>
-                        <li>Biosecurity</li>
-                    </ul>
+                <div class="about-stats reveal-element">
+                    <div class="stat-block">
+                        <span class="stat-value">100+</span>
+                        <span class="stat-label">Publications</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-value">40</span>
+                        <span class="stat-label">h-index</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-value">10k+</span>
+                        <span class="stat-label">Citations</span>
+                    </div>
                 </div>
             </div>
-            <div class="research-grid" style="margin-top: var(--space-xl);">
-                <div class="research-card">
-                    <h3>Giant Virus Biology</h3>
-                    <p>
-                        Discovering and characterizing nucleocytoplasmic large DNA viruses (NCLDV) through global metagenomics.
-                        My work has expanded known giant virus diversity by over 11-fold and revealed viruses with unprecedented
-                        genomic complexity, including translation system components.
-                    </p>
-                </div>
-                <div class="research-card">
-                    <h3>AI/ML Applications</h3>
-                    <p>
-                        Developing machine learning tools for pathogen detection, genome classification, and microbiome analysis.
-                        Projects include neural network-based phylogenetics, symbiont classification systems, and pathogen-agnostic
-                        detection models.
-                    </p>
-                </div>
-                <div class="research-card">
-                    <h3>Novel Microbial Diversity</h3>
-                    <p>
-                        Leading the New Lineages of Life initiative to systematically expand our understanding of bacterial,
-                        archaeal, and eukaryotic diversity through large-scale metagenomics and single-cell genomics approaches.
-                    </p>
-                </div>
-                <div class="research-card">
-                    <h3>Pathogen Detection & Biosecurity</h3>
-                    <p>
-                        Translating microbiome research into biosecurity applications, developing pathogen-agnostic detection
-                        methods and risk assessment frameworks for emerging biological threats.
-                    </p>
-                </div>
+            <div class="interest-tags reveal-element">
+                <span class="tag">Microbiome Data Science</span>
+                <span class="tag">AI/ML in Biology</span>
+                <span class="tag">Giant Virus Biology</span>
+                <span class="tag">Novel Microbial Diversity</span>
+                <span class="tag">Pathogen Detection</span>
+                <span class="tag">Biosecurity</span>
             </div>
         </div>
     </section>
 
-    <!-- Connect Section -->
-    <section id="connect" class="contact fade-in-section">
+    <!-- Work Gallery Section -->
+    <section id="work" class="work">
         <div class="container">
-            <div class="section-header">
-                <h2>Connect</h2>
+            <div class="section-label reveal-element">Selected Work</div>
+        </div>
+        <div class="work-gallery">
+            <div class="work-track">
+                <!-- Publications -->
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0001/10</span>
+                        <span class="work-year">2022</span>
+                        <span class="work-type">Publication</span>
+                    </div>
+                    <h3 class="work-card-title">Giant virus biology and diversity in the era of genome-resolved metagenomics</h3>
+                    <p class="work-card-venue">Nature Reviews Microbiology</p>
+                    <p class="work-card-desc">Comprehensive review synthesizing current understanding of giant virus diversity and evolution</p>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0002/10</span>
+                        <span class="work-year">2020</span>
+                        <span class="work-type">Publication</span>
+                    </div>
+                    <h3 class="work-card-title">Massive diversity of giant viruses in global metagenomes</h3>
+                    <p class="work-card-venue">Nature</p>
+                    <p class="work-card-desc">Expanded known giant virus diversity by 11-fold through global metagenomic analysis</p>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0003/10</span>
+                        <span class="work-year">2017</span>
+                        <span class="work-type">Publication</span>
+                    </div>
+                    <h3 class="work-card-title">Giant viruses with an expanded complement of translation system components</h3>
+                    <p class="work-card-venue">Science</p>
+                    <p class="work-card-desc">Discovery of giant viruses encoding unprecedented translation machinery components</p>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0004/10</span>
+                        <span class="work-year">2018</span>
+                        <span class="work-type">Publication</span>
+                    </div>
+                    <h3 class="work-card-title">Hidden diversity of soil giant viruses</h3>
+                    <p class="work-card-venue">Nature Communications</p>
+                    <p class="work-card-desc">Revealed extensive diversity of terrestrial giant viruses in soil environments</p>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0005/10</span>
+                        <span class="work-year">2015</span>
+                        <span class="work-type">Publication</span>
+                    </div>
+                    <h3 class="work-card-title">Marine amoebae with cytoplasmic and perinuclear symbionts</h3>
+                    <p class="work-card-venue">ISME Journal</p>
+                    <p class="work-card-desc">Characterization of diverse bacterial symbionts in marine protists</p>
+                    <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="work-card-link">Read more</a>
+                </article>
+
+                <!-- GitHub Tools -->
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0006/10</span>
+                        <span class="work-year">2024</span>
+                        <span class="work-type">Tool</span>
+                    </div>
+                    <h3 class="work-card-title">gvclass</h3>
+                    <p class="work-card-venue">GitHub</p>
+                    <p class="work-card-desc">Machine learning tool for classification and phylogenetic placement of giant virus genomes from metagenomic data</p>
+                    <a href="https://github.com/fschjgi/gvclass" target="_blank" class="work-card-link">View on GitHub</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0007/10</span>
+                        <span class="work-year">2024</span>
+                        <span class="work-type">Tool</span>
+                    </div>
+                    <h3 class="work-card-title">symclatron</h3>
+                    <p class="work-card-venue">GitHub</p>
+                    <p class="work-card-desc">Neural network-based classification system for identifying and characterizing microbial symbionts in genomic datasets</p>
+                    <a href="https://github.com/fschjgi/symclatron" target="_blank" class="work-card-link">View on GitHub</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0008/10</span>
+                        <span class="work-year">2024</span>
+                        <span class="work-type">Tool</span>
+                    </div>
+                    <h3 class="work-card-title">nsgtree</h3>
+                    <p class="work-card-venue">GitHub</p>
+                    <p class="work-card-desc">Neural network-guided phylogenetic inference for improved evolutionary analysis of novel microbial lineages</p>
+                    <a href="https://github.com/fschjgi/nsgtree" target="_blank" class="work-card-link">View on GitHub</a>
+                </article>
+
+                <!-- Ventures -->
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0009/10</span>
+                        <span class="work-year">2023</span>
+                        <span class="work-type">Venture</span>
+                    </div>
+                    <h3 class="work-card-title">New Lineages of Life</h3>
+                    <p class="work-card-venue">DOE JGI / LBNL</p>
+                    <p class="work-card-desc">Research group discovering novel microbial diversity through large-scale genomics and multi-omics approaches</p>
+                    <a href="https://newlineages.com" target="_blank" class="work-card-link">Visit site</a>
+                </article>
+
+                <article class="work-card reveal-element">
+                    <div class="work-card-meta">
+                        <span class="work-ref">#WORK-0010/10</span>
+                        <span class="work-year">2024</span>
+                        <span class="work-type">Venture</span>
+                    </div>
+                    <h3 class="work-card-title">SampleX</h3>
+                    <p class="work-card-venue">AI Startup</p>
+                    <p class="work-card-desc">AI-powered biological sample analysis and characterization platform for rapid pathogen identification</p>
+                    <a href="https://samplex.ai" target="_blank" class="work-card-link">Visit site</a>
+                </article>
             </div>
-            <div class="social-grid">
-                <a href="https://newlineages.com" target="_blank" class="social-link">
-                    <span class="social-icon">🧬</span>
-                    New Lineages
-                </a>
-                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">in</span>
-                    LinkedIn
-                </a>
-                <a href="https://github.com/fschjgi" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    GitHub
-                </a>
-                <a href="https://github.com/NeLLi-team" target="_blank" class="social-link">
-                    <span class="social-icon">gh</span>
-                    NeLLi Team
-                </a>
-                <a href="https://twitter.com/fmschulz" target="_blank" class="social-link">
-                    <span class="social-icon">X</span>
-                    Twitter/X
-                </a>
-                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="social-link">
-                    <span class="social-icon">📚</span>
-                    Google Scholar
-                </a>
+        </div>
+    </section>
+
+    <!-- Keyword Network Visualization Section -->
+    <section id="network" class="network-section">
+        <div class="container">
+            <div class="section-label reveal-element">Research Network</div>
+            <p class="network-intro reveal-element">Interactive visualization of key research topics and their connections across publications</p>
+            <div id="network-stats" class="reveal-element"></div>
+            <div id="network-container" data-lenis-prevent></div>
+        </div>
+    </section>
+
+    <!-- Connect Section -->
+    <section id="connect" class="connect">
+        <div class="container">
+            <div class="section-label reveal-element">Connect</div>
+            <div class="connect-grid reveal-element">
+                <a href="https://newlineages.com" target="_blank" class="connect-link">New Lineages</a>
+                <a href="https://linkedin.com/in/fmschulz" target="_blank" class="connect-link">LinkedIn</a>
+                <a href="https://github.com/fschjgi" target="_blank" class="connect-link">GitHub</a>
+                <a href="https://github.com/NeLLi-team" target="_blank" class="connect-link">NeLLi Team</a>
+                <a href="https://twitter.com/fmschulz" target="_blank" class="connect-link">X / Twitter</a>
+                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="connect-link">Google Scholar</a>
             </div>
-            <div class="contact-info">
+            <div class="connect-info reveal-element">
                 <p>ORCID: <strong>0000-0002-4932-4677</strong></p>
                 <p>Email: <strong>fmschulz@gmail.com</strong></p>
             </div>
         </div>
     </section>
 
-    <!-- Projects & Ventures Section (merged Orgs + Projects) -->
-    <section id="projects" class="projects fade-in-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Projects & Ventures</h2>
-            </div>
-            <div class="links-grid">
-                <a href="https://newlineages.com" target="_blank" class="link-card primary">
-                    <div class="link-icon">🧬</div>
-                    <h3>New Lineages of Life</h3>
-                    <p>Research group at DOE JGI/LBNL discovering novel microbial diversity through large-scale genomics</p>
-                </a>
-                <a href="https://samplex.ai" target="_blank" class="link-card">
-                    <div class="link-icon">🤖</div>
-                    <h3>SampleX</h3>
-                    <p>AI-powered biological sample analysis and characterization platform</p>
-                </a>
-            </div>
-            <div class="project-grid">
-                <div class="project-card">
-                    <h3>gvclass</h3>
-                    <p>Machine learning tool for classification and phylogenetic placement of giant virus genomes from metagenomic data.</p>
-                    <a href="https://github.com/fschjgi/gvclass" target="_blank" class="project-link">View on GitHub →</a>
-                </div>
-                <div class="project-card">
-                    <h3>symclatron</h3>
-                    <p>Neural network-based classification system for identifying and characterizing microbial symbionts in genomic datasets.</p>
-                    <a href="https://github.com/fschjgi/symclatron" target="_blank" class="project-link">View on GitHub →</a>
-                </div>
-                <div class="project-card">
-                    <h3>nsgtree</h3>
-                    <p>Neural network-guided phylogenetic inference for improved evolutionary analysis of novel microbial lineages.</p>
-                    <a href="https://github.com/fschjgi/nsgtree" target="_blank" class="project-link">View on GitHub →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Publications Section -->
-    <section id="publications" class="publications fade-in-section">
-        <div class="container">
-            <div class="pub-header">
-                <h2>Selected Publications</h2>
-                <a href="https://scholar.google.com/citations?user=jnGnCFkAAAAJ" target="_blank" class="scholar-link">
-                    View all on Google Scholar →
-                </a>
-            </div>
-
-            <div class="pub-metrics">
-                <div class="pub-metric">
-                    <span class="pub-metric-value">100+</span>
-                    <span class="pub-metric-label">Publications</span>
-                </div>
-                <div class="pub-metric">
-                    <span class="pub-metric-value">40</span>
-                    <span class="pub-metric-label">h-index</span>
-                </div>
-                <div class="pub-metric">
-                    <span class="pub-metric-value">10,000+</span>
-                    <span class="pub-metric-label">Citations</span>
-                </div>
-            </div>
-
-            <div class="pub-grid">
-                <div class="pub-card">
-                    <div class="pub-year">2022</div>
-                    <div class="pub-title">Giant virus biology and diversity in the era of genome-resolved metagenomics</div>
-                    <div class="pub-journal">Nature Reviews Microbiology</div>
-                    <div class="pub-impact">Comprehensive review synthesizing current understanding of giant virus diversity and evolution</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2020</div>
-                    <div class="pub-title">Massive diversity of giant viruses in global metagenomes</div>
-                    <div class="pub-journal">Nature</div>
-                    <div class="pub-impact">Expanded known giant virus diversity by 11-fold through global metagenomic analysis</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2017</div>
-                    <div class="pub-title">Giant viruses with an expanded complement of translation system components</div>
-                    <div class="pub-journal">Science</div>
-                    <div class="pub-impact">Discovery of giant viruses encoding unprecedented translation machinery components</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2018</div>
-                    <div class="pub-title">Hidden diversity of soil giant viruses</div>
-                    <div class="pub-journal">Nature Communications</div>
-                    <div class="pub-impact">Revealed extensive diversity of terrestrial giant viruses in soil environments</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-
-                <div class="pub-card">
-                    <div class="pub-year">2015</div>
-                    <div class="pub-title">Marine amoebae with cytoplasmic and perinuclear symbionts</div>
-                    <div class="pub-journal">ISME Journal</div>
-                    <div class="pub-impact">Characterization of diverse bacterial symbionts in marine protists</div>
-                    <div class="pub-links">
-                        <a href="#" class="pub-link">DOI</a>
-                        <a href="#" class="pub-link">Citation</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Keyword Network Visualization Section -->
-    <section id="network" class="network-section fade-in-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Research Topics Network</h2>
-                <p>Interactive visualization of key research topics and their connections across publications</p>
-            </div>
-            <div id="network-stats"></div>
-            <div id="network-container"></div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 Frederik Schulz. Professional academic portfolio.</p>
+            <p>&copy; 2026 Frederik Schulz</p>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="js/animations.js"></script>
     <script src="js/keyword-network.js"></script>
 </body>
 </html>

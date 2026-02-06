@@ -1,16 +1,16 @@
 /**
  * Interactive keyword network visualization using D3.js
- * Adapted for neobrutalist-hp site with warm orange/yellow gradient theme
+ * Monochrome palette for animated portfolio design
  */
 
-// Category colors matching the neobrutalist site theme
+// Category colors -- muted grayscale palette
 const CATEGORY_COLORS = {
-  virology: '#e67e22',      // Orange
-  microbiology: '#b8621b',  // Rust
-  methods: '#f39c12',       // Amber
-  environment: '#8b4513',   // Brown
-  biothreat: '#f1c40f',     // Gold
-  other: '#6b7280',         // Gray
+  virology: '#4a4a4a',
+  microbiology: '#6b6b6b',
+  methods: '#8a8a8a',
+  environment: '#5a5a5a',
+  biothreat: '#3a3a3a',
+  other: '#9a9a9a',
 };
 
 // Category labels for legend
@@ -119,9 +119,8 @@ async function initKeywordNetwork() {
       .append('line')
       .attr('class', 'network-edge')
       .attr('stroke', d => {
-        // Color based on source node category
         const sourceNode = networkData.nodes.find(n => n.id === (d.source.id || d.source));
-        return CATEGORY_COLORS[sourceNode?.category] || '#e67e22';
+        return CATEGORY_COLORS[sourceNode?.category] || '#9a9a9a';
       })
       .attr('stroke-width', d => edgeScale(d.weight))
       .attr('stroke-opacity', d => opacityScale(d.weight))
@@ -140,12 +139,16 @@ async function initKeywordNetwork() {
         .on('drag', dragged)
         .on('end', dragEnded));
 
+    // Resolve current text color from CSS variable for SVG use
+    const textColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--color-text').trim() || '#1a1a1a';
+
     // Add circles to nodes
     nodes.append('circle')
       .attr('r', d => Math.max(8, Math.min(35, d.size * 0.8)))
       .attr('fill', d => CATEGORY_COLORS[d.category] || CATEGORY_COLORS.other)
-      .attr('stroke', '#1a1a1a')
-      .attr('stroke-width', 2)
+      .attr('stroke', textColor)
+      .attr('stroke-width', 1)
       .attr('opacity', 0.9);
 
     // Add labels to nodes
@@ -154,7 +157,7 @@ async function initKeywordNetwork() {
       .attr('x', 0)
       .attr('y', d => -Math.max(8, Math.min(35, d.size * 0.8)) - 6)
       .attr('text-anchor', 'middle')
-      .attr('fill', '#1a1a1a')
+      .attr('fill', textColor)
       .attr('font-size', d => Math.max(10, Math.min(14, d.count / 5)))
       .attr('font-weight', d => d.count > 30 ? '600' : '400')
       .attr('opacity', d => d.count > 15 ? 1 : 0.7)
