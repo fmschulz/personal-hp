@@ -1,32 +1,37 @@
-# Frederik Schulz, PhD - Personal Website
+# Frederik Schulz, PhD — Personal Website
 
 https://fmschulz.github.io/neobrutalist-hp/
 
-A neo-brutalist personal website showcasing research in AI/ML and microbiome data science.
+A minimalist personal site in the Swiss / International Typographic style:
+pure monochrome, a strict 12-column grid, big grotesque type, and monospace
+metadata — with a single quiet signature element (a drifting dot-field network
+that the cursor "discovers"), echoing the search for hidden life in sequence data.
 
-## Features
+## Design
 
-- Neo-brutalist design inspired by elian.codes
-- Responsive layout optimized for all devices
-- Research showcase with publication highlights
-- AI scientist section featuring multiagent systems
-- Links to research group and company websites
-- Optimized for GitHub Pages hosting
+- **Lab Monochrome** — zero color by design; black on white, with a dark mode toggle
+- **Typography** — Space Grotesk (display), Inter (body), Space Mono (metadata)
+- **Selected work** — presented as a numbered editorial index with invert-on-hover rows
+- **Signature motif** — a faint, slow constellation that reveals connections near the pointer
+- **Motion** — masked headline reveals, hairline draws, GSAP + Lenis smooth scroll
+- **Accessible** — respects `prefers-reduced-motion`; keyboard-focusable; graceful no-JS fallback
 
-## Setup
+## Stack
 
-1. Fork or clone this repository
-2. Update content in HTML files as needed
-3. Customize colors and styles in `css/styles.css`
-4. Deploy to GitHub Pages
+- Static HTML5 + CSS3 (Grid / custom properties) + vanilla JavaScript
+- [GSAP](https://gsap.com/) + ScrollTrigger, [Lenis](https://lenis.darkroom.engineering/)
+- Hosted on GitHub Pages — no build step
 
-## Technologies
+## Develop
 
-- HTML5
-- CSS3 (with CSS Grid and Flexbox)
-- Vanilla JavaScript
-- Google Fonts (Space Grotesk, Inter)
+Open `index.html` directly, or serve the folder:
+
+```bash
+python3 -m http.server 8000   # then visit http://localhost:8000
+```
+
+Edit content in `index.html`, styling in `css/styles.css`, behavior in `js/animations.js`.
 
 ## License
 
-© 2025 Frederik Schulz. All rights reserved. 
+© 2026 Frederik Schulz. All rights reserved.

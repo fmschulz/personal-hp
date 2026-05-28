@@ -1,590 +1,330 @@
 /**
- * Animations: Loader, Lenis smooth scroll, per-character hero reveal,
- * 3D horizontal work gallery, separator marquees, fill-wipe hovers,
- * contrast toggle, nav tracking. Easing modeled on wodniack.dev.
+ * Frederik Schulz — Lab Monochrome
+ * Refined Swiss-style motion: minimal counter loader, masked headline
+ * reveals, a quiet drifting dot-field (a network the cursor "discovers"),
+ * theme toggle, live Berkeley clock, custom crosshair cursor.
+ *
+ * Design intent: restraint. Motion is slow, intentional, and respects
+ * prefers-reduced-motion. No color, ever.
  */
 
 (function () {
-    gsap.registerPlugin(ScrollTrigger);
+    'use strict';
 
-    // --- Text splitting utilities ---
+    const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-    function splitToChars(el) {
-        const fragment = document.createDocumentFragment();
-        const chars = [];
-        const nodes = [...el.childNodes];
+    const state = { dotRGB: [10, 10, 10] };
+    let lenis = null;
 
-        nodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                fragment.appendChild(node.cloneNode(true));
-                return;
-            }
-            if (node.nodeType !== Node.TEXT_NODE) return;
+    const debounce = (fn, ms) => {
+        let t;
+        return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+    };
 
-            [...node.textContent].forEach((ch) => {
-                if (ch === ' ') {
-                    fragment.appendChild(document.createTextNode(' '));
-                    return;
-                }
-                const wrap = document.createElement('span');
-                wrap.style.cssText =
-                    'display:inline-block;clip-path:inset(-5% -3% -15% -3%)';
-                const inner = document.createElement('span');
-                inner.style.display = 'inline-block';
-                inner.textContent = ch;
-                wrap.appendChild(inner);
-                fragment.appendChild(wrap);
-                chars.push(inner);
-            });
-        });
-
-        el.innerHTML = '';
-        el.appendChild(fragment);
-        return chars;
+    /* ---- Theme ---- */
+    function readDotColor() {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue('--dot');
+        const parts = raw.split(',').map((s) => parseInt(s.trim(), 10));
+        if (parts.length === 3 && parts.every((n) => !isNaN(n))) state.dotRGB = parts;
     }
 
-    function splitToWords(el) {
-        const text = el.textContent.trim();
-        el.innerHTML = '';
-        const words = [];
-
-        text.split(/\s+/).forEach((word, i) => {
-            if (i > 0) el.appendChild(document.createTextNode(' '));
-            const wrap = document.createElement('span');
-            wrap.style.cssText =
-                'display:inline-block;clip-path:inset(-5% -5% -15% -5%);vertical-align:top';
-            const inner = document.createElement('span');
-            inner.style.display = 'inline-block';
-            inner.textContent = word;
-            wrap.appendChild(inner);
-            el.appendChild(wrap);
-            words.push(inner);
-        });
-
-        return words;
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const isDark = theme === 'dark';
+        const label = document.querySelector('.theme-toggle-label');
+        if (label) label.textContent = isDark ? 'Light' : 'Dark';
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', isDark ? '#0a0a0a' : '#ffffff');
+        readDotColor();
     }
 
-    // --- Lenis smooth scroll ---
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smooth: true,
-    });
-
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
-    gsap.ticker.lagSmoothing(0);
-
-    // --- Directional patterns for char animation (top/right/bottom/left cycle) ---
-    const DIRECTIONS = [
-        { yPercent: -120, xPercent: 0 },
-        { yPercent: 0, xPercent: 120 },
-        { yPercent: 120, xPercent: 0 },
-        { yPercent: 0, xPercent: -120 },
-    ];
-
-    // --- Master animation timeline ---
-    function createMasterTimeline() {
-        const tl = gsap.timeline();
-
-        // Loader
-        tl.to('.loader-inner', {
-            opacity: 0,
-            scale: 0.85,
-            duration: 0.5,
-            delay: 0.6,
-            ease: 'expo.in',
-        }).to('.loader', {
-            yPercent: -100,
-            duration: 0.9,
-            ease: 'expo.inOut',
-            onComplete: () => {
-                const loader = document.querySelector('.loader');
-                if (loader) loader.remove();
-            },
-        });
-
-        // Hero character reveal
-        const title = document.querySelector('.hero-title');
-        const star = document.querySelector('.hero-star');
-
-        if (title) {
-            const chars = splitToChars(title);
-            chars.forEach((c, i) => gsap.set(c, DIRECTIONS[i % 4]));
-
-            tl.to(
-                chars,
-                {
-                    yPercent: 0,
-                    xPercent: 0,
-                    duration: 1,
-                    stagger: 0.025,
-                    ease: 'expo.inOut',
-                },
-                '-=0.3'
-            );
-        }
-
-        // Star spin-in
-        if (star) {
-            gsap.set(star, { scale: 0, rotation: -180 });
-            tl.to(
-                star,
-                { scale: 1, rotation: 0, duration: 1, ease: 'expo.out' },
-                '<0.4'
-            );
-            // Continuous rotation
-            gsap.to(star, {
-                rotation: 360,
-                duration: 12,
-                repeat: -1,
-                ease: 'none',
-            });
-        }
-
-        // Subtitle word reveal
-        const subtitle = document.querySelector('.hero-subtitle');
-        if (subtitle) {
-            const words = splitToWords(subtitle);
-            gsap.set(words, { yPercent: 110 });
-            tl.to(
-                words,
-                {
-                    yPercent: 0,
-                    duration: 0.8,
-                    stagger: 0.02,
-                    ease: 'expo.out',
-                },
-                '-=0.6'
-            );
-        }
-
-        // Role tags
-        tl.from(
-            '.role-tag',
-            {
-                yPercent: 100,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'expo.out',
-            },
-            '-=0.5'
-        );
-
-        return tl;
-    }
-
-    // --- Scroll-triggered reveals (aggressive easing) ---
-    function initScrollReveals() {
-        document.querySelectorAll('.reveal-el').forEach((el) => {
-            gsap.to(el, {
-                scrollTrigger: {
-                    trigger: el,
-                    start: 'top 85%',
-                    toggleActions: 'play none none none',
-                },
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: 'expo.out',
-            });
-        });
-    }
-
-    // --- Horizontal work gallery with 3D card entrances ---
-    function initWorkGallery() {
-        const gallery = document.querySelector('.work-gallery');
-        const track = document.querySelector('.work-track');
-        if (!gallery || !track) return;
-
-        const cards = track.querySelectorAll('.work-card');
-        const mm = gsap.matchMedia();
-
-        mm.add('(min-width: 768px)', () => {
-            const totalScroll = track.scrollWidth - gallery.clientWidth;
-
-            const scrollTween = gsap.to(track, {
-                x: -totalScroll,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: gallery,
-                    start: 'top top',
-                    end: () => `+=${totalScroll}`,
-                    pin: true,
-                    scrub: 1,
-                    invalidateOnRefresh: true,
-                },
-            });
-
-            // Per-card 3D entrance within horizontal scroll
-            cards.forEach((card, i) => {
-                gsap.from(card, {
-                    rotateY: i % 2 === 0 ? 8 : -8,
-                    scale: 0.9,
-                    opacity: 0,
-                    transformPerspective: 800,
-                    immediateRender: false,
-                    scrollTrigger: {
-                        trigger: card,
-                        containerAnimation: scrollTween,
-                        start: 'left 95%',
-                        end: 'left 65%',
-                        scrub: 1,
-                    },
-                });
-            });
-
-            return () => {
-                gsap.set(track, { x: 0 });
-                cards.forEach((c) =>
-                    gsap.set(c, { rotateY: 0, scale: 1, opacity: 1 })
-                );
-            };
-        });
-
-        // Mobile: stagger reveal
-        mm.add('(max-width: 767px)', () => {
-            cards.forEach((card) => {
-                gsap.to(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: 'top 85%',
-                    },
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.8,
-                    ease: 'expo.out',
-                });
-            });
-        });
-    }
-
-    // --- Separator marquees ---
-    function initSeparators() {
-        document.querySelectorAll('.separator-track').forEach((track) => {
-            const first = track.querySelector('span');
-            if (!first) return;
-            const w = first.offsetWidth;
-            gsap.to(track, {
-                x: -w,
-                duration: 25,
-                ease: 'none',
-                repeat: -1,
-                modifiers: {
-                    x: gsap.utils.unitize((x) => parseFloat(x) % w),
-                },
-            });
-        });
-    }
-
-    // --- Contrast toggle ---
-    function initContrastToggle() {
-        const btn = document.querySelector('.contrast-toggle');
+    function initTheme() {
+        applyTheme(localStorage.getItem('theme') || 'light');
+        const btn = document.querySelector('.theme-toggle');
         if (!btn) return;
-
-        if (localStorage.getItem('high-contrast') === 'true') {
-            document.documentElement.classList.add('high-contrast');
-        }
-
         btn.addEventListener('click', () => {
-            document.documentElement.classList.toggle('high-contrast');
-            const isHC =
-                document.documentElement.classList.contains('high-contrast');
-            localStorage.setItem('high-contrast', isHC);
+            const next =
+                document.documentElement.getAttribute('data-theme') === 'dark'
+                    ? 'light'
+                    : 'dark';
+            applyTheme(next);
+            localStorage.setItem('theme', next);
         });
     }
 
-    // --- Active nav tracking ---
-    function initNavTracking() {
-        const links = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section[id]');
-
-        function update() {
-            const y = window.scrollY + 120;
-            sections.forEach((s) => {
-                const top = s.offsetTop;
-                const id = s.getAttribute('id');
-                if (y >= top && y < top + s.offsetHeight) {
-                    links.forEach((l) =>
-                        l.classList.toggle(
-                            'active',
-                            l.getAttribute('href') === `#${id}`
-                        )
-                    );
-                }
-            });
-        }
-
-        window.addEventListener('scroll', update, { passive: true });
-        update();
+    /* ---- Live Berkeley clock ---- */
+    function initClock() {
+        const el = document.querySelector('.nav-clock');
+        if (!el) return;
+        const fmt = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'America/Los_Angeles',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZoneName: 'short',
+        });
+        const tick = () => {
+            const p = fmt.formatToParts(new Date());
+            const v = (t) => (p.find((x) => x.type === t) || {}).value || '';
+            el.textContent = `Berkeley ${v('hour')}:${v('minute')} ${v('timeZoneName')}`;
+        };
+        tick();
+        setInterval(tick, 30000);
     }
 
-    // --- Nav smooth scroll via Lenis ---
-    function initNavScroll() {
-        document.querySelectorAll('a[href^="#"]').forEach((link) => {
-            link.addEventListener('click', (e) => {
-                const href = link.getAttribute('href');
+    /* ---- Faint 12-column grid guides ---- */
+    function initGridGuides() {
+        const wrap = document.querySelector('.grid-guides');
+        if (!wrap) return;
+        const inner = document.createElement('div');
+        inner.className = 'guide-inner';
+        for (let i = 0; i < 12; i++) inner.appendChild(document.createElement('span'));
+        wrap.appendChild(inner);
+        requestAnimationFrame(() => wrap.classList.add('is-on'));
+    }
+
+    /* ---- Navigation: active tracking + smooth anchors ---- */
+    function initNav() {
+        const links = [...document.querySelectorAll('.nav-link')];
+        const sections = ['profile', 'work', 'connect']
+            .map((id) => document.getElementById(id))
+            .filter(Boolean);
+
+        const onScroll = () => {
+            const y = window.scrollY + 90;
+            let current = '';
+            sections.forEach((s) => { if (y >= s.offsetTop) current = s.id; });
+            links.forEach((l) => l.classList.toggle('is-active', l.dataset.section === current));
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        document.querySelectorAll('a[href^="#"]').forEach((a) => {
+            a.addEventListener('click', (e) => {
+                const href = a.getAttribute('href');
                 if (!href || href === '#') return;
                 const target = document.querySelector(href);
                 if (!target) return;
                 e.preventDefault();
-                lenis.scrollTo(target, { offset: -56 });
+                if (lenis) lenis.scrollTo(target, { offset: -60 });
+                else target.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth' });
             });
         });
     }
 
-    // --- Mouse-reactive SVG grid on hero ---
-    function initHeroGrid() {
-        const hero = document.querySelector('.hero');
-        if (!hero) return;
+    /* ---- Lenis smooth scroll ---- */
+    function initLenis() {
+        lenis = new Lenis({
+            duration: 1.15,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+    }
 
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.classList.add('hero-grid');
-        svg.setAttribute('aria-hidden', 'true');
-        hero.insertBefore(svg, hero.firstChild);
+    /* ---- Loader: counter + hairline, then slide away ---- */
+    function initLoader(done) {
+        const loader = document.querySelector('.loader');
+        const count = document.querySelector('.loader-count');
+        const fill = document.querySelector('.loader-bar-fill');
+        if (!loader) { done(); return; }
 
-        const SPACING = 80;
-        const MOUSE_RADIUS = 150;
-        const SPRING = 0.005;
-        const DAMPING = 0.925;
-        const WAVE_AMP = 6;
-        const MAX_DISP = 80;
-        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        const c = { v: 0 };
+        // done() first: it applies the headline's hidden start (fromTo
+        // immediateRender) while the loader still covers the screen, so the
+        // reveal can't flash its final position before animating.
+        gsap.timeline({ onComplete: () => { done(); loader.remove(); } })
+            .to(fill, { scaleX: 1, duration: 1.0, ease: 'power2.inOut' }, 0)
+            .to(c, {
+                v: 100,
+                duration: 1.0,
+                ease: 'power2.inOut',
+                onUpdate: () => {
+                    if (count) count.textContent = String(Math.round(c.v)).padStart(3, '0');
+                },
+            }, 0)
+            .to(loader, { yPercent: -100, duration: 0.8, ease: 'expo.inOut' }, '+=0.15');
+    }
 
-        let cols = 0;
-        let rows = 0;
-        let points = [];
-        let rowPaths = [];
-        let colPaths = [];
-        let mouse = { x: -9999, y: -9999 };
-        let smooth = { x: -9999, y: -9999 };
-        let paused = false;
+    /* ---- Masthead reveal (masked headline + rise) ---- */
+    function revealMasthead() {
+        // fromTo with an explicit percentage start: GSAP can't read a CSS
+        // translateY(%) back as yPercent (it lands in the px channel), so we
+        // own both endpoints here or the headline never leaves its mask.
+        gsap.timeline({ defaults: { ease: 'expo.out' } })
+            .fromTo('.masthead-title .line-in',
+                { yPercent: 110 },
+                { yPercent: 0, duration: 1.1, stagger: 0.12 })
+            .to('.masthead-rule', { scaleX: 1, duration: 1.0, ease: 'power3.inOut' }, '-=0.7')
+            .to('.masthead [data-reveal="rise"]',
+                { opacity: 1, y: 0, duration: 0.9, stagger: 0.08 }, '-=0.8');
+    }
 
-        function buildGrid() {
-            const w = hero.offsetWidth;
-            const h = hero.offsetHeight;
-            svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-            svg.setAttribute('width', w);
-            svg.setAttribute('height', h);
+    /* ---- Scroll-triggered reveals (sections) ---- */
+    function initScrollReveals() {
+        gsap.utils
+            .toArray('[data-reveal="rise"]')
+            .filter((el) => !el.closest('.masthead'))
+            .forEach((el) => {
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.9,
+                    ease: 'expo.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+                });
+            });
+    }
 
-            cols = Math.ceil(w / SPACING) + 1;
-            rows = Math.ceil(h / SPACING) + 1;
-            points = [];
+    /* ---- Dot-field: a quiet network revealed under the cursor ---- */
+    function initDotField() {
+        const canvas = document.querySelector('.dotfield');
+        const host = document.querySelector('.masthead');
+        if (!canvas || !host) return;
 
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    points.push({
-                        ox: c * SPACING,
-                        oy: r * SPACING,
-                        cx: 0, cy: 0,
-                        vx: 0, vy: 0,
-                    });
+        const ctx = canvas.getContext('2d');
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const LINK = 124;
+        const REVEAL = 178;
+        let w = 0, h = 0, pts = [], paused = false;
+        const mouse = { x: -9999, y: -9999 };
+
+        function build() {
+            w = host.offsetWidth;
+            h = host.offsetHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const count = Math.min(92, Math.max(34, Math.floor((w * h) / 16500)));
+            pts = Array.from({ length: count }, () => ({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.26,
+                vy: (Math.random() - 0.5) * 0.26,
+            }));
+        }
+
+        function drawLinks(r, g, b) {
+            for (let i = 0; i < pts.length; i++) {
+                const a = pts[i];
+                const near = Math.hypot(a.x - mouse.x, a.y - mouse.y) < REVEAL;
+                const max = near ? LINK * 1.7 : LINK;
+                for (let j = i + 1; j < pts.length; j++) {
+                    const b2 = pts[j];
+                    const d = Math.hypot(a.x - b2.x, a.y - b2.y);
+                    if (d >= max) continue;
+                    ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - d / max) * (near ? 0.4 : 0.1)})`;
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b2.x, b2.y);
+                    ctx.stroke();
                 }
-            }
-
-            svg.innerHTML = '';
-            rowPaths = [];
-            colPaths = [];
-
-            for (let r = 0; r < rows; r++) {
-                const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                svg.appendChild(p);
-                rowPaths.push(p);
-            }
-            for (let c = 0; c < cols; c++) {
-                const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                svg.appendChild(p);
-                colPaths.push(p);
             }
         }
 
-        function tick(time) {
+        function drawDots(r, g, b) {
+            for (const p of pts) {
+                const dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+                const near = dm < REVEAL;
+                ctx.fillStyle = `rgba(${r},${g},${b},${near ? 0.55 : 0.3})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, near ? 1.8 : 1.3, 0, Math.PI * 2);
+                ctx.fill();
+                if (!near) continue;
+                ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - dm / REVEAL) * 0.5})`;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.stroke();
+            }
+        }
+
+        function step() {
             if (paused) return;
-
-            smooth.x += (mouse.x - smooth.x) * 0.1;
-            smooth.y += (mouse.y - smooth.y) * 0.1;
-
-            const t = time;
-
-            for (let i = 0; i < points.length; i++) {
-                const pt = points[i];
-                let wx = Math.sin(pt.ox * 0.003 + t) * WAVE_AMP;
-                let wy = Math.cos(pt.oy * 0.003 + t * 0.7) * WAVE_AMP;
-
-                if (!isMobile) {
-                    const dx = pt.ox + pt.cx - smooth.x;
-                    const dy = pt.oy + pt.cy - smooth.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < MOUSE_RADIUS && dist > 0) {
-                        const force = (1 - dist / MOUSE_RADIUS) * 20;
-                        pt.vx += (dx / dist) * force * 0.15;
-                        pt.vy += (dy / dist) * force * 0.15;
-                    }
-                }
-
-                pt.vx += (0 - pt.cx) * SPRING;
-                pt.vy += (0 - pt.cy) * SPRING;
-                pt.vx *= DAMPING;
-                pt.vy *= DAMPING;
-                pt.cx += pt.vx;
-                pt.cy += pt.vy;
-
-                pt.cx = Math.max(-MAX_DISP, Math.min(MAX_DISP, pt.cx));
-                pt.cy = Math.max(-MAX_DISP, Math.min(MAX_DISP, pt.cy));
-
-                pt.fx = pt.ox + pt.cx + wx;
-                pt.fy = pt.oy + pt.cy + wy;
+            ctx.clearRect(0, 0, w, h);
+            ctx.lineWidth = 1;
+            const [r, g, b] = state.dotRGB;
+            for (const p of pts) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < -10) p.x = w + 10; else if (p.x > w + 10) p.x = -10;
+                if (p.y < -10) p.y = h + 10; else if (p.y > h + 10) p.y = -10;
             }
-
-            for (let r = 0; r < rows; r++) {
-                let d = '';
-                for (let c = 0; c < cols; c++) {
-                    const pt = points[r * cols + c];
-                    d += (c === 0 ? 'M' : 'L') + pt.fx.toFixed(1) + ',' + pt.fy.toFixed(1);
-                }
-                rowPaths[r].setAttribute('d', d);
-            }
-
-            for (let c = 0; c < cols; c++) {
-                let d = '';
-                for (let r = 0; r < rows; r++) {
-                    const pt = points[r * cols + c];
-                    d += (r === 0 ? 'M' : 'L') + pt.fx.toFixed(1) + ',' + pt.fy.toFixed(1);
-                }
-                colPaths[c].setAttribute('d', d);
-            }
+            drawLinks(r, g, b);
+            drawDots(r, g, b);
         }
 
-        buildGrid();
-        window.addEventListener('resize', buildGrid);
-
-        hero.addEventListener('mousemove', (e) => {
-            const rect = hero.getBoundingClientRect();
+        build();
+        window.addEventListener('resize', debounce(build, 200));
+        host.addEventListener('mousemove', (e) => {
+            const rect = host.getBoundingClientRect();
             mouse.x = e.clientX - rect.left;
             mouse.y = e.clientY - rect.top;
         });
-
-        hero.addEventListener('mouseleave', () => {
-            mouse.x = -9999;
-            mouse.y = -9999;
-        });
-
-        hero.addEventListener('click', (e) => {
-            if (e.target.closest('a')) return;
-            const rect = hero.getBoundingClientRect();
-            const cx = e.clientX - rect.left;
-            const cy = e.clientY - rect.top;
-
-            for (let i = 0; i < points.length; i++) {
-                const pt = points[i];
-                const dx = pt.ox - cx;
-                const dy = pt.oy - cy;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > 0 && dist < 500) {
-                    const force = (1 - dist / 500) * 30;
-                    pt.vx += (dx / dist) * force;
-                    pt.vy += (dy / dist) * force;
-                }
-            }
-        });
-
-        gsap.ticker.add(tick);
-
-        const observer = new IntersectionObserver(
-            ([entry]) => { paused = !entry.isIntersecting; },
+        host.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+        gsap.ticker.add(step);
+        new IntersectionObserver(
+            ([e]) => { paused = !e.isIntersecting; },
             { threshold: 0 }
-        );
-        observer.observe(hero);
+        ).observe(host);
     }
 
-    // --- Magnetic letter hover on hero chars ---
-    function initMagneticChars() {
-        const hero = document.querySelector('.hero');
-        const title = document.querySelector('.hero-title');
-        if (!hero || !title) return;
-        if (window.matchMedia('(max-width: 767px)').matches) return;
+    /* ---- Custom crosshair cursor ---- */
+    function initCursor() {
+        const dot = document.querySelector('.cursor');
+        if (!dot) return;
+        document.documentElement.classList.add('has-cursor');
+        dot.style.display = 'block';
+        gsap.set(dot, { xPercent: -50, yPercent: -50 });
+        const xTo = gsap.quickTo(dot, 'x', { duration: 0.22, ease: 'power3' });
+        const yTo = gsap.quickTo(dot, 'y', { duration: 0.22, ease: 'power3' });
 
-        const RADIUS = 120;
-        const STRENGTH = 15;
-        const wrappers = title.querySelectorAll('span > span');
-        if (!wrappers.length) return;
-
-        hero.addEventListener('mousemove', (e) => {
-            const mx = e.clientX;
-            const my = e.clientY;
-
-            wrappers.forEach((el) => {
-                const rect = el.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-                const dx = cx - mx;
-                const dy = cy - my;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < RADIUS) {
-                    const factor = (1 - dist / RADIUS) * STRENGTH;
-                    gsap.to(el, {
-                        x: (dx / dist) * factor,
-                        y: (dy / dist) * factor,
-                        duration: 0.3,
-                        ease: 'power2.out',
-                        overwrite: 'auto',
-                    });
-                } else {
-                    gsap.to(el, {
-                        x: 0,
-                        y: 0,
-                        duration: 0.5,
-                        ease: 'power2.out',
-                        overwrite: 'auto',
-                    });
-                }
-            });
+        window.addEventListener('mousemove', (e) => {
+            xTo(e.clientX);
+            yTo(e.clientY);
+            dot.classList.add('is-active');
         });
-
-        hero.addEventListener('mouseleave', () => {
-            gsap.to(Array.from(wrappers), {
-                x: 0,
-                y: 0,
-                duration: 0.5,
-                ease: 'power2.out',
-                overwrite: 'auto',
-            });
+        const sel = 'a, button, .index-link, .theme-toggle';
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(sel)) dot.classList.add('is-hover');
+        });
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(sel)) dot.classList.remove('is-hover');
         });
     }
 
-    // --- Click hero to cycle accent color ---
-    function initColorCycle() {
-        const hero = document.querySelector('.hero');
-        if (!hero) return;
-
-        const PALETTE = [
-            '#0d7377', '#4834d4', '#d35400',
-            '#0c2461', '#7d6608', '#1e8449',
-        ];
-        let idx = 0;
-
-        hero.addEventListener('click', (e) => {
-            if (e.target.closest('a')) return;
-            idx = (idx + 1) % PALETTE.length;
-            document.documentElement.style.setProperty('--color-accent', PALETTE[idx]);
-        });
-    }
-
-    // --- Init ---
+    /* ---- Boot ---- */
     function init() {
-        createMasterTimeline();
-        initHeroGrid();
-        initMagneticChars();
-        initColorCycle();
+        if (!window.gsap) {
+            document.documentElement.classList.remove('js');
+            const l = document.querySelector('.loader');
+            if (l) l.remove();
+            return;
+        }
+        gsap.registerPlugin(ScrollTrigger);
+
+        initTheme();
+        initClock();
+        initGridGuides();
+        initNav();
+
+        if (REDUCE) {
+            const l = document.querySelector('.loader');
+            if (l) l.remove();
+            return;
+        }
+
+        initLenis();
+        if (FINE) {
+            initCursor();
+            initDotField();
+        }
+        initLoader(revealMasthead);
         initScrollReveals();
-        initWorkGallery();
-        initSeparators();
-        initContrastToggle();
-        initNavTracking();
-        initNavScroll();
     }
 
     if (document.readyState === 'loading') {
