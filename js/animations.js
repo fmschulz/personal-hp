@@ -22,6 +22,30 @@
         return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
     };
 
+    // Icosahedron (12 vertices, 30 edges) — the giant-virus capsid form.
+    // Built once from golden-ratio coordinates, normalized to a unit radius.
+    const ICO = (() => {
+        const p = (1 + Math.sqrt(5)) / 2;
+        const raw = [
+            [0, 1, p], [0, -1, p], [0, 1, -p], [0, -1, -p],
+            [1, p, 0], [-1, p, 0], [1, -p, 0], [-1, -p, 0],
+            [p, 0, 1], [-p, 0, 1], [p, 0, -1], [-p, 0, -1],
+        ];
+        const verts = raw.map((v) => {
+            const m = Math.hypot(v[0], v[1], v[2]);
+            return [v[0] / m, v[1] / m, v[2] / m];
+        });
+        const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+        let min = Infinity;
+        for (let i = 0; i < verts.length; i++)
+            for (let j = i + 1; j < verts.length; j++) min = Math.min(min, dist(verts[i], verts[j]));
+        const edges = [];
+        for (let i = 0; i < verts.length; i++)
+            for (let j = i + 1; j < verts.length; j++)
+                if (dist(verts[i], verts[j]) <= min * 1.05) edges.push([i, j]);
+        return { verts, edges };
+    })();
+
     /* ---- Theme ---- */
     function readDotColor() {
         const raw = getComputedStyle(document.documentElement).getPropertyValue('--dot');
@@ -178,20 +202,36 @@
             });
     }
 
-    /* ---- Dot-field: a quiet network revealed under the cursor ---- */
-    function initDotField() {
+    /* ---- Capsid field: icosahedral virus particles; click to assemble ----
+       Giant-virus capsids are icosahedra, so the masthead motif is a field of
+       them. A few drift at rest; every left click seeds one that stays. */
+    function initCapsidField() {
         const canvas = document.querySelector('.dotfield');
         const host = document.querySelector('.masthead');
         if (!canvas || !host) return;
 
         const ctx = canvas.getContext('2d');
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const LINK = 124;
-        const REVEAL = 178;
-        let w = 0, h = 0, pts = [], paused = false;
+        const MAX_PLACED = 140;       // soft cap; oldest fades out beyond it
+        const REVEAL = 200;           // cursor "illuminates" nearby capsids
+        let w = 0, h = 0, now = 0, paused = false;
         const mouse = { x: -9999, y: -9999 };
+        const shapes = [];
 
-        function build() {
+        function makeShape(x, y, r, drift) {
+            return {
+                x, y, r, drift, born: now, fade: 1, dying: false,
+                vx: drift ? (Math.random() - 0.5) * 0.16 : 0,
+                vy: drift ? (Math.random() - 0.5) * 0.16 : 0,
+                px: Math.random() * Math.PI * 2,        // rotation phase
+                py: Math.random() * Math.PI * 2,
+                sx: 0.08 + Math.random() * 0.22,        // spin (rad/sec)
+                sy: 0.08 + Math.random() * 0.22,
+                base: drift ? 0.09 : 0.2,               // edge opacity
+            };
+        }
+
+        function resize() {
             w = host.offsetWidth;
             h = host.offsetHeight;
             canvas.width = w * dpr;
@@ -199,73 +239,89 @@
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            const count = Math.min(92, Math.max(34, Math.floor((w * h) / 16500)));
-            pts = Array.from({ length: count }, () => ({
-                x: Math.random() * w,
-                y: Math.random() * h,
-                vx: (Math.random() - 0.5) * 0.26,
-                vy: (Math.random() - 0.5) * 0.26,
-            }));
         }
 
-        function drawLinks(r, g, b) {
-            for (let i = 0; i < pts.length; i++) {
-                const a = pts[i];
-                const near = Math.hypot(a.x - mouse.x, a.y - mouse.y) < REVEAL;
-                const max = near ? LINK * 1.7 : LINK;
-                for (let j = i + 1; j < pts.length; j++) {
-                    const b2 = pts[j];
-                    const d = Math.hypot(a.x - b2.x, a.y - b2.y);
-                    if (d >= max) continue;
-                    ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - d / max) * (near ? 0.4 : 0.1)})`;
-                    ctx.beginPath();
-                    ctx.moveTo(a.x, a.y);
-                    ctx.lineTo(b2.x, b2.y);
-                    ctx.stroke();
-                }
+        function seedAmbient() {
+            const n = w < 700 ? 2 : 4;
+            for (let i = 0; i < n; i++) {
+                shapes.push(makeShape(Math.random() * w, Math.random() * h, 28 + Math.random() * 24, true));
             }
         }
 
-        function drawDots(r, g, b) {
-            for (const p of pts) {
-                const dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
-                const near = dm < REVEAL;
-                ctx.fillStyle = `rgba(${r},${g},${b},${near ? 0.55 : 0.3})`;
+        function project(s, rad, ax, ay) {
+            const cax = Math.cos(ax), sax = Math.sin(ax);
+            const cay = Math.cos(ay), say = Math.sin(ay);
+            return ICO.verts.map((v) => {
+                const y1 = v[1] * cax - v[2] * sax;
+                const z1 = v[1] * sax + v[2] * cax;
+                const x2 = v[0] * cay + z1 * say;
+                const z2 = -v[0] * say + z1 * cay;
+                return [s.x + x2 * rad, s.y + y1 * rad, z2];
+            });
+        }
+
+        function drawShape(s, r, g, b) {
+            const enter = Math.min((now - s.born) / 0.5, 1);
+            const grow = 1 - Math.pow(1 - enter, 3);     // easeOutCubic
+            const near = Math.hypot(s.x - mouse.x, s.y - mouse.y) < REVEAL + s.r;
+            const aMul = s.fade * enter * (near ? 1.8 : 1);
+            const p = project(s, s.r * grow, s.px + now * s.sx, s.py + now * s.sy);
+            for (const [i, j] of ICO.edges) {
+                const depth = 0.4 + 0.6 * ((p[i][2] + p[j][2]) / 4 + 0.5);
+                ctx.strokeStyle = `rgba(${r},${g},${b},${s.base * depth * aMul})`;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, near ? 1.8 : 1.3, 0, Math.PI * 2);
-                ctx.fill();
-                if (!near) continue;
-                ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - dm / REVEAL) * 0.5})`;
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(mouse.x, mouse.y);
+                ctx.moveTo(p[i][0], p[i][1]);
+                ctx.lineTo(p[j][0], p[j][1]);
                 ctx.stroke();
             }
+            for (const v of p) {
+                ctx.fillStyle = `rgba(${r},${g},${b},${(s.base + 0.12) * (0.4 + 0.6 * ((v[2] + 1) / 2)) * aMul})`;
+                ctx.beginPath();
+                ctx.arc(v[0], v[1], 1.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        function step() {
+        function step(time) {
             if (paused) return;
+            now = time;
             ctx.clearRect(0, 0, w, h);
             ctx.lineWidth = 1;
             const [r, g, b] = state.dotRGB;
-            for (const p of pts) {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < -10) p.x = w + 10; else if (p.x > w + 10) p.x = -10;
-                if (p.y < -10) p.y = h + 10; else if (p.y > h + 10) p.y = -10;
+            for (let i = shapes.length - 1; i >= 0; i--) {
+                const s = shapes[i];
+                if (s.drift) {
+                    s.x += s.vx; s.y += s.vy;
+                    if (s.x < -s.r) s.x = w + s.r; else if (s.x > w + s.r) s.x = -s.r;
+                    if (s.y < -s.r) s.y = h + s.r; else if (s.y > h + s.r) s.y = -s.r;
+                }
+                if (s.dying && (s.fade -= 0.02) <= 0) { shapes.splice(i, 1); continue; }
+                drawShape(s, r, g, b);
             }
-            drawLinks(r, g, b);
-            drawDots(r, g, b);
         }
 
-        build();
-        window.addEventListener('resize', debounce(build, 200));
+        function spawn(x, y) {
+            shapes.push(makeShape(x, y, 34 + Math.random() * 30, false));
+            const placed = shapes.filter((s) => !s.drift && !s.dying);
+            if (placed.length > MAX_PLACED) placed[0].dying = true;
+            const hint = document.querySelector('.capsid-hint');
+            if (hint) hint.classList.add('is-hidden');
+        }
+
+        resize();
+        seedAmbient();
+        window.addEventListener('resize', debounce(resize, 200));
         host.addEventListener('mousemove', (e) => {
             const rect = host.getBoundingClientRect();
             mouse.x = e.clientX - rect.left;
             mouse.y = e.clientY - rect.top;
         });
         host.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+        host.addEventListener('click', (e) => {
+            if (e.target.closest('a, button')) return;
+            const rect = host.getBoundingClientRect();
+            spawn(e.clientX - rect.left, e.clientY - rect.top);
+        });
         gsap.ticker.add(step);
         new IntersectionObserver(
             ([e]) => { paused = !e.isIntersecting; },
@@ -321,7 +377,7 @@
         initLenis();
         if (FINE) {
             initCursor();
-            initDotField();
+            initCapsidField();
         }
         initLoader(revealMasthead);
         initScrollReveals();
