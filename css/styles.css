@@ -308,14 +308,6 @@ html.js .loader { display: flex; }
 }
 .masthead-title .line { display: block; overflow: hidden; }
 .masthead-title .line-in { display: block; will-change: transform; }
-.phd {
-    font-family: var(--font-mono);
-    font-weight: 400;
-    letter-spacing: 0;
-    color: var(--muted);
-    margin-left: 0.3em;
-}
-
 .masthead-rule {
     height: 1px;
     background: var(--fg);
