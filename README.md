@@ -1,11 +1,10 @@
-# Frederik Schulz, PhD — Personal Website
+# Frederik Schulz — Minimalist Personal Homepage
 
-https://fmschulz.github.io/neobrutalist-hp/
+https://fmschulz.github.io/personal-hp/
 
-A minimalist personal site in the Swiss / International Typographic style:
+A minimalist personal homepage in the Swiss / International Typographic style:
 pure monochrome, a strict 12-column grid, big grotesque type, and monospace
-metadata — with a single quiet signature element (a drifting dot-field network
-that the cursor "discovers"), echoing the search for hidden life in sequence data.
+metadata.
 
 ## Design
 
