@@ -301,7 +301,7 @@ html.js .loader { display: flex; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .masthead-title {
-    font-size: clamp(3.2rem, 15.5vw, 14rem);
+    font-size: clamp(1.6rem, 7.75vw, 7rem);
     line-height: 0.86;
     letter-spacing: -0.045em;
     text-transform: uppercase;
