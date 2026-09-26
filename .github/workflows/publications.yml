@@ -1,0 +1,52 @@
+# Weekly refresh of the Selected Work index from ORCID (see scripts/update_publications.py).
+# Commits index.html only when the generated list changed, then asks Pages to rebuild.
+name: Update publications
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: publications
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+
+      - name: Test the updater
+        run: uv run --no-project python -m unittest discover -s tests -v
+
+      - name: Rebuild the Work index from ORCID, Crossref and OpenAlex
+        run: uv run scripts/update_publications.py
+
+      - name: Commit and push if the list changed
+        id: commit
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "No change."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore(publications): weekly update from ORCID"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Request a Pages build
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"

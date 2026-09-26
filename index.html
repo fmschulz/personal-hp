@@ -18,10 +18,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=19">
+    <link rel="stylesheet" href="css/styles.css?v=20">
 
     <!-- GSAP + ScrollTrigger -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
@@ -73,29 +73,41 @@
                 <span>Microbiome Data Science / AI&middot;ML / Giant Viruses</span>
             </div>
 
-            <h1 class="masthead-title reveal-mask">
-                <span class="line"><span class="line-in">Frederik</span></span>
-                <span class="line"><span class="line-in">Schulz</span></span>
-            </h1>
+            <div class="masthead-text">
+                <h1 class="masthead-title reveal-mask">
+                    <span class="line"><span class="line-in">Frederik</span></span>
+                    <span class="line"><span class="line-in">Schulz</span></span>
+                </h1>
 
-            <div class="masthead-rule" data-reveal="line"></div>
+                <div class="masthead-rule" data-reveal="line"></div>
 
-            <p class="masthead-deck" data-reveal="rise">
-                Discovering new lineages of life and advancing biosecurity through
-                computational biology and machine learning.
-            </p>
+                <p class="masthead-deck" data-reveal="rise">
+                    Discovering new lineages of life and advancing biosecurity through
+                    computational biology and machine learning.
+                </p>
 
-            <ul class="masthead-roles" data-reveal="rise">
-                <li><span class="role-no">i</span> Staff Scientist &amp; PI &mdash; DOE JGI</li>
-                <li><span class="role-no">ii</span> CEO &mdash; SampleX</li>
-                <li><span class="role-no">iii</span> Biosecurity Lead &mdash; DOE JGI</li>
-            </ul>
+                <ul class="masthead-roles" data-reveal="rise">
+                    <li><span class="role-no">i</span> Staff Scientist &amp; PI &mdash; DOE JGI</li>
+                    <li><span class="role-no">ii</span> CEO &mdash; SampleX</li>
+                    <li><span class="role-no">iii</span> Biosecurity Lead &mdash; DOE JGI</li>
+                </ul>
+            </div>
+
+            <figure class="plate" data-reveal="rise">
+                <a class="plate-frame" href="lab/virophage/" aria-label="Open Parasite&rsquo;s Parasite, a live WebGPU simulation">
+                    <img class="plate-img plate-img--light" src="img/plate-phase.webp" width="1200" height="1200"
+                         alt="Simulated amoeba on a counting slide, its cytoplasm packed with new giant virus particles around a dark viral factory.">
+                    <img class="plate-img plate-img--dark" src="img/plate-darkfield.webp" width="1200" height="1200" alt="" loading="lazy">
+                    <span class="plate-open">Open &rarr;</span>
+                </a>
+                <figcaption class="plate-cap">
+                    <span class="plate-no">Fig. 01</span>
+                    <span><em>Parasite&rsquo;s Parasite.</em> A simulated amoeba full of giant virus progeny, shortly before it bursts. Live in WebGPU.</span>
+                </figcaption>
+            </figure>
 
             <div class="masthead-foot" data-reveal="rise">
-                <span class="foot-left">
-                    <span>DOE Joint Genome Institute / Lawrence Berkeley National Laboratory</span>
-                    <span class="capsid-hint">&#10022; Click anywhere to assemble icosahedral capsids</span>
-                </span>
+                <span>DOE Joint Genome Institute / Lawrence Berkeley National Laboratory</span>
                 <a href="#profile" class="scroll-cue">Index <span class="scroll-cue-arrow">&darr;</span></a>
             </div>
         </div>
@@ -147,14 +159,6 @@
                     </div>
                 </dl>
 
-                <ul class="tags" data-reveal="rise">
-                    <li>Microbiome Data Science</li>
-                    <li>AI/ML in Biology</li>
-                    <li>Giant Virus Biology</li>
-                    <li>Novel Microbial Diversity</li>
-                    <li>Pathogen Detection</li>
-                    <li>Biosecurity</li>
-                </ul>
             </div>
         </div>
     </section>
@@ -162,188 +166,239 @@
     <!-- 02 — Selected Work -->
     <section id="work" class="section work">
         <div class="container">
+            <!-- work:start -->
             <div class="section-head" data-reveal="rise">
                 <span class="sec-no">02</span>
                 <span class="sec-label">Selected Work</span>
-                <span class="sec-count">11 Entries &mdash; 2015&ndash;2026</span>
+                <span class="sec-count">16 Entries &mdash; 2015&ndash;2026</span>
             </div>
 
-            <ol class="index-list">
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="lab/virophage/">
-                        <span class="ix-no">01</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Parasite&rsquo;s Parasite</span>
-                            <span class="ix-desc">Interactive WebGPU study: a virophage rides a giant virus into an amoeba, replicates in the viral factory, and leaves when the cell bursts.</span>
-                        </span>
-                        <span class="ix-meta">
-                            <span class="ix-venue">Infection Studies</span>
-                            <span class="ix-year">2026</span>
-                            <span class="ix-type">Interactive</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&rarr;</span>
-                    </a>
-                </li>
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
-                        <span class="ix-no">02</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Giant virus biology and diversity in the era of genome-resolved metagenomics</span>
-                            <span class="ix-desc">Comprehensive review synthesizing current understanding of giant virus diversity and evolution.</span>
-                        </span>
-                        <span class="ix-meta">
+            <div class="index-cols" aria-hidden="true">
+                <span>No.</span><span>Title</span><span>Venue</span><span>Year</span>
+            </div>
+
+            <div class="index-group">
+                <h3 class="index-group-label" data-reveal="rise">Selected papers</h3>
+                <ol class="index-list">
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41579-022-00754-5" target="_blank" rel="noopener">
+                            <span class="ix-no">01</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Giant virus biology and diversity in the era of genome-resolved metagenomics</span>
+                                <span class="ix-desc">Comprehensive review synthesizing current understanding of giant virus diversity and evolution.</span>
+                            </span>
                             <span class="ix-venue">Nature Reviews Microbiology</span>
                             <span class="ix-year">2022</span>
-                            <span class="ix-type">Review</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
-                        <span class="ix-no">03</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Massive diversity of giant viruses in global metagenomes</span>
-                            <span class="ix-desc">Expanded known giant virus diversity 11-fold through global metagenomic analysis.</span>
-                        </span>
-                        <span class="ix-meta">
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41586-020-1957-x" target="_blank" rel="noopener">
+                            <span class="ix-no">02</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Giant virus diversity and host interactions through global metagenomics</span>
+                                <span class="ix-desc">Expanded known giant virus diversity 11-fold through global metagenomic analysis.</span>
+                            </span>
                             <span class="ix-venue">Nature</span>
                             <span class="ix-year">2020</span>
-                            <span class="ix-type">Publication</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
-                        <span class="ix-no">04</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Giant viruses with an expanded complement of translation system components</span>
-                            <span class="ix-desc">Discovery of giant viruses encoding unprecedented translation machinery components.</span>
-                        </span>
-                        <span class="ix-meta">
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1126/science.aal4657" target="_blank" rel="noopener">
+                            <span class="ix-no">03</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Giant viruses with an expanded complement of translation system components</span>
+                                <span class="ix-desc">Discovery of giant viruses encoding unprecedented translation machinery components.</span>
+                            </span>
                             <span class="ix-venue">Science</span>
                             <span class="ix-year">2017</span>
-                            <span class="ix-type">Publication</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
-                        <span class="ix-no">05</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Hidden diversity of soil giant viruses</span>
-                            <span class="ix-desc">Revealed extensive diversity of terrestrial giant viruses in soil environments.</span>
-                        </span>
-                        <span class="ix-meta">
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41467-018-07335-2" target="_blank" rel="noopener">
+                            <span class="ix-no">04</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Hidden diversity of soil giant viruses</span>
+                                <span class="ix-desc">Revealed extensive diversity of terrestrial giant viruses in soil environments.</span>
+                            </span>
                             <span class="ix-venue">Nature Communications</span>
                             <span class="ix-year">2018</span>
-                            <span class="ix-type">Publication</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener">
-                        <span class="ix-no">06</span>
-                        <span class="ix-body">
-                            <span class="ix-title">Marine amoebae with cytoplasmic and perinuclear symbionts</span>
-                            <span class="ix-desc">Characterization of diverse bacterial symbionts in marine protists.</span>
-                        </span>
-                        <span class="ix-meta">
-                            <span class="ix-venue">ISME Journal</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/srep13381" target="_blank" rel="noopener">
+                            <span class="ix-no">05</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Marine amoebae with cytoplasmic and perinuclear symbionts deeply branching in the Gammaproteobacteria</span>
+                                <span class="ix-desc">Characterization of diverse bacterial symbionts in marine protists.</span>
+                            </span>
+                            <span class="ix-venue">Scientific Reports</span>
                             <span class="ix-year">2015</span>
-                            <span class="ix-type">Publication</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                </ol>
+            </div>
 
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://github.com/fschjgi/gvclass" target="_blank" rel="noopener">
-                        <span class="ix-no">07</span>
-                        <span class="ix-body">
-                            <span class="ix-title">gvclass</span>
-                            <span class="ix-desc">Machine-learning classification and phylogenetic placement of giant virus genomes from metagenomic data.</span>
-                        </span>
-                        <span class="ix-meta">
+            <div class="index-group">
+                <h3 class="index-group-label" data-reveal="rise">Recent papers <span class="index-group-note">updated weekly from ORCID</span></h3>
+                <ol class="index-list">
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41467-026-77765-w" target="_blank" rel="noopener">
+                            <span class="ix-no">06</span>
+                            <span class="ix-body">
+                                <span class="ix-title">The biogeography of giant viruses and interactions with Eukaryotes across European lakes</span>
+                                <span class="ix-desc">Kolmakova et al.</span>
+                            </span>
+                            <span class="ix-venue">Nature Communications</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1128/jvi.00520-26" target="_blank" rel="noopener">
+                            <span class="ix-no">07</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Evidence for the acquisition of a proteorhodopsin-like rhodopsin by a chrysophyte-infecting giant virus</span>
+                                <span class="ix-desc">Byl et al.</span>
+                            </span>
+                            <span class="ix-venue">Journal of Virology</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41467-026-73437-x" target="_blank" rel="noopener">
+                            <span class="ix-no">08</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Vicennial metagenomic time series unveils evolutionary dynamics of giant viruses in a freshwater ecosystem</span>
+                                <span class="ix-desc">Vasquez et al.</span>
+                            </span>
+                            <span class="ix-venue">Nature Communications</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41579-026-01287-x" target="_blank" rel="noopener">
+                            <span class="ix-no">09</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Predicting phage–host specificity</span>
+                                <span class="ix-desc">Aureli and Schulz</span>
+                            </span>
+                            <span class="ix-venue">Nature Reviews Microbiology</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://doi.org/10.1038/s41564-026-02336-0" target="_blank" rel="noopener">
+                            <span class="ix-no">10</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Hunting for new lineages and mechanisms of life</span>
+                                <span class="ix-desc">Szabó et al.</span>
+                            </span>
+                            <span class="ix-venue">Nature Microbiology</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="index-group">
+                <h3 class="index-group-label" data-reveal="rise">Software</h3>
+                <ol class="index-list">
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://github.com/NeLLi-team/gvclass" target="_blank" rel="noopener">
+                            <span class="ix-no">11</span>
+                            <span class="ix-body">
+                                <span class="ix-title">gvclass</span>
+                                <span class="ix-desc">Classifies giant virus genomes and metagenome-assembled genomes with marker-gene trees, and reports taxonomy, completeness and contamination.</span>
+                            </span>
                             <span class="ix-venue">GitHub</span>
-                            <span class="ix-year">2024</span>
-                            <span class="ix-type">Tool</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://github.com/fschjgi/symclatron" target="_blank" rel="noopener">
-                        <span class="ix-no">08</span>
-                        <span class="ix-body">
-                            <span class="ix-title">symclatron</span>
-                            <span class="ix-desc">Neural-network classification system for identifying and characterizing microbial symbionts in genomic datasets.</span>
-                        </span>
-                        <span class="ix-meta">
+                            <span class="ix-year">2022</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://github.com/NeLLi-team/symclatron" target="_blank" rel="noopener">
+                            <span class="ix-no">12</span>
+                            <span class="ix-body">
+                                <span class="ix-title">symclatron</span>
+                                <span class="ix-desc">Classifies microbial genomes as free-living, host-associated symbiont or obligate intracellular symbiont.</span>
+                            </span>
                             <span class="ix-venue">GitHub</span>
-                            <span class="ix-year">2024</span>
-                            <span class="ix-type">Tool</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://github.com/fschjgi/nsgtree" target="_blank" rel="noopener">
-                        <span class="ix-no">09</span>
-                        <span class="ix-body">
-                            <span class="ix-title">nsgtree</span>
-                            <span class="ix-desc">Neural-network-guided phylogenetic inference for evolutionary analysis of novel microbial lineages.</span>
-                        </span>
-                        <span class="ix-meta">
+                            <span class="ix-year">2025</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://github.com/NeLLi-team/nsgtree" target="_blank" rel="noopener">
+                            <span class="ix-no">13</span>
+                            <span class="ix-body">
+                                <span class="ix-title">nsgtree</span>
+                                <span class="ix-desc">New Simple Genome Tree: builds a phylogenomic tree from a folder of genome proteomes in one command.</span>
+                            </span>
                             <span class="ix-venue">GitHub</span>
-                            <span class="ix-year">2024</span>
-                            <span class="ix-type">Tool</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
+                            <span class="ix-year">2023</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                </ol>
+            </div>
 
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://newlineages.com" target="_blank" rel="noopener">
-                        <span class="ix-no">10</span>
-                        <span class="ix-body">
-                            <span class="ix-title">New Lineages of Life</span>
-                            <span class="ix-desc">Research group discovering novel microbial diversity through large-scale genomics and multi-omics.</span>
-                        </span>
-                        <span class="ix-meta">
+            <div class="index-group">
+                <h3 class="index-group-label" data-reveal="rise">Group &amp; venture</h3>
+                <ol class="index-list">
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://newlineages.com" target="_blank" rel="noopener">
+                            <span class="ix-no">14</span>
+                            <span class="ix-body">
+                                <span class="ix-title">New Lineages of Life</span>
+                                <span class="ix-desc">Research group discovering novel microbial diversity through large-scale genomics and multi-omics.</span>
+                            </span>
                             <span class="ix-venue">DOE JGI / LBNL</span>
                             <span class="ix-year">2023</span>
-                            <span class="ix-type">Group</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-
-                <li class="index-item" data-reveal="rise">
-                    <a class="index-link" href="https://samplex.ai" target="_blank" rel="noopener">
-                        <span class="ix-no">11</span>
-                        <span class="ix-body">
-                            <span class="ix-title">SampleX</span>
-                            <span class="ix-desc">AI-powered biological sample analysis for rapid pathogen identification and characterization.</span>
-                        </span>
-                        <span class="ix-meta">
-                            <span class="ix-venue">AI Startup</span>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="https://samplex.ai" target="_blank" rel="noopener">
+                            <span class="ix-no">15</span>
+                            <span class="ix-body">
+                                <span class="ix-title">SampleX</span>
+                                <span class="ix-desc">AI-powered biological sample analysis for rapid pathogen identification and characterization.</span>
+                            </span>
+                            <span class="ix-venue">AI startup</span>
                             <span class="ix-year">2024</span>
-                            <span class="ix-type">Venture</span>
-                        </span>
-                        <span class="ix-arrow" aria-hidden="true">&#8599;</span>
-                    </a>
-                </li>
-            </ol>
+                            <span class="ix-arrow" aria-hidden="true">&#8599;</span>
+                        </a>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="index-group">
+                <h3 class="index-group-label" data-reveal="rise">Lab</h3>
+                <ol class="index-list">
+                    <li class="index-item" data-reveal="rise">
+                        <a class="index-link" href="lab/virophage/">
+                            <span class="ix-no">16</span>
+                            <span class="ix-body">
+                                <span class="ix-title">Parasite’s Parasite</span>
+                                <span class="ix-desc">Interactive WebGPU study: a virophage rides a giant virus into an amoeba, replicates in the viral factory, and leaves when the cell bursts.</span>
+                            </span>
+                            <span class="ix-venue">Infection Studies</span>
+                            <span class="ix-year">2026</span>
+                            <span class="ix-arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                </ol>
+            </div>
+            <!-- work:end -->
         </div>
     </section>
 
@@ -368,7 +423,7 @@
                     <li><a href="https://newlineages.com" target="_blank" rel="noopener"><span class="lk-no">01</span><span class="lk-name">New Lineages</span><span class="lk-host">newlineages.com</span></a></li>
                     <li><a href="https://samplex.ai" target="_blank" rel="noopener"><span class="lk-no">02</span><span class="lk-name">SampleX</span><span class="lk-host">samplex.ai</span></a></li>
                     <li><a href="https://scholar.google.com/citations?user=rGqwhgkAAAAJ&hl=en&oi=ao" target="_blank" rel="noopener"><span class="lk-no">03</span><span class="lk-name">Google Scholar</span><span class="lk-host">scholar.google.com</span></a></li>
-                    <li><a href="https://github.com/fschjgi" target="_blank" rel="noopener"><span class="lk-no">04</span><span class="lk-name">GitHub</span><span class="lk-host">github.com/fschjgi</span></a></li>
+                    <li><a href="https://github.com/fmschulz" target="_blank" rel="noopener"><span class="lk-no">04</span><span class="lk-name">GitHub</span><span class="lk-host">github.com/fmschulz</span></a></li>
                     <li><a href="https://github.com/NeLLi-team" target="_blank" rel="noopener"><span class="lk-no">05</span><span class="lk-name">NeLLi Team</span><span class="lk-host">github.com/NeLLi-team</span></a></li>
                     <li><a href="https://linkedin.com/in/fmschulz" target="_blank" rel="noopener"><span class="lk-no">06</span><span class="lk-name">LinkedIn</span><span class="lk-host">in/fmschulz</span></a></li>
                     <li><a href="https://twitter.com/fmschulz" target="_blank" rel="noopener"><span class="lk-no">07</span><span class="lk-name">X / Twitter</span><span class="lk-host">@fmschulz</span></a></li>
@@ -381,11 +436,11 @@
     <footer class="footer">
         <div class="container footer-inner">
             <span class="footer-mark">F.Schulz</span>
-            <span class="footer-colophon">Set in Space Grotesk &amp; Space Mono &middot; Berkeley, CA</span>
+            <span class="footer-colophon">Set in Space Grotesk, Instrument Serif &amp; Space Mono &middot; Berkeley, CA</span>
             <span class="footer-copy">&copy; 2026</span>
         </div>
     </footer>
 
-    <script src="js/animations.js?v=19"></script>
+    <script src="js/animations.js?v=20"></script>
 </body>
 </html>
