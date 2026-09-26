@@ -242,7 +242,7 @@
         }
 
         function seedAmbient() {
-            const n = w < 700 ? 2 : 4;
+            const n = w < 700 ? 1 : 2;
             for (let i = 0; i < n; i++) {
                 shapes.push(makeShape(Math.random() * w, Math.random() * h, 28 + Math.random() * 24, true));
             }
@@ -304,8 +304,6 @@
             shapes.push(makeShape(x, y, 34 + Math.random() * 30, false));
             const placed = shapes.filter((s) => !s.drift && !s.dying);
             if (placed.length > MAX_PLACED) placed[0].dying = true;
-            const hint = document.querySelector('.capsid-hint');
-            if (hint) hint.classList.add('is-hidden');
         }
 
         resize();
