@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="0">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Parasite's Parasite — Infection Studies No. 001 · Frederik Schulz</title>
+<meta name="description" content="An interactive WebGPU study. A virophage rides a giant virus into an amoeba, replicates in the viral factory, and leaves when the cell bursts.">
+<meta name="theme-color" content="#e6e5e1">
+<link rel="icon" href="data:,">
+<meta property="og:title" content="Parasite's Parasite — Infection Studies No. 001">
+<meta property="og:description" content="A soft-body amoeba, a giant virus, and the virophage that rides it. Real-time WebGPU.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #e6e5e1;
+    --fg: #121211;
+    --muted: rgba(18, 18, 17, 0.56);
+    --hair: rgba(18, 18, 17, 0.22);
+    --hair-soft: rgba(18, 18, 17, 0.1);
+    --veil: rgba(230, 229, 225, 0.74);
+    --serif: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    --sans: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono: 'Space Mono', ui-monospace, Menlo, Consolas, monospace;
+    --pad: clamp(18px, 2.3vw, 34px);
+    --panel-w: 264px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-mode="1"], html[data-mode="2"] {
+    --fg: #efeeea;
+    --muted: rgba(239, 238, 234, 0.55);
+    --hair: rgba(239, 238, 234, 0.24);
+    --hair-soft: rgba(239, 238, 234, 0.11);
+    --veil: rgba(8, 8, 9, 0.62);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.6s var(--ease), color 0.6s var(--ease);
+}
+a { color: inherit; }
+button, input { font: inherit; color: inherit; }
+::selection { background: var(--fg); color: var(--bg); }
+
+.mono, .panel h2, .kicker, .back, .status, .readout dt, .readout dd, .btn, .preset b,
+.field-head, .checks label, .stages li, .notes summary, .fine, .scalebar span {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-size: 10.5px;
+    font-weight: 400;
+}
+
+/* ===== Stage ===== */
+.app { position: fixed; inset: 0; }
+.stage { position: absolute; inset: 0; }
+#view {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: crosshair;
+    outline: none;
+}
+#view.can-grab { cursor: grab; }
+#view.is-grabbing { cursor: grabbing; }
+
+/* ===== Masthead (top left) ===== */
+.masthead {
+    position: absolute;
+    left: var(--pad); top: var(--pad);
+    max-width: 440px;
+    pointer-events: none;
+    z-index: 2;
+}
+.masthead a { pointer-events: auto; }
+.back { display: inline-flex; gap: 0.7em; color: var(--muted); text-decoration: none; transition: color 0.3s var(--ease); }
+.back:hover, .back:focus-visible { color: var(--fg); }
+.kicker { margin-top: 30px; }
+.kicker .sep { color: var(--muted); margin: 0 0.5em; }
+h1 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(56px, 7.4vw, 118px);
+    line-height: 0.84;
+    letter-spacing: -0.015em;
+    margin-top: 14px;
+}
+h1 span { display: block; }
+h1 span + span { padding-left: 0.42em; }
+.caption { margin-top: 22px; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.caption span { display: block; }
+
+/* ===== Status (top right) ===== */
+.status {
+    position: absolute;
+    right: var(--pad); top: var(--pad);
+    display: flex; align-items: center; gap: 0.75em;
+    z-index: 2;
+    line-height: 1;
+}
+.status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: live 2.4s ease-in-out infinite; }
+.status.is-idle i { animation: none; background: transparent; box-shadow: inset 0 0 0 1px currentColor; }
+@keyframes live { 50% { opacity: 0.2; } }
+
+/* ===== Panel (right) ===== */
+.panel {
+    position: absolute;
+    right: var(--pad);
+    top: calc(var(--pad) + 30px);
+    width: var(--panel-w);
+    max-height: calc(100% - var(--pad) * 2 - 30px - 56px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    border-top: 1px solid var(--fg);
+    background: var(--veil);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    z-index: 2;
+}
+.panel h2 { font-weight: 700; padding: 11px 0 10px; display: flex; justify-content: space-between; }
+.panel h2 span { color: var(--muted); font-weight: 400; }
+.group { padding: 12px 0 14px; border-top: 1px solid var(--hair-soft); }
+.field-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--muted); }
+.field-head output { color: var(--fg); font-variant-numeric: tabular-nums; }
+
+.presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 9px; }
+.preset {
+    background: transparent;
+    border: 1px solid var(--hair);
+    padding: 5px 5px 6px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease);
+}
+.preset svg { display: block; width: 100%; height: auto; margin-bottom: 6px; }
+.preset b { display: block; font-size: 9.5px; letter-spacing: 0.07em; }
+.preset:hover { border-color: var(--fg); }
+.preset[aria-pressed="true"] { border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
+
+input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 22px;
+    background: transparent;
+    cursor: pointer;
+    margin-top: 2px;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--fg); }
+input[type="range"]::-moz-range-track { height: 1px; background: var(--fg); }
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 11px; height: 11px; margin-top: -5px;
+    background: var(--bg); border: 1px solid var(--fg); border-radius: 0;
+}
+input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; background: var(--bg); border: 1px solid var(--fg); border-radius: 0; }
+input[type="range"]:focus-visible { outline: 1px solid var(--fg); outline-offset: 2px; }
+.field + .field { margin-top: 10px; }
+
+.btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.btn {
+    border: 1px solid var(--fg);
+    background: transparent;
+    padding: 9px 8px;
+    cursor: pointer;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.btn:hover, .btn:focus-visible { background: var(--fg); color: var(--bg); outline: none; }
+.btn.wide { width: 100%; margin-top: 10px; }
+.checks { display: flex; gap: 18px; margin-top: 12px; }
+.checks label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.checks input {
+    -webkit-appearance: none; appearance: none;
+    width: 11px; height: 11px;
+    border: 1px solid var(--fg);
+    background: transparent;
+    cursor: pointer;
+}
+.checks input:checked { background: var(--fg); }
+.checks input:focus-visible { outline: 1px solid var(--fg); outline-offset: 2px; }
+
+.stages { list-style: none; margin-top: 8px; }
+.stages li {
+    display: grid;
+    grid-template-columns: 16px 22px 1fr auto;
+    align-items: center;
+    padding: 5px 0;
+    border-top: 1px solid var(--hair-soft);
+    color: var(--muted);
+    transition: color 0.4s var(--ease);
+}
+.stages li .mk { width: 7px; height: 7px; box-shadow: inset 0 0 0 1px currentColor; }
+.stages li em { font-style: normal; color: var(--muted); font-size: 9.5px; }
+.stages li.is-done { color: var(--fg); }
+.stages li.is-done .mk { box-shadow: none; background: linear-gradient(currentColor, currentColor) center / 7px 1px no-repeat; }
+.stages li.is-now { color: var(--fg); }
+.stages li.is-now .mk { background: currentColor; }
+
+/* ===== Readout (bottom left) ===== */
+.readout {
+    position: absolute;
+    left: var(--pad); bottom: var(--pad);
+    width: 330px;
+    pointer-events: none;
+    z-index: 2;
+}
+.readout button { pointer-events: auto; }
+.hint { font-size: 13px; line-height: 1.5; max-width: 34ch; margin-bottom: 14px; }
+.readout dl { display: grid; grid-template-columns: 1fr auto; border-top: 1px solid var(--fg); }
+.readout dt, .readout dd { padding: 5px 0 4px; border-bottom: 1px solid var(--hair-soft); }
+.readout dt { color: var(--muted); }
+.readout dd { text-align: right; font-variant-numeric: tabular-nums; text-transform: none; letter-spacing: 0.02em; }
+.scalebar { display: flex; align-items: center; gap: 10px; margin-top: 12px; min-height: 12px; white-space: nowrap; }
+.scalebar span { text-transform: none; }
+.scalebar i { display: block; height: 7px; border: 1px solid var(--fg); border-top: 0; width: 60px; transition: width 0.2s linear; }
+.scalebar .fit { margin-left: auto; border: 0; background: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.fine { color: var(--muted); font-size: 9.5px; letter-spacing: 0.06em; margin-top: 9px; line-height: 1.6; text-transform: none; }
+
+/* ===== Notes (bottom right) ===== */
+.notes {
+    position: absolute;
+    right: var(--pad); bottom: var(--pad);
+    width: var(--panel-w);
+    z-index: 3;
+}
+.notes summary {
+    list-style: none;
+    display: flex; justify-content: space-between;
+    border-top: 1px solid var(--fg);
+    padding-top: 10px;
+    cursor: pointer;
+}
+.notes summary::-webkit-details-marker { display: none; }
+.notes summary .pm::before { content: '+'; }
+.notes[open] summary .pm::before { content: '\2212'; }
+.notes[open] { width: min(380px, calc(100vw - var(--pad) * 2)); background: var(--bg); box-shadow: 0 0 0 12px var(--bg); }
+.notes .body {
+    max-height: min(52vh, 480px);
+    overflow-y: auto;
+    padding: 12px 14px 14px 0;
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+.notes h3 { font-family: var(--mono); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; font-size: 10px; margin: 14px 0 5px; }
+.notes h3:first-child { margin-top: 0; }
+.notes p + p { margin-top: 6px; }
+.notes ol { margin: 4px 0 0 1.2em; }
+.notes li { margin-top: 3px; }
+.notes a { text-underline-offset: 2px; }
+
+/* ===== Fallback ===== */
+.fallback {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    padding: var(--pad);
+    background: var(--bg);
+    z-index: 5;
+}
+[hidden] { display: none !important; }
+.fallback .card { max-width: 520px; border-top: 1px solid var(--fg); padding-top: 16px; }
+.fallback h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 44px; line-height: 1; margin: 10px 0 14px; }
+.fallback p { font-size: 14px; }
+.fallback p + p { margin-top: 10px; }
+.fallback code { font-family: var(--mono); font-size: 12px; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ===== Narrow screens: stack everything, keep the cell clear ===== */
+@media (max-width: 760px) {
+    body { overflow: auto; }
+    .app { position: relative; min-height: 100%; display: flex; flex-direction: column; }
+    .masthead { position: relative; left: auto; top: auto; padding: 20px 20px 4px; max-width: none; }
+    .kicker { margin-top: 18px; }
+    h1 { font-size: clamp(46px, 14.5vw, 72px); }
+    .caption { margin-top: 14px; font-size: 13px; }
+    .stage { position: relative; inset: auto; height: min(112vw, 64svh); order: 1; }
+    .readout { position: relative; left: auto; bottom: auto; width: auto; padding: 14px 20px 0; order: 2; }
+    .panel { position: relative; right: auto; top: auto; width: auto; max-height: none; margin: 22px 20px 0; order: 3; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .notes, .notes[open] { position: relative; right: auto; bottom: auto; width: auto; margin: 22px 20px 36px; order: 4; }
+    .notes .body { max-height: none; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .status { top: 22px; right: 20px; }
+}
+@media (max-width: 760px) and (orientation: landscape) {
+    .stage { height: 86svh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .status i { animation: none; }
+    body { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+    <header class="masthead">
+        <a class="back" href="../../">&larr; Frederik Schulz</a>
+        <p class="kicker mono">Infection Studies<span class="sep">/</span>No. 001</p>
+        <h1><span>Parasite&rsquo;s</span><span>Parasite.</span></h1>
+        <p class="caption">
+            <span>An amoeba swallows a giant.</span>
+            <span>A virophage rides along.</span>
+            <span>Everyone leaves but the host.</span>
+        </p>
+    </header>
+
+    <div class="status is-idle" role="status"><i aria-hidden="true"></i><span class="status-text">WebGPU &middot; Starting</span></div>
+
+    <div class="stage">
+        <canvas id="view" tabindex="0" aria-label="Interactive 3D simulation. An amoeba on a slide; drag it to stretch it, drag a virus particle into it, or tap the slide to add one."></canvas>
+    </div>
+
+    <aside class="panel" aria-label="Controls">
+        <h2>The culture <span>A. castellanii</span></h2>
+
+        <div class="group">
+            <div class="field-head"><span>Imaging</span><output id="mode-name">Phase contrast</output></div>
+            <div class="presets" role="group" aria-label="Imaging preset">
+                <button class="preset" type="button" data-mode="0" aria-pressed="true">
+                    <svg viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#dddcd7"/><ellipse cx="30" cy="16" rx="17" ry="9" fill="#a9a8a3" stroke="#f6f5f1" stroke-width="1.6"/><circle cx="25" cy="15" r="3.2" fill="#7c7b77"/><circle cx="35" cy="17" r="1.6" fill="#2a2a29"/></svg>
+                    <b>Phase</b>
+                </button>
+                <button class="preset" type="button" data-mode="1" aria-pressed="false">
+                    <svg viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#0b0b0c"/><ellipse cx="30" cy="16" rx="17" ry="9" fill="#1b1b1d" stroke="#e8e8ea" stroke-width="1.2"/><circle cx="25" cy="15" r="3.2" fill="#4a4a4d"/><circle cx="35" cy="17" r="1.6" fill="#f2f2f2"/></svg>
+                    <b>Darkfield</b>
+                </button>
+                <button class="preset" type="button" data-mode="2" aria-pressed="false">
+                    <svg viewBox="0 0 60 30" aria-hidden="true"><rect width="60" height="30" fill="#050608"/><ellipse cx="30" cy="16" rx="17" ry="9" fill="#0b0d10" stroke="#1d2a33" stroke-width="1"/><circle cx="25" cy="15" r="3.4" fill="#3d63f0"/><circle cx="35" cy="17" r="2" fill="#55e07a"/><circle cx="39" cy="13" r="1.1" fill="#f0469a"/></svg>
+                    <b>Fluor.</b>
+                </button>
+            </div>
+        </div>
+
+        <div class="group">
+            <div class="field">
+                <label class="field-head" for="load"><span>Virophage load</span><output id="load-out" for="load">4 / virion</output></label>
+                <input id="load" type="range" min="0" max="10" step="1" value="4">
+            </div>
+            <div class="field">
+                <label class="field-head" for="stiff"><span>Cortex stiffness</span><output id="stiff-out" for="stiff">0.55</output></label>
+                <input id="stiff" type="range" min="0" max="1" step="0.01" value="0.55">
+            </div>
+            <div class="field">
+                <label class="field-head" for="visc"><span>Cytoplasm viscosity</span><output id="visc-out" for="visc">0.45</output></label>
+                <input id="visc" type="range" min="0" max="1" step="0.01" value="0.45">
+            </div>
+        </div>
+
+        <div class="group">
+            <div class="btns">
+                <button class="btn" type="button" id="inoculate">Inoculate</button>
+                <button class="btn" type="button" id="newhost">New host</button>
+            </div>
+            <div class="checks">
+                <label><input type="checkbox" id="slow"> &frac14; speed</label>
+                <label><input type="checkbox" id="mesh"> Show mesh</label>
+            </div>
+            <button class="btn wide" type="button" id="pause" aria-pressed="false">Pause</button>
+        </div>
+
+        <div class="group">
+            <div class="field-head"><span>Infection cycle</span><output id="stage-name" aria-live="polite">Uninfected</output></div>
+            <ol class="stages">
+                <li data-stage="0"><span class="mk"></span><span>01</span><span>Uptake</span><em>0 h</em></li>
+                <li data-stage="1"><span class="mk"></span><span>02</span><span>Eclipse</span><em>1&ndash;3 h</em></li>
+                <li data-stage="2"><span class="mk"></span><span>03</span><span>Viral factory</span><em>3&ndash;7 h</em></li>
+                <li data-stage="3"><span class="mk"></span><span>04</span><span>Assembly</span><em>7&ndash;13 h</em></li>
+                <li data-stage="4"><span class="mk"></span><span>05</span><span>Lysis</span><em>~13 h</em></li>
+            </ol>
+        </div>
+    </aside>
+
+    <section class="readout" aria-label="Live readouts">
+        <p class="hint">Drag the cell to stretch it. Throw a virion into it, or tap the slide to drop one. Scroll or pinch to zoom.</p>
+        <dl>
+            <dt>Time post-infection</dt><dd id="r-time">&mdash;</dd>
+            <dt>Cell volume</dt><dd id="r-vol">1.00&times; rest</dd>
+            <dt>Cell mass</dt><dd id="r-mass">&mdash;</dd>
+            <dt>Kinetic energy</dt><dd id="r-ke">0</dd>
+            <dt>Giant progeny</dt><dd id="r-gv">0</dd>
+            <dt>Virophage progeny</dt><dd id="r-vp">0</dd>
+            <dt>Free on slide</dt><dd id="r-free">0</dd>
+        </dl>
+        <div class="scalebar"><i id="scale-bar"></i><span id="scale-label">5 &micro;m</span><button class="fit mono" type="button" id="fit" hidden>Fit view</button></div>
+        <p class="fine">Times approximate: 1 h of infection takes about 2 s at full speed. Mass from the simulated volume at 1.05 g/mL. Energy in simulation units.</p>
+    </section>
+
+    <details class="notes">
+        <summary><span>Inside the experiment</span><span class="pm" aria-hidden="true"></span></summary>
+        <div class="body">
+            <h3>The biology</h3>
+            <p>Acanthamoeba feeds on bacteria by phagocytosis. A Mimivirus particle, about 0.75&nbsp;&micro;m across with its fibers, is large enough to pass for food. In the phagosome, five capsid faces around one vertex, the stargate, fold open, and the genome enters the cytoplasm. A viral factory grows beside the nucleus and assembles hundreds of new particles.</p>
+            <p>Sputnik, a 50&nbsp;nm virophage, cannot multiply in the amoeba alone. In this model it enters attached to the fibers of a giant virion and replicates in the giant virus&rsquo;s factory. The giant virus then makes fewer particles, and more of them are abortive or misassembled. The amoeba bursts either way. In the related Cafeteria&ndash;CroV&ndash;mavirus system, the released virophages protect the next host cells, not the one that made them.</p>
+            <h3>The physics</h3>
+            <p>The cell is a lattice of <span id="n-tets">about 4,000</span> tetrahedra solved with extended position-based dynamics (XPBD). Each element carries an edge constraint and a volume constraint, and the cortex near the membrane is stiffer than the cytoplasm. The solver runs fixed 1/120&nbsp;s steps with six substeps and per-edge viscous damping. The underside holds the slide through adhesions that creep slowly and peel off under a hard pull. Pseudopods, the rounding before lysis, and the collapse after it are changes in rest length, not keyframes. The nucleus, factory, vacuoles, granules and virions store rest-space coordinates and ride the deformation by barycentric interpolation.</p>
+            <h3>The rendering</h3>
+            <p>Four WebGPU passes run each frame: a top-down height map for contact shadows, a thickness buffer from front- and back-face depth, the slide with everything inside the cell, and then the membrane. The membrane pass adds screen-space refraction, Beer&ndash;Lambert absorption, Schlick Fresnel, a GGX highlight and thin-edge transmission. The vertex shader skins the surface from the tetrahedra.</p>
+            <h3>Scale</h3>
+            <p>The amoeba is about 25&nbsp;&micro;m across; the slide grid is 10&nbsp;&micro;m, subdivided at 2&nbsp;&micro;m. Giant virions are drawn at 1.5&times; and virophages at about 4&times; true size. Yields and timings are approximate. Fluorescence colors are false color: DNA in blue, giant virus in green, virophage in magenta.</p>
+            <h3>References</h3>
+            <ol>
+                <li>La Scola B et al. The virophage as a unique parasite of the giant mimivirus. <i>Nature</i> 2008. <a href="https://doi.org/10.1038/nature07218" target="_blank" rel="noopener">doi</a></li>
+                <li>Zauberman N et al. Distinct DNA exit and packaging portals in the virus Acanthamoeba polyphaga mimivirus. <i>PLoS Biol</i> 2008. <a href="https://doi.org/10.1371/journal.pbio.0060114" target="_blank" rel="noopener">doi</a></li>
+                <li>Fischer MG, Hackl T. Host genome integration and giant virus-induced reactivation of the virophage mavirus. <i>Nature</i> 2016. <a href="https://doi.org/10.1038/nature20593" target="_blank" rel="noopener">doi</a></li>
+            </ol>
+        </div>
+    </details>
+
+    <div class="fallback" hidden>
+        <div class="card">
+            <p class="mono">Infection Studies / No. 001</p>
+            <h2>This specimen needs WebGPU.</h2>
+            <p id="fallback-reason">This browser did not provide a WebGPU device.</p>
+            <p>The simulation renders live on your graphics card through WebGPU, so there is no fallback image. Try a current version of Chrome, Edge or Safari, or Firefox on Windows. On Linux, Chrome may need WebGPU switched on under <code>chrome://flags</code>.</p>
+            <p><a class="back" href="../../">&larr; Back to Frederik Schulz</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* =============================================================
+   Parasite's Parasite
+   Soft-body amoeba (tetrahedral XPBD on the CPU), a Mimivirus /
+   Sputnik infection cycle, and a four-pass WebGPU renderer.
+   ============================================================= */
+
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s) => document.querySelector(s);
+
+// ---------- Scale, capacities, timing ----------
+const UM = 8.6;                 // micrometres per world unit (cell spans ~2.9 units = 25 um)
+const RC = 0.045;               // giant capsid circumradius (true ~0.029; drawn 1.5x)
+const RF = RC * 1.5;            // fiber layer radius
+const RV = 0.011;               // virophage radius (true ~0.003; drawn ~4x)
+const MAXG = 640, MAXV = 4096, NGRAN = 200, MAXBLOB = 64;
+const DT = 1 / 120, SUB = 6, MAX_STEPS = 4;
+const HPS = 0.45;               // infection hours per simulated second
+const T_GATE = 1.0, T_OPEN = 0.8, T_LYSIS = 10.5; // hours (lysis measured from factory seeding)
+
+const rand = Math.random;
+const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const randn = () => { let q = 0; while (!q) q = rand(); return Math.sqrt(-2 * Math.log(q)) * Math.cos(6.2831853 * rand()); };
+function poisson(l) { const L = Math.exp(-l); let k = 0, p = 1; do { k++; p *= rand(); } while (p > L); return k - 1; }
+
+/* =============================================================
+   1. Rest shape: a flattened, lobed amoeba as a signed distance
+   ============================================================= */
+const LOBES = [
+    [0.35, 0.92, 0.62, 0.3, 0.19],    // angle, distance, radial, tangential, height
+    [1.95, 0.86, 0.52, 0.27, 0.17],
+    [3.4, 0.95, 0.6, 0.3, 0.18],
+    [4.85, 0.84, 0.5, 0.26, 0.16],
+];
+function sdEll(x, y, z, rx, ry, rz) {
+    const k0 = Math.hypot(x / rx, y / ry, z / rz);
+    const k1 = Math.hypot(x / (rx * rx), y / (ry * ry), z / (rz * rz));
+    return k1 > 1e-9 ? k0 * (k0 - 1) / k1 : -Math.min(rx, ry, rz);
+}
+function smin(a, b, k) { const h = Math.max(k - Math.abs(a - b), 0) / k; return Math.min(a, b) - h * h * k * 0.25; }
+function sdf(x, y, z) {
+    const th = Math.atan2(z, x);
+    const wob = 1 + 0.05 * Math.sin(3 * th + 0.7) + 0.035 * Math.sin(5 * th + 2.1);
+    let d = sdEll(x / wob, y - 0.26, z / wob, 0.98, 0.36, 0.84);
+    for (const L of LOBES) {
+        const ca = Math.cos(L[0]), sa = Math.sin(L[0]);
+        const lx = x - ca * L[1], lz = z - sa * L[1];
+        d = smin(d, sdEll(lx * ca + lz * sa, y - 0.17, -lx * sa + lz * ca, L[2], L[4], L[3]), 0.24);
+    }
+    return -smin(-d, y - 0.03, 0.08);   // flat, adherent underside
+}
+
+/* =============================================================
+   2. Tetrahedral lattice (5 tets per cube, alternating parity)
+   ============================================================= */
+const HX = 0.2, HY = 0.13, HZ = 0.2, LX0 = -1.9, LZ0 = -1.9, CX = 19, CY = 6, CZ = 19;
+const nodeAt = new Int32Array((CX + 1) * (CY + 1) * (CZ + 1)).fill(-1);
+const cubeTet = new Int32Array(CX * CY * CZ).fill(-1);
+const restL = [], tetL = [];
+{
+    const TP0 = [[0, 1, 2, 4], [3, 2, 1, 7], [5, 1, 4, 7], [6, 2, 7, 4], [1, 2, 4, 7]];
+    const TP1 = [[1, 0, 3, 5], [2, 0, 3, 6], [4, 0, 5, 6], [7, 3, 5, 6], [0, 3, 5, 6]];
+    const half = 0.5 * Math.hypot(HX, HY, HZ) * 1.15;
+    const node = (i, j, k) => {
+        const key = (k * (CY + 1) + j) * (CX + 1) + i;
+        if (nodeAt[key] < 0) { nodeAt[key] = restL.length / 3; restL.push(LX0 + i * HX, j * HY, LZ0 + k * HZ); }
+        return nodeAt[key];
+    };
+    for (let k = 0; k < CZ; k++) for (let j = 0; j < CY; j++) for (let i = 0; i < CX; i++) {
+        if (sdf(LX0 + (i + 0.5) * HX, (j + 0.5) * HY, LZ0 + (k + 0.5) * HZ) > half) continue;
+        cubeTet[(k * CY + j) * CX + i] = tetL.length / 4;
+        const cn = [];
+        for (let c = 0; c < 8; c++) cn.push(node(i + (c & 1), j + ((c >> 1) & 1), k + ((c >> 2) & 1)));
+        for (const t of ((i + j + k) & 1 ? TP1 : TP0)) tetL.push(cn[t[0]], cn[t[1]], cn[t[2]], cn[t[3]]);
+    }
+}
+const NN = restL.length / 3, NT = tetL.length / 4;
+const RX = new Float32Array(restL);
+const T4 = new Int32Array(tetL);
+const DMI = new Float32Array(NT * 9);      // inverse rest shape matrix, row-major
+const V0 = new Float32Array(NT);
+for (let t = 0; t < NT; t++) {
+    let a = T4[t * 4] * 3, b = T4[t * 4 + 1] * 3, c = T4[t * 4 + 2] * 3, d = T4[t * 4 + 3] * 3;
+    let e1x = RX[b] - RX[a], e1y = RX[b + 1] - RX[a + 1], e1z = RX[b + 2] - RX[a + 2];
+    let e2x = RX[c] - RX[a], e2y = RX[c + 1] - RX[a + 1], e2z = RX[c + 2] - RX[a + 2];
+    const e3x = RX[d] - RX[a], e3y = RX[d + 1] - RX[a + 1], e3z = RX[d + 2] - RX[a + 2];
+    let det = e1x * (e2y * e3z - e2z * e3y) - e1y * (e2x * e3z - e2z * e3x) + e1z * (e2x * e3y - e2y * e3x);
+    if (det < 0) {   // enforce positive orientation
+        const s = T4[t * 4 + 1]; T4[t * 4 + 1] = T4[t * 4 + 2]; T4[t * 4 + 2] = s;
+        [e1x, e2x] = [e2x, e1x]; [e1y, e2y] = [e2y, e1y]; [e1z, e2z] = [e2z, e1z];
+        det = -det;
+    }
+    V0[t] = det / 6;
+    const r = DMI, o = t * 9, id = 1 / det;
+    // rows of inverse: (e2 x e3), (e3 x e1), (e1 x e2), divided by det
+    r[o] = (e2y * e3z - e2z * e3y) * id; r[o + 1] = (e2z * e3x - e2x * e3z) * id; r[o + 2] = (e2x * e3y - e2y * e3x) * id;
+    r[o + 3] = (e3y * e1z - e3z * e1y) * id; r[o + 4] = (e3z * e1x - e3x * e1z) * id; r[o + 5] = (e3x * e1y - e3y * e1x) * id;
+    r[o + 6] = (e1y * e2z - e1z * e2y) * id; r[o + 7] = (e1z * e2x - e1x * e2z) * id; r[o + 8] = (e1x * e2y - e1y * e2x) * id;
+}
+
+// Unique edges, masses, cortex flags
+const edgeMap = new Map();
+const edgeL = [];
+for (let t = 0; t < NT; t++) {
+    for (let p = 0; p < 4; p++) for (let q = p + 1; q < 4; q++) {
+        let a = T4[t * 4 + p], b = T4[t * 4 + q];
+        if (a > b) [a, b] = [b, a];
+        const key = a * NN + b;
+        if (!edgeMap.has(key)) { edgeMap.set(key, edgeL.length / 2); edgeL.push(a, b); }
+    }
+}
+const NE = edgeL.length / 2;
+const E2 = new Int32Array(edgeL);
+const L0 = new Float32Array(NE), Lc = new Float32Array(NE), eK = new Float32Array(NE);
+const eY2 = new Float32Array(NE), eMid = new Float32Array(NE * 3), tMid = new Float32Array(NT * 3);
+const depth = new Float32Array(NN);
+for (let i = 0; i < NN; i++) depth[i] = -sdf(RX[i * 3], RX[i * 3 + 1], RX[i * 3 + 2]);
+for (let e = 0; e < NE; e++) {
+    const a = E2[e * 2] * 3, b = E2[e * 2 + 1] * 3;
+    const dx = RX[b] - RX[a], dy = RX[b + 1] - RX[a + 1], dz = RX[b + 2] - RX[a + 2];
+    const l = Math.hypot(dx, dy, dz);
+    L0[e] = Lc[e] = l;
+    eY2[e] = (dy / l) * (dy / l);
+    eMid[e * 3] = (RX[a] + RX[b]) / 2; eMid[e * 3 + 1] = (RX[a + 1] + RX[b + 1]) / 2; eMid[e * 3 + 2] = (RX[a + 2] + RX[b + 2]) / 2;
+    eK[e] = Math.min(depth[E2[e * 2]], depth[E2[e * 2 + 1]]) < 0.1 ? 0.3 : 1.0;   // stiffer cortex
+}
+const IM = new Float32Array(NN);
+{
+    const m = new Float32Array(NN);
+    let tot = 0;
+    for (let t = 0; t < NT; t++) {
+        for (let k = 0; k < 4; k++) m[T4[t * 4 + k]] += V0[t] / 4;
+        tot += V0[t];
+        for (let k = 0; k < 3; k++) tMid[t * 3 + k] = (RX[T4[t * 4] * 3 + k] + RX[T4[t * 4 + 1] * 3 + k] + RX[T4[t * 4 + 2] * 3 + k] + RX[T4[t * 4 + 3] * 3 + k]) / 4;
+    }
+    const mean = tot / NN;
+    for (let i = 0; i < NN; i++) IM[i] = mean / m[i];   // masses normalised to mean 1
+}
+const MASS = new Float32Array(NN);
+for (let i = 0; i < NN; i++) MASS[i] = 1 / IM[i];
+
+// Pseudopod weights: six sectors, radial edges near the rim lengthen when active
+const NLOBE = 6;
+const eW = new Float32Array(NLOBE * NE), tW = new Float32Array(NLOBE * NT);
+for (let l = 0; l < NLOBE; l++) {
+    const phi = l / NLOBE * 6.2831853 + 0.3;
+    const cph = Math.cos(phi), sph = Math.sin(phi);
+    for (let e = 0; e < NE; e++) {
+        const mx = eMid[e * 3], mz = eMid[e * 3 + 2], r = Math.hypot(mx, mz) + 1e-6;
+        const ang = (mx * cph + mz * sph) / r;
+        const a = E2[e * 2] * 3, b = E2[e * 2 + 1] * 3;
+        const dx = RX[b] - RX[a], dz = RX[b + 2] - RX[a + 2];
+        const al = (dx * mx + dz * mz) / (r * L0[e]);
+        eW[l * NE + e] = sstep(0.62, 1.0, ang) * sstep(0.45, 1.3, r) * al * al;
+    }
+    for (let t = 0; t < NT; t++) {
+        const mx = tMid[t * 3], mz = tMid[t * 3 + 2], r = Math.hypot(mx, mz) + 1e-6;
+        tW[l * NT + t] = 0.6 * sstep(0.62, 1.0, (mx * cph + mz * sph) / r) * sstep(0.45, 1.3, r);
+    }
+}
+
+// Point location in rest space: lattice lookup, then barycentric test
+const loc = { t: -1, b1: 0, b2: 0, b3: 0 };
+function testTet(t, px, py, pz) {
+    const o = t * 9, a = T4[t * 4] * 3;
+    const qx = px - RX[a], qy = py - RX[a + 1], qz = pz - RX[a + 2];
+    const b1 = DMI[o] * qx + DMI[o + 1] * qy + DMI[o + 2] * qz;
+    const b2 = DMI[o + 3] * qx + DMI[o + 4] * qy + DMI[o + 5] * qz;
+    const b3 = DMI[o + 6] * qx + DMI[o + 7] * qy + DMI[o + 8] * qz;
+    return [b1, b2, b3, Math.min(b1, b2, b3, 1 - b1 - b2 - b3)];
+}
+function locate(px, py, pz) {
+    const ci = Math.floor((px - LX0) / HX), cj = Math.floor(py / HY), ck = Math.floor((pz - LZ0) / HZ);
+    let best = -1, bm = -1e9, bb = null;
+    for (let pass = 0; pass < 2; pass++) {
+        const r = pass;
+        for (let dk = -r; dk <= r; dk++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) {
+            if (pass === 1 && !di && !dj && !dk) continue;
+            const i = ci + di, j = cj + dj, k = ck + dk;
+            if (i < 0 || j < 0 || k < 0 || i >= CX || j >= CY || k >= CZ) continue;
+            const t0 = cubeTet[(k * CY + j) * CX + i];
+            if (t0 < 0) continue;
+            for (let t = t0; t < t0 + 5; t++) {
+                const b = testTet(t, px, py, pz);
+                if (b[3] > bm) { bm = b[3]; best = t; bb = b; }
+            }
+        }
+        if (bm > -1e-4) break;
+    }
+    loc.t = best;
+    if (best >= 0) { loc.b1 = bb[0]; loc.b2 = bb[1]; loc.b3 = bb[2]; }
+    return best;
+}
+
+/* =============================================================
+   3. Geometry: icospheres, the membrane surface, the capsid
+   ============================================================= */
+function icosphere(sub) {
+    const t = (1 + Math.sqrt(5)) / 2;
+    const V = [[-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0], [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t], [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]]
+        .map((v) => { const l = Math.hypot(...v); return [v[0] / l, v[1] / l, v[2] / l]; });
+    let F = [[0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11], [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+        [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9], [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]];
+    for (let s = 0; s < sub; s++) {
+        const cache = new Map(), NF = [];
+        const mid = (a, b) => {
+            const key = a < b ? a * 1e6 + b : b * 1e6 + a;
+            if (cache.has(key)) return cache.get(key);
+            const p = [(V[a][0] + V[b][0]) / 2, (V[a][1] + V[b][1]) / 2, (V[a][2] + V[b][2]) / 2];
+            const l = Math.hypot(...p);
+            V.push([p[0] / l, p[1] / l, p[2] / l]);
+            cache.set(key, V.length - 1);
+            return V.length - 1;
+        };
+        for (const [a, b, c] of F) {
+            const ab = mid(a, b), bc = mid(b, c), ca = mid(c, a);
+            NF.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]);
+        }
+        F = NF;
+    }
+    for (const f of F) {   // outward, counter-clockwise
+        const [a, b, c] = f.map((i) => V[i]);
+        const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+        const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        if (nx * (a[0] + b[0] + c[0]) + ny * (a[1] + b[1] + c[1]) + nz * (a[2] + b[2] + c[2]) < 0) { const s = f[1]; f[1] = f[2]; f[2] = s; }
+    }
+    return { V, F };
+}
+const flatPos = (ico) => new Float32Array(ico.V.flat());
+const flatIdx = (ico) => new Uint32Array(ico.F.flat());
+
+// Membrane surface: project a fine icosphere radially onto the SDF, bind to tets
+const SURF = (() => {
+    const ico = icosphere(5);
+    const n = ico.V.length;
+    const data = new ArrayBuffer(n * 40);
+    const f = new Float32Array(data), u = new Uint32Array(data);
+    const rest = new Float32Array(n * 3);
+    const cy = 0.26;
+    for (let i = 0; i < n; i++) {
+        const [dx, dy, dz] = ico.V[i];
+        let lo = 0, hi = 0.05;
+        while (sdf(dx * hi, cy + dy * hi, dz * hi) < 0 && hi < 4) { lo = hi; hi += 0.05; }
+        for (let it = 0; it < 24; it++) { const m = (lo + hi) / 2; if (sdf(dx * m, cy + dy * m, dz * m) < 0) lo = m; else hi = m; }
+        const px = dx * lo, py = cy + dy * lo, pz = dz * lo;
+        const e = 1e-3;
+        let gx = sdf(px + e, py, pz) - sdf(px - e, py, pz), gy = sdf(px, py + e, pz) - sdf(px, py - e, pz), gz = sdf(px, py, pz + e) - sdf(px, py, pz - e);
+        const gl = Math.hypot(gx, gy, gz) || 1; gx /= gl; gy /= gl; gz /= gl;
+        locate(px, py, pz);
+        const o = i * 10;
+        f[o] = px; f[o + 1] = py; f[o + 2] = pz; f[o + 3] = gx; f[o + 4] = gy; f[o + 5] = gz;
+        f[o + 6] = loc.b1; f[o + 7] = loc.b2; f[o + 8] = loc.b3; u[o + 9] = loc.t;
+        rest[i * 3] = px; rest[i * 3 + 1] = py; rest[i * 3 + 2] = pz;
+    }
+    const idx = flatIdx(ico);
+    let vol = 0;
+    for (let t = 0; t < idx.length; t += 3) {
+        const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
+        vol += (rest[a] * (rest[b + 1] * rest[c + 2] - rest[b + 2] * rest[c + 1]) - rest[a + 1] * (rest[b] * rest[c + 2] - rest[b + 2] * rest[c]) + rest[a + 2] * (rest[b] * rest[c + 1] - rest[b + 1] * rest[c])) / 6;
+    }
+    // A sparse sample of the surface, skinned on the CPU for contact and footprint
+    const sample = [];
+    for (let i = 0; i < n; i += 9) sample.push(i);
+    return { n, data, f, u, idx, count: idx.length, vol, sample: new Int32Array(sample) };
+})();
+
+// Flat icosahedron with stargate metadata (vertex 5 is the stargate vertex)
+const CAPSID = (() => {
+    const ico = icosphere(0);
+    const out = new Float32Array(60 * 11);
+    let o = 0;
+    for (const [a, b, c] of ico.F) {
+        const A = ico.V[a], B = ico.V[b], C = ico.V[c];
+        const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], vx = C[0] - A[0], vy = C[1] - A[1], vz = C[2] - A[2];
+        let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        const nl = Math.hypot(nx, ny, nz); nx /= nl; ny /= nl; nz /= nl;
+        const gate = a === 5 || b === 5 || c === 5;
+        let bm = [0, 0, 0];
+        if (gate) {
+            const oth = [a, b, c].filter((x) => x !== 5).map((x) => ico.V[x]);
+            bm = [(oth[0][0] + oth[1][0]) / 2, (oth[0][1] + oth[1][1]) / 2, (oth[0][2] + oth[1][2]) / 2];
+        }
+        for (const id of [a, b, c]) {
+            const P = ico.V[id];
+            out.set([P[0], P[1], P[2], nx, ny, nz, gate ? 1 : 0, id === 5 ? 1 : 0, bm[0], bm[1], bm[2]], o);
+            o += 11;
+        }
+    }
+    return out;
+})();
+
+/* =============================================================
+   4. Simulation state
+   ============================================================= */
+const X = new Float32Array(NN * 3), Pr = new Float32Array(NN * 3), Vel = new Float32Array(NN * 3);
+const eAlive = new Uint8Array(NE).fill(1), tAlive = new Uint8Array(NT).fill(1);
+const Vt = new Float32Array(NT);
+const ANC = new Float32Array(NN * 2), ancOn = new Uint8Array(NN);   // focal adhesions (xz anchors)
+const eDist = new Float32Array(NE), tDist = new Float32Array(NT);
+const COF = new Float32Array(NN * 12);
+const NODE4 = new Float32Array(NN * 4);
+const SK = new Float32Array(SURF.sample.length * 3);   // skinned surface sample
+
+const sim = { edgeC: 4e-6, volC: 2e-11, damp: 0.004, speed: 1, paused: false };
+const settings = { load: 4, mode: 0, mesh: false };
+
+const host = {
+    alive: false, pending: false, deadT: 0, t: 0, opacity: 0,
+    infected: false, tau: 0, seedTau: -1, vfR: 0, vfMax: 0.33,
+    uptake: 0, cooldown: 0, vIn: 0,
+    yieldG: 0, yieldV: 0, defFrac: 0, spawnedG: 0, spawnedV: 0, defects: 0,
+    roundR: 0, deflate: 0, lysing: false, lysisT: 0, rupR: 0, rupC: [0, 0, 0], rupW: [0, 0, 0],
+    pseudo: REDUCE ? 0.2 : 0.5, cv: 0, lastTau: 0, lysedAt: -1, home: [0, 0],
+    osc: [], cores: [],
+};
+for (let l = 0; l < NLOBE; l++) host.osc.push([6.2831853 / (8 + rand() * 7), rand() * 6.28]);
+
+// Organelles in rest space
+const ORG = {
+    nuc: [-0.3, 0.3, 0.14], nucR: 0.24,
+    vf: [0.3, 0.29, -0.08],
+    cv: [-0.86, 0.22, -0.36],
+    food: [[0.62, 0.22, 0.42], [-0.55, 0.24, 0.52], [0.78, 0.21, -0.45]],
+};
+const orgLoc = {};
+function bindOrg(name, p) { locate(p[0], p[1], p[2]); orgLoc[name] = [loc.t, loc.b1, loc.b2, loc.b3]; }
+bindOrg('nuc', ORG.nuc); bindOrg('vf', ORG.vf); bindOrg('cv', ORG.cv);
+ORG.food.forEach((p, i) => bindOrg('food' + i, p));
+{   // nucleolus sits slightly off-centre within the nucleus
+    const p = [ORG.nuc[0] + 0.04, ORG.nuc[1] + 0.02, ORG.nuc[2] - 0.03];
+    bindOrg('nucleolus', p);
+}
+
+// Interior sample pool (jittered grid), used for targets of internal particles
+const POOL = [];
+for (let x = -1.6; x <= 1.6; x += 0.085) for (let z = -1.6; z <= 1.6; z += 0.085) for (let y = 0.09; y <= 0.56; y += 0.085) {
+    const px = x + (rand() - 0.5) * 0.06, py = y + (rand() - 0.5) * 0.05, pz = z + (rand() - 0.5) * 0.06;
+    if (sdf(px, py, pz) < -0.075) POOL.push([px, py, pz]);
+}
+function inNucleus(p, m) { return Math.hypot(p[0] - ORG.nuc[0], (p[1] - ORG.nuc[1]) / 0.82, p[2] - ORG.nuc[2]) < ORG.nucR + m; }
+function inFactory(p, m) { return Math.hypot(p[0] - ORG.vf[0], (p[1] - ORG.vf[1]) / 0.62, p[2] - ORG.vf[2]) < 0.4 + m; }
+let poolFree = [];
+function refillPool() {
+    poolFree = POOL.filter((p) => !inNucleus(p, 0.07) && !inFactory(p, 0.06));
+    for (let i = poolFree.length - 1; i > 0; i--) { const j = (rand() * (i + 1)) | 0; [poolFree[i], poolFree[j]] = [poolFree[j], poolFree[i]]; }
+}
+function takePool(near) {
+    if (!poolFree.length) refillPool();
+    if (!near) return poolFree.pop();
+    let bi = poolFree.length - 1, bd = 1e9;
+    for (let k = 0; k < 40 && k < poolFree.length; k++) {
+        const i = poolFree.length - 1 - k, p = poolFree[i];
+        const d = Math.hypot(p[0] - near[0], p[1] - near[1], p[2] - near[2]);
+        if (d < bd) { bd = d; bi = i; }
+    }
+    const p = poolFree[bi];
+    poolFree[bi] = poolFree[poolFree.length - 1];
+    poolFree.pop();
+    return p;
+}
+
+// Giant virions
+const GS = { DEAD: 0, FREE: 1, ENGULF: 2, PHAGO: 3, EMPTY: 4, PROG: 5 };
+const G = {
+    st: new Uint8Array(MAXG), p: new Float32Array(MAXG * 3), v: new Float32Array(MAXG * 3),
+    r: new Float32Array(MAXG * 3), tg: new Float32Array(MAXG * 3), sp: new Float32Array(MAXG * 3),
+    tet: new Int32Array(MAXG), b: new Float32Array(MAXG * 3), q: new Float32Array(MAXG * 4), w: new Float32Array(MAXG * 3),
+    sc: new Float32Array(MAXG), fib: new Float32Array(MAXG), def: new Uint8Array(MAXG), gate: new Float32Array(MAXG),
+    fade: new Float32Array(MAXG), age: new Float32Array(MAXG), t0: new Float32Array(MAXG), prog: new Float32Array(MAXG),
+    nv: new Uint8Array(MAXG), done: new Uint8Array(MAXG), cursor: 0,
+};
+// Virophages
+const VS = { DEAD: 0, FREE: 1, ATT: 2, IN: 3, PROG: 4 };
+const Vp = {
+    st: new Uint8Array(MAXV), p: new Float32Array(MAXV * 3), v: new Float32Array(MAXV * 3),
+    g: new Int32Array(MAXV), l: new Float32Array(MAXV * 3), r: new Float32Array(MAXV * 3), tg: new Float32Array(MAXV * 3),
+    tet: new Int32Array(MAXV), b: new Float32Array(MAXV * 3), fade: new Float32Array(MAXV), sc: new Float32Array(MAXV),
+    age: new Float32Array(MAXV), seed: new Float32Array(MAXV), done: new Uint8Array(MAXV), cursor: 0,
+};
+for (let i = 0; i < MAXV; i++) Vp.seed[i] = rand();
+// Cytoplasmic granules
+const GR = { r: new Float32Array(NGRAN * 3), vr: new Float32Array(NGRAN * 3), tet: new Int32Array(NGRAN), b: new Float32Array(NGRAN * 3), p: new Float32Array(NGRAN * 3), size: new Float32Array(NGRAN), shade: new Float32Array(NGRAN) };
+
+function embedInto(t, b1, b2, b3, out, o) {
+    const b0 = 1 - b1 - b2 - b3, a = T4[t * 4] * 3, b = T4[t * 4 + 1] * 3, c = T4[t * 4 + 2] * 3, d = T4[t * 4 + 3] * 3;
+    out[o] = X[a] * b0 + X[b] * b1 + X[c] * b2 + X[d] * b3;
+    out[o + 1] = X[a + 1] * b0 + X[b + 1] * b1 + X[c + 1] * b2 + X[d + 1] * b3;
+    out[o + 2] = X[a + 2] * b0 + X[b + 2] * b1 + X[c + 2] * b2 + X[d + 2] * b3;
+}
+const tmp3 = new Float32Array(3);
+function embedRest(p) { locate(p[0], p[1], p[2]); if (loc.t < 0) return null; embedInto(loc.t, loc.b1, loc.b2, loc.b3, tmp3, 0); return tmp3; }
+function nodeVelAt(t, b1, b2, b3, out) {
+    const b0 = 1 - b1 - b2 - b3;
+    for (let k = 0; k < 3; k++) out[k] = Vel[T4[t * 4] * 3 + k] * b0 + Vel[T4[t * 4 + 1] * 3 + k] * b1 + Vel[T4[t * 4 + 2] * 3 + k] * b2 + Vel[T4[t * 4 + 3] * 3 + k] * b3;
+}
+
+/* ---------- Allocation ---------- */
+function allocG() {
+    for (let k = 0; k < MAXG; k++) { const i = (G.cursor + k) % MAXG; if (G.st[i] === GS.DEAD) { G.cursor = i + 1; return i; } }
+    let o = -1, oa = -1;
+    for (let i = 0; i < MAXG; i++) if (G.st[i] === GS.FREE && i !== drag.gi && G.age[i] > oa) { oa = G.age[i]; o = i; }
+    if (o >= 0) killG(o);
+    return o;
+}
+function allocV() {
+    for (let k = 0; k < MAXV; k++) { const i = (Vp.cursor + k) % MAXV; if (Vp.st[i] === VS.DEAD) { Vp.cursor = i + 1; return i; } }
+    let o = -1, oa = -1;
+    for (let i = 0; i < MAXV; i++) if (Vp.st[i] === VS.FREE && Vp.age[i] > oa) { oa = Vp.age[i]; o = i; }
+    if (o >= 0) Vp.st[o] = VS.DEAD;
+    return o;
+}
+function killG(i) {
+    G.st[i] = GS.DEAD;
+    for (let k = 0; k < MAXV; k++) if (Vp.st[k] === VS.ATT && Vp.g[k] === i) Vp.st[k] = VS.DEAD;
+}
+function randQuat(q, o) {
+    const u1 = rand(), u2 = rand() * 6.2831853, u3 = rand() * 6.2831853;
+    const s1 = Math.sqrt(1 - u1), s2 = Math.sqrt(u1);
+    q[o] = s1 * Math.sin(u2); q[o + 1] = s1 * Math.cos(u2); q[o + 2] = s2 * Math.sin(u3); q[o + 3] = s2 * Math.cos(u3);
+}
+function newGiant(x, y, z, state) {
+    const i = allocG();
+    if (i < 0) return -1;
+    G.st[i] = state; G.p[i * 3] = x; G.p[i * 3 + 1] = y; G.p[i * 3 + 2] = z;
+    G.v.fill(0, i * 3, i * 3 + 3);
+    randQuat(G.q, i * 4);
+    G.w[i * 3] = randn() * 0.5; G.w[i * 3 + 1] = randn() * 0.5; G.w[i * 3 + 2] = randn() * 0.5;
+    G.sc[i] = 1; G.fib[i] = 1; G.def[i] = 0; G.gate[i] = 0; G.fade[i] = 1; G.age[i] = 0; G.nv[i] = 0; G.done[i] = 0; G.prog[i] = 0;
+    return i;
+}
+function attachVp(i, gi) {
+    const u = rand() * 2 - 1, a = rand() * 6.2831853, s = Math.sqrt(1 - u * u);
+    let lx = s * Math.cos(a), ly = u, lz = s * Math.sin(a);
+    // keep the stargate vertex bald
+    const vs = 0.5257311 * ly + 0.8506508 * lz;
+    if (vs > 0.85) { ly -= 0.6; lz -= 0.9; const l = Math.hypot(lx, ly, lz); lx /= l; ly /= l; lz /= l; }
+    Vp.st[i] = VS.ATT; Vp.g[i] = gi; Vp.l[i * 3] = lx; Vp.l[i * 3 + 1] = ly; Vp.l[i * 3 + 2] = lz;
+    Vp.sc[i] = 1; Vp.fade[i] = 1; Vp.age[i] = 0;
+    G.nv[gi]++;
+}
+function spawnFreeGiant(x, y, z, vx, vy, vz, nVp) {
+    const i = newGiant(x, y, z, GS.FREE);
+    if (i < 0) return -1;
+    G.v[i * 3] = vx; G.v[i * 3 + 1] = vy; G.v[i * 3 + 2] = vz;
+    for (let k = 0; k < nVp; k++) { const j = allocV(); if (j >= 0) attachVp(j, i); }
+    return i;
+}
+function spawnFreeVp(x, y, z) {
+    const j = allocV();
+    if (j < 0) return;
+    Vp.st[j] = VS.FREE; Vp.p[j * 3] = x; Vp.p[j * 3 + 1] = y; Vp.p[j * 3 + 2] = z;
+    Vp.v.fill(0, j * 3, j * 3 + 3); Vp.sc[j] = 1; Vp.fade[j] = 1; Vp.age[j] = 0;
+}
+
+/* ---------- Host lifecycle ---------- */
+function spawnHost(clearSlide) {
+    endDrag();
+    const yaw = rand() * 6.2831853, c = Math.cos(yaw), s = Math.sin(yaw);
+    const ox = (rand() - 0.5) * 0.4, oz = (rand() - 0.5) * 0.3;
+    host.home = [ox, oz];
+    for (let i = 0; i < NN; i++) {
+        const x = RX[i * 3], y = RX[i * 3 + 1], z = RX[i * 3 + 2];
+        X[i * 3] = c * x + s * z + ox; X[i * 3 + 1] = y + 0.55; X[i * 3 + 2] = -s * x + c * z + oz;
+    }
+    Pr.set(X); Vel.fill(0); ancOn.fill(0);
+    eAlive.fill(1); tAlive.fill(1);
+    Object.assign(host, {
+        alive: true, pending: false, deadT: 0, t: 0, opacity: 0, infected: false, tau: 0, seedTau: -1, vfR: 0, vfMax: 0.33,
+        uptake: 0, cooldown: 0.8, vIn: 0, yieldG: 0, yieldV: 0, defFrac: 0, spawnedG: 0, spawnedV: 0, defects: 0,
+        roundR: 0, deflate: 0, lysing: false, lysisT: 0, rupR: 0, cv: rand(), cores: [], lysedAt: -1,
+    });
+    for (const o of host.osc) o[1] = rand() * 6.28;
+    for (let i = 0; i < MAXG; i++) if (G.st[i] > GS.FREE || (clearSlide && G.st[i])) G.st[i] = GS.DEAD;
+    for (let i = 0; i < MAXV; i++) {
+        const st = Vp.st[i];
+        if (clearSlide || st === VS.IN || st === VS.PROG || (st === VS.ATT && G.st[Vp.g[i]] !== GS.FREE)) Vp.st[i] = VS.DEAD;
+    }
+    for (let i = 0; i < MAXG; i++) G.nv[i] = 0;
+    for (let i = 0; i < MAXV; i++) if (Vp.st[i] === VS.ATT) G.nv[Vp.g[i]]++;
+    refillPool();
+    for (let k = 0; k < NGRAN; k++) {
+        const p = takePool();
+        GR.r[k * 3] = p[0]; GR.r[k * 3 + 1] = p[1]; GR.r[k * 3 + 2] = p[2];
+        GR.vr[k * 3] = randn() * 0.02; GR.vr[k * 3 + 1] = 0; GR.vr[k * 3 + 2] = randn() * 0.02;
+        GR.size[k] = 0.011 + rand() * 0.012; GR.shade[k] = 0.6 + rand() * 0.6;
+    }
+    refillPool();
+}
+
+function computeYields() {
+    const lf = host.vIn / (host.vIn + 4);
+    host.yieldG = Math.round(250 * (1 - 0.72 * lf)) + 6 * Math.max(0, host.uptake - 1);
+    host.defFrac = 0.5 * lf;
+    host.yieldV = host.vIn > 0 ? Math.min(3000, Math.round(900 + 230 * Math.min(host.vIn, 10))) : 0;
+}
+
+function startLysis() {
+    host.lysing = true; host.lysisT = 0; host.lastTau = host.tau; host.lysedAt = host.tau;
+    const rx = ORG.vf[0] * 0.5, rz = ORG.vf[2] * 0.5;
+    let y = 1.0;
+    while (y > 0 && sdf(rx, y, rz) > 0) y -= 0.01;
+    host.rupC = [rx, y, rz];
+    const w = embedRest(host.rupC);
+    host.rupW = w ? [w[0], w[1], w[2]] : [0, 0.6, 0];
+    for (let e = 0; e < NE; e++) eDist[e] = Math.hypot(eMid[e * 3] - rx, eMid[e * 3 + 1] - y, eMid[e * 3 + 2] - rz);
+    for (let t = 0; t < NT; t++) tDist[t] = Math.hypot(tMid[t * 3] - rx, tMid[t * 3 + 1] - y, tMid[t * 3 + 2] - rz);
+    if (drag.kind === 1) endDrag();
+}
+
+/* =============================================================
+   5. XPBD soft body
+   ============================================================= */
+const drag = { kind: 0, gi: -1, n: 0, ids: new Int32Array(NN), w: new Float32Array(NN), off: new Float32Array(NN * 3), tx: 0, ty: 0, tz: 0, moved: false };
+
+function updateRestLengths() {
+    const A = host.pseudo * (1 - host.roundR) * (host.infected && host.tau > 8 ? 0.5 : 1);
+    const R = host.roundR, D = host.deflate;
+    const act = [];
+    for (let l = 0; l < NLOBE; l++) { const s = Math.sin(host.t * host.osc[l][0] + host.osc[l][1]); act.push(s > 0 ? s * s * s * A : 0); }
+    // Rounding before lysis and collapse after it are one affine rest-shape change,
+    // diag(sxz, sy, sxz), so edge lengths and volumes stay mutually consistent.
+    const syR = 1 + 0.5 * R, sxzR = (1 + 0.04 * R) / Math.sqrt(syR);
+    const sy = syR * lerp(1, 0.38, D), sxz = sxzR * lerp(1, 1.06, D);
+    const sy2 = sy * sy, sxz2 = sxz * sxz;
+    for (let e = 0; e < NE; e++) {
+        let s = 0;
+        for (let l = 0; l < NLOBE; l++) if (act[l]) s += act[l] * eW[l * NE + e];
+        const y2 = eY2[e];
+        Lc[e] = L0[e] * (1 + s) * Math.sqrt(sxz2 * (1 - y2) + sy2 * y2);
+    }
+    const vs = sxz2 * sy;
+    for (let t = 0; t < NT; t++) {
+        let s = 0;
+        for (let l = 0; l < NLOBE; l++) if (act[l]) s += act[l] * tW[l * NT + t];
+        Vt[t] = V0[t] * (1 + s) * vs;
+    }
+}
+
+function stepSoft(dt) {
+    const h = dt / SUB, ih = 1 / h, h2 = h * h;
+    const soft = host.lysing ? 4 : 1;
+    const aE = sim.edgeC * soft / h2, aV = sim.volC * soft / h2;
+    const damp = sim.damp, g = -7.5 * h, fr = 0.8, drg = 1 - 0.8 * h, vmax = 9;
+    const grab = drag.kind === 1;
+    for (let s = 0; s < SUB; s++) {
+        for (let i3 = 0; i3 < NN * 3; i3 += 3) {
+            Vel[i3 + 1] += g;
+            Pr[i3] = X[i3]; Pr[i3 + 1] = X[i3 + 1]; Pr[i3 + 2] = X[i3 + 2];
+            X[i3] += Vel[i3] * h; X[i3 + 1] += Vel[i3 + 1] * h; X[i3 + 2] += Vel[i3 + 2] * h;
+        }
+        if (grab) {
+            for (let k = 0; k < drag.n; k++) {
+                const i3 = drag.ids[k] * 3, w = drag.w[k] * 0.55;
+                X[i3] += (drag.tx + drag.off[k * 3] - X[i3]) * w;
+                X[i3 + 1] += (drag.ty + drag.off[k * 3 + 1] - X[i3 + 1]) * w;
+                X[i3 + 2] += (drag.tz + drag.off[k * 3 + 2] - X[i3 + 2]) * w;
+            }
+        }
+        // distance constraints
+        for (let e = 0; e < NE; e++) {
+            if (!eAlive[e]) continue;
+            const ia = E2[e * 2], ib = E2[e * 2 + 1], a = ia * 3, b = ib * 3;
+            let dx = X[b] - X[a], dy = X[b + 1] - X[a + 1], dz = X[b + 2] - X[a + 2];
+            const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (len < 1e-9) continue;
+            const wa = IM[ia], wb = IM[ib];
+            const k = -(len - Lc[e]) / (wa + wb + aE * eK[e]) / len;
+            dx *= k; dy *= k; dz *= k;
+            X[a] -= dx * wa; X[a + 1] -= dy * wa; X[a + 2] -= dz * wa;
+            X[b] += dx * wb; X[b + 1] += dy * wb; X[b + 2] += dz * wb;
+        }
+        // volume constraints
+        for (let t = 0; t < NT; t++) {
+            if (!tAlive[t]) continue;
+            const n0 = T4[t * 4], n1 = T4[t * 4 + 1], n2 = T4[t * 4 + 2], n3 = T4[t * 4 + 3];
+            const p0 = n0 * 3, p1 = n1 * 3, p2 = n2 * 3, p3 = n3 * 3;
+            const ax = X[p1] - X[p0], ay = X[p1 + 1] - X[p0 + 1], az = X[p1 + 2] - X[p0 + 2];
+            const bx = X[p2] - X[p0], by = X[p2 + 1] - X[p0 + 1], bz = X[p2 + 2] - X[p0 + 2];
+            const cx = X[p3] - X[p0], cy = X[p3 + 1] - X[p0 + 1], cz = X[p3 + 2] - X[p0 + 2];
+            // gradients (divided by 6)
+            const g3x = (ay * bz - az * by) / 6, g3y = (az * bx - ax * bz) / 6, g3z = (ax * by - ay * bx) / 6;
+            const g1x = (by * cz - bz * cy) / 6, g1y = (bz * cx - bx * cz) / 6, g1z = (bx * cy - by * cx) / 6;
+            const g2x = (cy * az - cz * ay) / 6, g2y = (cz * ax - cx * az) / 6, g2z = (cx * ay - cy * ax) / 6;
+            const g0x = -g1x - g2x - g3x, g0y = -g1y - g2y - g3y, g0z = -g1z - g2z - g3z;
+            const w0 = IM[n0], w1 = IM[n1], w2 = IM[n2], w3 = IM[n3];
+            const wsum = w0 * (g0x * g0x + g0y * g0y + g0z * g0z) + w1 * (g1x * g1x + g1y * g1y + g1z * g1z)
+                + w2 * (g2x * g2x + g2y * g2y + g2z * g2z) + w3 * (g3x * g3x + g3y * g3y + g3z * g3z);
+            if (wsum < 1e-14) continue;
+            const vol = (g3x * cx + g3y * cy + g3z * cz);
+            const k = -(vol - Vt[t]) / (wsum + aV);
+            X[p0] += g0x * k * w0; X[p0 + 1] += g0y * k * w0; X[p0 + 2] += g0z * k * w0;
+            X[p1] += g1x * k * w1; X[p1 + 1] += g1y * k * w1; X[p1 + 2] += g1z * k * w1;
+            X[p2] += g2x * k * w2; X[p2 + 1] += g2y * k * w2; X[p2 + 2] += g2z * k * w2;
+            X[p3] += g3x * k * w3; X[p3 + 1] += g3y * k * w3; X[p3 + 2] += g3z * k * w3;
+        }
+        // slide contact with focal adhesions: bottom nodes pin to anchors that creep
+        // slowly (so pseudopods advance) and peel off when pulled too far
+        for (let i = 0, i3 = 0; i < NN; i++, i3 += 3) {
+            if (X[i3 + 1] < 0) X[i3 + 1] = 0;
+            if (X[i3 + 1] < 0.012) {
+                if (ancOn[i]) {
+                    const dx = X[i3] - ANC[i * 2], dz = X[i3 + 2] - ANC[i * 2 + 1];
+                    if (dx * dx + dz * dz > 1.0) ancOn[i] = 0;
+                    else {
+                        X[i3] -= dx * 0.5; X[i3 + 2] -= dz * 0.5;
+                        ANC[i * 2] += (X[i3] - ANC[i * 2]) * 0.0005; ANC[i * 2 + 1] += (X[i3 + 2] - ANC[i * 2 + 1]) * 0.0005;
+                    }
+                } else if (X[i3 + 1] < 1e-3) { ancOn[i] = 1; ANC[i * 2] = X[i3]; ANC[i * 2 + 1] = X[i3 + 2]; }
+            } else ancOn[i] = 0;
+        }
+        for (let i3 = 0; i3 < NN * 3; i3 += 3) {
+            X[i3] = clamp(X[i3], -3.4, 3.4); X[i3 + 2] = clamp(X[i3 + 2], -2.9, 2.9);
+            let vx = (X[i3] - Pr[i3]) * ih, vy = (X[i3 + 1] - Pr[i3 + 1]) * ih, vz = (X[i3 + 2] - Pr[i3 + 2]) * ih;
+            const sp = Math.sqrt(vx * vx + vy * vy + vz * vz);
+            if (sp > vmax) { const f = vmax / sp; vx *= f; vy *= f; vz *= f; }
+            if (X[i3 + 1] < 1e-3) { vx *= fr; vz *= fr; if (vy < 0) vy = 0; }
+            Vel[i3] = vx * drg; Vel[i3 + 1] = vy * drg; Vel[i3 + 2] = vz * drg;
+        }
+        // viscous damping of relative motion along edges
+        if (damp > 0) {
+            for (let e = 0; e < NE; e++) {
+                if (!eAlive[e]) continue;
+                const ia = E2[e * 2], ib = E2[e * 2 + 1], a = ia * 3, b = ib * 3;
+                let nx = X[b] - X[a], ny = X[b + 1] - X[a + 1], nz = X[b + 2] - X[a + 2];
+                const l = Math.sqrt(nx * nx + ny * ny + nz * nz);
+                if (l < 1e-9) continue;
+                nx /= l; ny /= l; nz /= l;
+                const dv = (Vel[b] - Vel[a]) * nx + (Vel[b + 1] - Vel[a + 1]) * ny + (Vel[b + 2] - Vel[a + 2]) * nz;
+                const wa = IM[ia], wb = IM[ib], j = dv * damp / (wa + wb);
+                Vel[a] += nx * j * wa; Vel[a + 1] += ny * j * wa; Vel[a + 2] += nz * j * wa;
+                Vel[b] -= nx * j * wb; Vel[b + 1] -= ny * j * wb; Vel[b + 2] -= nz * j * wb;
+            }
+        }
+    }
+}
+
+// Deformation-gradient cofactors per node, for GPU normal skinning
+function computeCofactors() {
+    COF.fill(0);
+    for (let t = 0; t < NT; t++) {
+        const a = T4[t * 4] * 3, b = T4[t * 4 + 1] * 3, c = T4[t * 4 + 2] * 3, d = T4[t * 4 + 3] * 3;
+        const d0x = X[b] - X[a], d0y = X[b + 1] - X[a + 1], d0z = X[b + 2] - X[a + 2];
+        const d1x = X[c] - X[a], d1y = X[c + 1] - X[a + 1], d1z = X[c + 2] - X[a + 2];
+        const d2x = X[d] - X[a], d2y = X[d + 1] - X[a + 1], d2z = X[d + 2] - X[a + 2];
+        const o = t * 9, M = DMI;
+        // F columns f_c = d0 * M[0][c] + d1 * M[1][c] + d2 * M[2][c]
+        const f0x = d0x * M[o] + d1x * M[o + 3] + d2x * M[o + 6], f0y = d0y * M[o] + d1y * M[o + 3] + d2y * M[o + 6], f0z = d0z * M[o] + d1z * M[o + 3] + d2z * M[o + 6];
+        const f1x = d0x * M[o + 1] + d1x * M[o + 4] + d2x * M[o + 7], f1y = d0y * M[o + 1] + d1y * M[o + 4] + d2y * M[o + 7], f1z = d0z * M[o + 1] + d1z * M[o + 4] + d2z * M[o + 7];
+        const f2x = d0x * M[o + 2] + d1x * M[o + 5] + d2x * M[o + 8], f2y = d0y * M[o + 2] + d1y * M[o + 5] + d2y * M[o + 8], f2z = d0z * M[o + 2] + d1z * M[o + 5] + d2z * M[o + 8];
+        const c0x = f1y * f2z - f1z * f2y, c0y = f1z * f2x - f1x * f2z, c0z = f1x * f2y - f1y * f2x;
+        const c1x = f2y * f0z - f2z * f0y, c1y = f2z * f0x - f2x * f0z, c1z = f2x * f0y - f2y * f0x;
+        const c2x = f0y * f1z - f0z * f1y, c2y = f0z * f1x - f0x * f1z, c2z = f0x * f1y - f0y * f1x;
+        for (let k = 0; k < 4; k++) {
+            const o2 = T4[t * 4 + k] * 12;
+            COF[o2] += c0x; COF[o2 + 1] += c0y; COF[o2 + 2] += c0z;
+            COF[o2 + 4] += c1x; COF[o2 + 5] += c1y; COF[o2 + 6] += c1z;
+            COF[o2 + 8] += c2x; COF[o2 + 9] += c2y; COF[o2 + 10] += c2z;
+        }
+    }
+    for (let i = 0; i < NN; i++) { NODE4[i * 4] = X[i * 3]; NODE4[i * 4 + 1] = X[i * 3 + 1]; NODE4[i * 4 + 2] = X[i * 3 + 2]; }
+}
+
+/* =============================================================
+   6. Footprint of the cell on the slide (for particle contact)
+   ============================================================= */
+const NB = 40;
+const FP = { cx: 0, cz: 0, top: 0.6, R: new Float32Array(NB), idx: new Int32Array(NB) };
+function skinSample() {
+    const f = SURF.f, u = SURF.u, s = SURF.sample;
+    for (let k = 0; k < s.length; k++) {
+        const o = s[k] * 10;
+        embedInto(u[o + 9], f[o + 6], f[o + 7], f[o + 8], SK, k * 3);
+    }
+}
+function computeFootprint() {
+    skinSample();
+    const n = SURF.sample.length;
+    let cx = 0, cz = 0, top = 0;
+    for (let k = 0; k < n; k++) { cx += SK[k * 3]; cz += SK[k * 3 + 2]; top = Math.max(top, SK[k * 3 + 1]); }
+    cx /= n; cz /= n;
+    FP.R.fill(0);
+    for (let k = 0; k < n; k++) {
+        const dx = SK[k * 3] - cx, dz = SK[k * 3 + 2] - cz, r = Math.hypot(dx, dz);
+        const b = ((Math.floor((Math.atan2(dz, dx) + Math.PI) / (2 * Math.PI) * NB) % NB) + NB) % NB;
+        if (r > FP.R[b]) { FP.R[b] = r; FP.idx[b] = k; }
+    }
+    for (let pass = 0; pass < 2; pass++) for (let b = 0; b < NB; b++) if (FP.R[b] === 0) FP.R[b] = Math.max(FP.R[(b + 1) % NB], FP.R[(b + NB - 1) % NB]);
+    FP.cx = cx; FP.cz = cz; FP.top = top;
+}
+// Returns penetration info in fpHit when point (radius rad) touches the cell
+const fpHit = { nx: 0, nz: 0, push: 0, up: 0, bin: 0 };
+function footprintContact(px, py, pz, rad) {
+    const dx = px - FP.cx, dz = pz - FP.cz, d = Math.hypot(dx, dz);
+    const b = ((Math.floor((Math.atan2(dz, dx) + Math.PI) / (2 * Math.PI) * NB) % NB) + NB) % NB;
+    const R = FP.R[b];
+    if (d > R + rad) return false;
+    const u = Math.min(d / R, 1);
+    const hTop = FP.top * Math.sqrt(Math.max(0, 1 - u * u * u));
+    if (py > hTop + rad) return false;
+    fpHit.nx = d > 1e-6 ? dx / d : 1; fpHit.nz = d > 1e-6 ? dz / d : 0;
+    fpHit.push = R + rad - d; fpHit.up = hTop + rad - py; fpHit.bin = b;
+    return true;
+}
+function nearestSample(px, py, pz) {
+    let bk = 0, bd = 1e9;
+    for (let k = 0; k < SURF.sample.length; k++) {
+        const d = (SK[k * 3] - px) ** 2 + (SK[k * 3 + 1] - py) ** 2 + (SK[k * 3 + 2] - pz) ** 2;
+        if (d < bd) { bd = d; bk = k; }
+    }
+    return SURF.sample[bk];
+}
+
+/* =============================================================
+   7. World update: host, infection, particles
+   ============================================================= */
+const qtmp = new Float32Array(4);
+function qmulAxis(q, o, wx, wy, wz, dt) {
+    const ang = Math.hypot(wx, wy, wz) * dt;
+    if (ang < 1e-7) return;
+    const s = Math.sin(ang / 2) / (Math.hypot(wx, wy, wz)), c = Math.cos(ang / 2);
+    const ax = wx * s, ay = wy * s, az = wz * s;
+    const x = q[o], y = q[o + 1], z = q[o + 2], w = q[o + 3];
+    qtmp[0] = c * x + ax * w + ay * z - az * y;
+    qtmp[1] = c * y - ax * z + ay * w + az * x;
+    qtmp[2] = c * z + ax * y - ay * x + az * w;
+    qtmp[3] = c * w - ax * x - ay * y - az * z;
+    const l = Math.hypot(qtmp[0], qtmp[1], qtmp[2], qtmp[3]);
+    q[o] = qtmp[0] / l; q[o + 1] = qtmp[1] / l; q[o + 2] = qtmp[2] / l; q[o + 3] = qtmp[3] / l;
+}
+function qrotInto(q, o, x, y, z, out, oo) {
+    const qx = q[o], qy = q[o + 1], qz = q[o + 2], qw = q[o + 3];
+    const tx = 2 * (qy * z - qz * y), ty = 2 * (qz * x - qx * z), tz = 2 * (qx * y - qy * x);
+    out[oo] = x + qw * tx + (qy * tz - qz * ty);
+    out[oo + 1] = y + qw * ty + (qz * tx - qx * tz);
+    out[oo + 2] = z + qw * tz + (qx * ty - qy * tx);
+}
+
+function relocate(arr, i, rArr) {
+    locate(rArr[i * 3], rArr[i * 3 + 1], rArr[i * 3 + 2]);
+    if (loc.t >= 0) { arr.tet[i] = loc.t; arr.b[i * 3] = loc.b1; arr.b[i * 3 + 1] = loc.b2; arr.b[i * 3 + 2] = loc.b3; }
+}
+function moveRest(arr, i, rate) {
+    const o = i * 3;
+    const dx = arr.tg[o] - arr.r[o], dy = arr.tg[o + 1] - arr.r[o + 1], dz = arr.tg[o + 2] - arr.r[o + 2];
+    const d = Math.hypot(dx, dy, dz);
+    if (d < 0.004) { arr.done[i] = 1; return; }
+    const k = Math.min(1, rate / d);
+    arr.r[o] += dx * k; arr.r[o + 1] += dy * k; arr.r[o + 2] += dz * k;
+    relocate(arr, i, arr.r);
+}
+
+function startEngulf(i) {
+    const s = nearestSample(G.p[i * 3], G.p[i * 3 + 1], G.p[i * 3 + 2]);
+    const f = SURF.f, o = s * 10;
+    const entry = [f[o] * 0.9, clamp(f[o + 1], 0.12, 0.4), f[o + 2] * 0.9];
+    const tg = takePool(entry);
+    G.st[i] = GS.ENGULF; G.prog[i] = 0;
+    G.sp.set(G.p.subarray(i * 3, i * 3 + 3), i * 3);
+    G.r[i * 3] = entry[0]; G.r[i * 3 + 1] = entry[1]; G.r[i * 3 + 2] = entry[2];
+    G.tg[i * 3] = tg[0]; G.tg[i * 3 + 1] = tg[1]; G.tg[i * 3 + 2] = tg[2];
+    relocate(G, i, G.r);
+    host.uptake++;
+    host.cooldown = 1.4;
+    if (drag.kind === 2 && drag.gi === i) endDrag();
+}
+
+function spawnProgenyGiant() {
+    const i = newGiant(0, 0, 0, GS.PROG);
+    if (i < 0) return;
+    // on the factory surface
+    const u = rand() * 2 - 1, a = rand() * 6.2831853, s = Math.sqrt(1 - u * u);
+    const R = host.vfR * 0.95;
+    G.r[i * 3] = ORG.vf[0] + s * Math.cos(a) * R; G.r[i * 3 + 1] = ORG.vf[1] + u * R * 0.62; G.r[i * 3 + 2] = ORG.vf[2] + s * Math.sin(a) * R;
+    const tg = takePool();
+    G.tg.set(tg, i * 3);
+    G.sc[i] = 0; G.fib[i] = 0;
+    G.def[i] = rand() < host.defFrac ? 1 : 0;
+    if (G.def[i]) host.defects++;
+    relocate(G, i, G.r);
+    embedInto(G.tet[i], G.b[i * 3], G.b[i * 3 + 1], G.b[i * 3 + 2], G.p, i * 3);
+    host.spawnedG++;
+}
+function spawnProgenyVp() {
+    const j = allocV();
+    if (j < 0) return;
+    const u = rand() * 2 - 1, a = rand() * 6.2831853, s = Math.sqrt(1 - u * u), R = host.vfR * Math.cbrt(rand()) * 0.9;
+    Vp.r[j * 3] = ORG.vf[0] + s * Math.cos(a) * R; Vp.r[j * 3 + 1] = ORG.vf[1] + u * R * 0.62; Vp.r[j * 3 + 2] = ORG.vf[2] + s * Math.sin(a) * R;
+    if (rand() < 0.45) {   // some drift out into the cytoplasm around the factory
+        const u2 = rand() * 2 - 1, a2 = rand() * 6.2831853, s2 = Math.sqrt(1 - u2 * u2), R2 = host.vfR + 0.05 + rand() * 0.35;
+        let tg = [ORG.vf[0] + s2 * Math.cos(a2) * R2, ORG.vf[1] + u2 * 0.15, ORG.vf[2] + s2 * Math.sin(a2) * R2];
+        if (sdf(tg[0], tg[1], tg[2]) > -0.04 || inNucleus(tg, 0.02)) tg = [Vp.r[j * 3], Vp.r[j * 3 + 1], Vp.r[j * 3 + 2]];
+        Vp.tg.set(tg, j * 3);
+    } else Vp.tg.set(Vp.r.subarray(j * 3, j * 3 + 3), j * 3);
+    Vp.st[j] = VS.PROG; Vp.sc[j] = 0; Vp.fade[j] = 1; Vp.age[j] = 0; Vp.done[j] = 0;
+    relocate(Vp, j, Vp.r);
+    host.spawnedV++;
+}
+
+function releaseParticles(all) {
+    const rc = host.rupC, cx = FP.cx, cz = FP.cz, kv = REDUCE ? 0.5 : 1;
+    const vel = new Float32Array(3);
+    const fling = (pos, v, o, rr) => {
+        if (!all && Math.hypot(rr[0] - rc[0], rr[1] - rc[1], rr[2] - rc[2]) > host.rupR + 0.25) return false;
+        let dx = (pos[o] - cx) * 0.9, dy = 0.9 + rand() * 0.7, dz = (pos[o + 2] - cz) * 0.9;
+        const l = Math.hypot(dx, dy, dz), sp = (0.9 + rand() * 1.1) * kv;
+        v[o] = vel[0] + dx / l * sp; v[o + 1] = vel[1] + dy / l * sp; v[o + 2] = vel[2] + dz / l * sp;
+        return true;
+    };
+    for (let i = 0; i < MAXG; i++) {
+        const st = G.st[i];
+        if (st < GS.ENGULF) continue;
+        if (st === GS.EMPTY || (st === GS.PROG && G.sc[i] < 0.5)) { if (all) killG(i); continue; }
+        nodeVelAt(G.tet[i], G.b[i * 3], G.b[i * 3 + 1], G.b[i * 3 + 2], vel);
+        if (fling(G.p, G.v, i * 3, G.r.subarray(i * 3, i * 3 + 3))) { G.st[i] = GS.FREE; G.age[i] = 0; if (!G.def[i]) G.fib[i] = Math.max(G.fib[i], 0.4); }
+    }
+    for (let j = 0; j < MAXV; j++) {
+        const st = Vp.st[j];
+        if (st === VS.IN) { if (all) Vp.st[j] = VS.DEAD; continue; }
+        if (st !== VS.PROG) continue;
+        nodeVelAt(Vp.tet[j], Vp.b[j * 3], Vp.b[j * 3 + 1], Vp.b[j * 3 + 2], vel);
+        if (fling(Vp.p, Vp.v, j * 3, Vp.r.subarray(j * 3, j * 3 + 3))) { Vp.st[j] = VS.FREE; Vp.sc[j] = 1; Vp.age[j] = 0; }
+    }
+}
+
+function updateHost(dt) {
+    if (!host.alive) {
+        if (host.pending && (host.deadT += dt) > 2.4) spawnHost(false);
+        return;
+    }
+    host.t += dt;
+    host.cooldown -= dt;
+    // Pseudopods against slide friction make the cell crawl; ease it back into frame
+    if (drag.kind !== 1 && !host.lysing) {
+        const k = Math.min(1, dt * 0.35), hx = (host.home[0] - FP.cx) * k, hz = (host.home[1] - FP.cz) * k;
+        for (let i3 = 0; i3 < NN * 3; i3 += 3) { X[i3] += hx; Pr[i3] += hx; X[i3 + 2] += hz; Pr[i3 + 2] += hz; }
+        for (let i2 = 0; i2 < NN * 2; i2 += 2) { ANC[i2] += hx; ANC[i2 + 1] += hz; }
+    }
+    if (!host.lysing) host.opacity = Math.min(1, host.t / 0.35);
+    if (host.infected && !host.lysing) {
+        host.tau += dt * HPS;
+        if (host.seedTau >= 0) {
+            const st = host.seedTau;
+            host.vfR = host.vfMax * Math.pow(sstep(st, st + 4.2, host.tau), 0.8);
+            const a0 = st + 3.8, a1 = st + 9.6;
+            if (host.tau > a0 - 0.5 && !host.yieldG) computeYields();
+            if (host.yieldG) {
+                const nG = Math.floor(host.yieldG * clamp((host.tau - a0) / (a1 - a0), 0, 1));
+                let guard = 0;
+                while (host.spawnedG < nG && guard++ < 40) spawnProgenyGiant();
+                if (host.yieldV) {
+                    const nV = Math.floor(host.yieldV * clamp((host.tau - st - 3.3) / 6.1, 0, 1));
+                    guard = 0;
+                    while (host.spawnedV < nV && guard++ < 200) spawnProgenyVp();
+                }
+            }
+            host.roundR = sstep(st + 8.0, st + 10.3, host.tau);
+            if (host.tau >= st + T_LYSIS) startLysis();
+        }
+        // genome cores travel to the factory site
+        for (let k = host.cores.length - 1; k >= 0; k--) {
+            const c = host.cores[k];
+            c.prog += dt * HPS / 0.9;
+            if (c.prog >= 1) {
+                if (host.seedTau < 0) host.seedTau = host.tau; else host.vfMax = Math.min(0.4, host.vfMax + 0.025);
+                host.cores.splice(k, 1);
+            }
+        }
+    }
+    if (host.lysing) {
+        host.lysisT += dt;
+        const lt = host.lysisT;
+        host.rupR = 1.9 * (1 - Math.pow(1 - Math.min(1, lt / 0.85), 3));
+        const lim = host.rupR * 0.7;
+        for (let e = 0; e < NE; e++) if (eAlive[e] && eDist[e] < lim) eAlive[e] = 0;
+        for (let t = 0; t < NT; t++) if (tAlive[t] && tDist[t] < lim) tAlive[t] = 0;
+        host.deflate = sstep(0.15, 2.2, lt);
+        host.opacity = 1 - sstep(1.4, 4.8, lt);
+        releaseParticles(lt > 0.9);
+        if (lt > 5) { host.alive = false; host.pending = true; host.deadT = 0; }
+    }
+    if (!(host.infected && host.tau > 9)) host.cv = (host.cv + dt / 7.5) % 1;
+}
+
+// Spatial hash (xz) of free giants, for virophage adsorption and picking
+const HG = 36, HC = 0.25, H0 = -4.5;
+const hHead = new Int32Array(HG * HG), hNext = new Int32Array(MAXG);
+const hcell = (x, z) => { const i = clamp(Math.floor((x - H0) / HC), 0, HG - 1), k = clamp(Math.floor((z - H0) / HC), 0, HG - 1); return k * HG + i; };
+
+function updateParticles(dt) {
+    const fpOn = host.alive && !host.lysing;
+    const receptive = () => fpOn && host.cooldown <= 0 && host.uptake < 4 && !(host.infected && host.tau > 6);
+    const sq = Math.sqrt(dt);
+    hHead.fill(-1);
+    // ----- giants -----
+    for (let i = 0; i < MAXG; i++) {
+        const st = G.st[i];
+        if (!st) continue;
+        const o = i * 3;
+        G.age[i] += dt;
+        if (st === GS.FREE) {
+            if (drag.kind === 2 && drag.gi === i) {
+                const k = Math.min(1, dt * 30);
+                G.p[o] += (drag.tx - G.p[o]) * k; G.p[o + 1] += (drag.ty - G.p[o + 1]) * k; G.p[o + 2] += (drag.tz - G.p[o + 2]) * k;
+            } else {
+                const damp = Math.exp(-2.0 * dt);
+                G.v[o] = G.v[o] * damp + randn() * 0.25 * sq;
+                G.v[o + 1] = (G.v[o + 1] - 0.25 * dt) * damp + randn() * 0.12 * sq;
+                G.v[o + 2] = G.v[o + 2] * damp + randn() * 0.25 * sq;
+                G.p[o] += G.v[o] * dt; G.p[o + 1] += G.v[o + 1] * dt; G.p[o + 2] += G.v[o + 2] * dt;
+            }
+            if (G.p[o + 1] < RF) { G.p[o + 1] = RF; if (G.v[o + 1] < 0) G.v[o + 1] *= -0.25; G.v[o] *= 0.9; G.v[o + 2] *= 0.9; }
+            if (Math.abs(G.p[o]) > 4.2) { G.p[o] = Math.sign(G.p[o]) * 4.2; G.v[o] *= -0.5; }
+            if (Math.abs(G.p[o + 2]) > 3.4) { G.p[o + 2] = Math.sign(G.p[o + 2]) * 3.4; G.v[o + 2] *= -0.5; }
+            qmulAxis(G.q, i * 4, G.w[o], G.w[o + 1], G.w[o + 2], dt);
+            if (fpOn && footprintContact(G.p[o], G.p[o + 1], G.p[o + 2], RF * 0.85)) {
+                if (receptive()) { startEngulf(i); continue; }
+                if (fpHit.push < fpHit.up) { G.p[o] += fpHit.nx * fpHit.push; G.p[o + 2] += fpHit.nz * fpHit.push; const vn = G.v[o] * fpHit.nx + G.v[o + 2] * fpHit.nz; if (vn < 0) { G.v[o] -= vn * fpHit.nx; G.v[o + 2] -= vn * fpHit.nz; } }
+                else { G.p[o + 1] += fpHit.up; if (G.v[o + 1] < 0) G.v[o + 1] = 0; }
+            }
+            if (G.age[i] > 80) { G.fade[i] -= dt / 4; if (G.fade[i] <= 0) { killG(i); continue; } }
+            const c = hcell(G.p[o], G.p[o + 2]);
+            hNext[i] = hHead[c]; hHead[c] = i;
+        } else if (st === GS.ENGULF) {
+            G.prog[i] = Math.min(1, G.prog[i] + dt / 1.4);
+            const e = G.prog[i] * G.prog[i] * (3 - 2 * G.prog[i]);
+            const ex = G.r[o], ey = G.r[o + 1], ez = G.r[o + 2];
+            const rx = lerp(ex, G.tg[o], e), ry = lerp(ey, G.tg[o + 1], e), rz = lerp(ez, G.tg[o + 2], e);
+            locate(rx, ry, rz);
+            if (loc.t >= 0) {
+                embedInto(loc.t, loc.b1, loc.b2, loc.b3, tmp3, 0);
+                const k = sstep(0, 0.55, G.prog[i]);
+                G.p[o] = lerp(G.sp[o], tmp3[0], k); G.p[o + 1] = lerp(G.sp[o + 1], tmp3[1], k); G.p[o + 2] = lerp(G.sp[o + 2], tmp3[2], k);
+                // phagocytic cup: the membrane reaches for the particle
+                const pull = 0.05 * (1 - G.prog[i]);
+                for (let n = 0; n < NN; n++) {
+                    if (depth[n] > 0.05) continue;
+                    const dx = G.p[o] - X[n * 3], dy = G.p[o + 1] - X[n * 3 + 1], dz = G.p[o + 2] - X[n * 3 + 2];
+                    const d2 = dx * dx + dy * dy + dz * dz;
+                    if (d2 < 0.1) { const w = pull * (1 - d2 / 0.1); X[n * 3] += dx * w; X[n * 3 + 1] += dy * w; X[n * 3 + 2] += dz * w; }
+                }
+            }
+            qmulAxis(G.q, i * 4, G.w[o], G.w[o + 1], G.w[o + 2], dt);
+            if (G.prog[i] >= 1) {
+                G.r.set(G.tg.subarray(o, o + 3), o);
+                relocate(G, i, G.r);
+                G.st[i] = GS.PHAGO;
+                if (!host.infected) { host.infected = true; host.tau = 0; }
+                G.t0[i] = host.tau;
+            }
+        } else if (st === GS.PHAGO || st === GS.EMPTY) {
+            embedInto(G.tet[i], G.b[o], G.b[o + 1], G.b[o + 2], G.p, o);
+            qmulAxis(G.q, i * 4, G.w[o] * 0.3, G.w[o + 1] * 0.3, G.w[o + 2] * 0.3, dt);
+            if (st === GS.PHAGO && host.infected && !host.lysing) {
+                const tt = host.tau - G.t0[i] - T_GATE;
+                if (tt > 0) G.gate[i] = Math.min(1, tt / T_OPEN);
+                if (G.gate[i] >= 1) {
+                    G.st[i] = GS.EMPTY;
+                    host.cores.push({ r0: [G.r[o], G.r[o + 1], G.r[o + 2]], prog: 0 });
+                    for (let j = 0; j < MAXV; j++) {   // hitchhikers enter the cytoplasm and head for the factory
+                        if (Vp.st[j] !== VS.ATT || Vp.g[j] !== i) continue;
+                        Vp.st[j] = VS.IN; Vp.done[j] = 0;
+                        Vp.r[j * 3] = G.r[o] + Vp.l[j * 3] * RF; Vp.r[j * 3 + 1] = G.r[o + 1] + Vp.l[j * 3 + 1] * RF; Vp.r[j * 3 + 2] = G.r[o + 2] + Vp.l[j * 3 + 2] * RF;
+                        const a = rand() * 6.2831853, rr = Math.sqrt(rand()) * 0.18;
+                        Vp.tg[j * 3] = ORG.vf[0] + Math.cos(a) * rr; Vp.tg[j * 3 + 1] = ORG.vf[1] + (rand() - 0.5) * 0.1; Vp.tg[j * 3 + 2] = ORG.vf[2] + Math.sin(a) * rr;
+                        relocate(Vp, j, Vp.r);
+                        host.vIn++;
+                    }
+                    G.nv[i] = 0;
+                }
+            } else if (st === GS.EMPTY) {
+                G.fade[i] -= dt * HPS / 1.3;
+                if (G.fade[i] <= 0) killG(i);
+            }
+        } else if (st === GS.PROG) {
+            if (!G.done[i]) moveRest(G, i, dt * HPS * 0.5);
+            embedInto(G.tet[i], G.b[o], G.b[o + 1], G.b[o + 2], G.p, o);
+            G.sc[i] = Math.min(1, G.sc[i] + dt * HPS / 0.5);
+            if (G.sc[i] >= 1 && !G.def[i]) G.fib[i] = Math.min(1, G.fib[i] + dt * HPS / 0.7);
+            qmulAxis(G.q, i * 4, G.w[o] * 0.2, G.w[o + 1] * 0.2, G.w[o + 2] * 0.2, dt);
+        }
+    }
+    // ----- virophages -----
+    for (let j = 0; j < MAXV; j++) {
+        const st = Vp.st[j];
+        if (!st) continue;
+        const o = j * 3;
+        Vp.age[j] += dt;
+        if (st === VS.FREE) {
+            const damp = Math.exp(-3 * dt);
+            Vp.v[o] = Vp.v[o] * damp + randn() * 0.45 * sq;
+            Vp.v[o + 1] = (Vp.v[o + 1] - 0.04 * dt) * damp + randn() * 0.3 * sq;
+            Vp.v[o + 2] = Vp.v[o + 2] * damp + randn() * 0.45 * sq;
+            Vp.p[o] += Vp.v[o] * dt; Vp.p[o + 1] += Vp.v[o + 1] * dt; Vp.p[o + 2] += Vp.v[o + 2] * dt;
+            if (Vp.p[o + 1] < RV) { Vp.p[o + 1] = RV; if (Vp.v[o + 1] < 0) Vp.v[o + 1] *= -0.3; }
+            if (Vp.p[o + 1] > 1.6) Vp.v[o + 1] -= 0.5 * dt;
+            if (Math.abs(Vp.p[o]) > 4.2) { Vp.p[o] = Math.sign(Vp.p[o]) * 4.2; Vp.v[o] *= -0.5; }
+            if (Math.abs(Vp.p[o + 2]) > 3.4) { Vp.p[o + 2] = Math.sign(Vp.p[o + 2]) * 3.4; Vp.v[o + 2] *= -0.5; }
+            if (fpOn && footprintContact(Vp.p[o], Vp.p[o + 1], Vp.p[o + 2], RV)) {
+                if (fpHit.push < fpHit.up) { Vp.p[o] += fpHit.nx * fpHit.push; Vp.p[o + 2] += fpHit.nz * fpHit.push; }
+                else Vp.p[o + 1] += fpHit.up;
+            }
+            // adsorb onto the fibers of a nearby free giant virion
+            const ci = clamp(Math.floor((Vp.p[o] - H0) / HC), 0, HG - 1), ck = clamp(Math.floor((Vp.p[o + 2] - H0) / HC), 0, HG - 1);
+            let stuck = false;
+            for (let dk = -1; dk <= 1 && !stuck; dk++) for (let di = -1; di <= 1 && !stuck; di++) {
+                const ii = ci + di, kk = ck + dk;
+                if (ii < 0 || kk < 0 || ii >= HG || kk >= HG) continue;
+                for (let gi = hHead[kk * HG + ii]; gi >= 0; gi = hNext[gi]) {
+                    if (G.nv[gi] >= 14) continue;
+                    const d = Math.hypot(Vp.p[o] - G.p[gi * 3], Vp.p[o + 1] - G.p[gi * 3 + 1], Vp.p[o + 2] - G.p[gi * 3 + 2]);
+                    if (d < RF * 1.15 && rand() < 0.6) { attachVp(j, gi); stuck = true; break; }
+                }
+            }
+            if (!stuck && Vp.age[j] > 90) { Vp.fade[j] -= dt / 4; if (Vp.fade[j] <= 0) Vp.st[j] = VS.DEAD; }
+        } else if (st === VS.ATT) {
+            const gi = Vp.g[j];
+            if (!G.st[gi]) { Vp.st[j] = VS.FREE; Vp.v.fill(0, o, o + 3); continue; }
+            qrotInto(G.q, gi * 4, Vp.l[o] * RF * 0.97, Vp.l[o + 1] * RF * 0.97, Vp.l[o + 2] * RF * 0.97, Vp.p, o);
+            Vp.p[o] += G.p[gi * 3]; Vp.p[o + 1] += G.p[gi * 3 + 1]; Vp.p[o + 2] += G.p[gi * 3 + 2];
+        } else if (st === VS.IN) {
+            if (!Vp.done[j]) moveRest(Vp, j, dt * HPS * 0.35);
+            embedInto(Vp.tet[j], Vp.b[o], Vp.b[o + 1], Vp.b[o + 2], Vp.p, o);
+            if (Vp.done[j] && host.seedTau >= 0) {   // uncoats in the factory: the eclipse
+                Vp.fade[j] -= dt * HPS / 0.6;
+                if (Vp.fade[j] <= 0) Vp.st[j] = VS.DEAD;
+            }
+        } else if (st === VS.PROG) {
+            if (!Vp.done[j]) moveRest(Vp, j, dt * HPS * 0.25);
+            embedInto(Vp.tet[j], Vp.b[o], Vp.b[o + 1], Vp.b[o + 2], Vp.p, o);
+            Vp.sc[j] = Math.min(1, Vp.sc[j] + dt * HPS / 0.4);
+        }
+    }
+    // ----- granules stream through the cytoplasm -----
+    if (host.alive) {
+        for (let k = 0; k < NGRAN; k++) {
+            const o = k * 3;
+            const x = GR.r[o], z = GR.r[o + 2];
+            GR.vr[o] += (-z * 0.03 + randn() * 0.02) * dt; GR.vr[o + 2] += (x * 0.03 + randn() * 0.02) * dt; GR.vr[o + 1] += randn() * 0.01 * dt;
+            GR.vr[o] *= 0.995; GR.vr[o + 1] *= 0.99; GR.vr[o + 2] *= 0.995;
+            const nx = x + GR.vr[o] * dt, ny = GR.r[o + 1] + GR.vr[o + 1] * dt, nz = z + GR.vr[o + 2] * dt;
+            const np = [nx, ny, nz];
+            if (sdf(nx, ny, nz) < -0.045 && !inNucleus(np, 0.02) && !inFactory(np, host.vfR - 0.38)) { GR.r[o] = nx; GR.r[o + 1] = ny; GR.r[o + 2] = nz; }
+            else { GR.vr[o] *= -1; GR.vr[o + 1] *= -1; GR.vr[o + 2] *= -1; }
+            relocate(GR, k, GR.r);
+            embedInto(GR.tet[k], GR.b[o], GR.b[o + 1], GR.b[o + 2], GR.p, o);
+        }
+    }
+}
+
+/* =============================================================
+   8. Camera
+   ============================================================= */
+const cam = { el: 0.64, az: 0.52, fov: 30 * Math.PI / 180, zoom: 1, tgt: [0, 0.2, 0], baseT: [0, 0.2, 0], base: 7, ox: 0, oy: 0, eye: [0, 0, 0], dist: 7 };
+let VPm = null, IVP = null, VIEW = null, PROJ = null;
+function mat4Mul(a, b) {
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) o[c * 4 + r] = a[r] * b[c * 4] + a[4 + r] * b[c * 4 + 1] + a[8 + r] * b[c * 4 + 2] + a[12 + r] * b[c * 4 + 3];
+    return o;
+}
+function mat4Inv(a) {
+    const o = new Float32Array(16);
+    const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3], a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+    const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11], a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+    const b00 = a00 * a11 - a01 * a10, b01 = a00 * a12 - a02 * a10, b02 = a00 * a13 - a03 * a10, b03 = a01 * a12 - a02 * a11;
+    const b04 = a01 * a13 - a03 * a11, b05 = a02 * a13 - a03 * a12, b06 = a20 * a31 - a21 * a30, b07 = a20 * a32 - a22 * a30;
+    const b08 = a20 * a33 - a23 * a30, b09 = a21 * a32 - a22 * a31, b10 = a21 * a33 - a23 * a31, b11 = a22 * a33 - a23 * a32;
+    const det = 1 / (b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06);
+    o[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det; o[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+    o[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det; o[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+    o[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det; o[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+    o[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det; o[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+    o[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det; o[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+    o[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det; o[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+    o[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det; o[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+    o[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det; o[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+    return o;
+}
+function lookAt(e, t) {
+    let zx = e[0] - t[0], zy = e[1] - t[1], zz = e[2] - t[2], l = Math.hypot(zx, zy, zz);
+    zx /= l; zy /= l; zz /= l;
+    let xx = zz, xy = 0, xz = -zx;   // up = +y
+    l = Math.hypot(xx, xy, xz); xx /= l; xy /= l; xz /= l;
+    const yx = zy * xz - zz * xy, yy = zz * xx - zx * xz, yz = zx * xy - zy * xx;
+    return new Float32Array([xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0,
+        -(xx * e[0] + xy * e[1] + xz * e[2]), -(yx * e[0] + yy * e[1] + yz * e[2]), -(zx * e[0] + zy * e[1] + zz * e[2]), 1]);
+}
+function updateCamera(W, H) {
+    const d = cam.base * cam.zoom;
+    cam.dist = d;
+    const ce = Math.cos(cam.el);
+    cam.eye = [cam.tgt[0] + d * Math.sin(cam.az) * ce, cam.tgt[1] + d * Math.sin(cam.el), cam.tgt[2] + d * Math.cos(cam.az) * ce];
+    VIEW = lookAt(cam.eye, cam.tgt);
+    const f = 1 / Math.tan(cam.fov / 2), n = 0.1, fa = 60;
+    PROJ = new Float32Array(16);
+    PROJ[0] = f / (W / H); PROJ[5] = f; PROJ[8] = -cam.ox; PROJ[9] = -cam.oy; PROJ[10] = fa / (n - fa); PROJ[11] = -1; PROJ[14] = n * fa / (n - fa);
+    VPm = mat4Mul(PROJ, VIEW);
+    IVP = mat4Inv(VPm);
+}
+function ray(px, py, W, H) {
+    const nx = px / W * 2 - 1, ny = 1 - py / H * 2;
+    const m = IVP;
+    const tr = (x, y, z) => {
+        const w = m[3] * x + m[7] * y + m[11] * z + m[15];
+        return [(m[0] * x + m[4] * y + m[8] * z + m[12]) / w, (m[1] * x + m[5] * y + m[9] * z + m[13]) / w, (m[2] * x + m[6] * y + m[10] * z + m[14]) / w];
+    };
+    const a = tr(nx, ny, 0), b = tr(nx, ny, 1);
+    const d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], l = Math.hypot(...d);
+    return { o: a, d: [d[0] / l, d[1] / l, d[2] / l] };
+}
+
+/* =============================================================
+   9. Palettes (linear, before tone mapping)
+   ============================================================= */
+const MODES = [
+    { name: 'Phase contrast', exposure: 1.0,
+        bg: [0.95, 0.94, 0.915, 0.05], floor: [0.9, 0.895, 0.87, 0.6], grid: [0.48, 0.48, 0.47, 0.5],
+        cellAbs: [1.9, 1.9, 1.8, 0.035], cellScat: [0.14, 0.14, 0.135, 1.6], cellRim: [1.1, 1.1, 1.08, 0.35],
+        nuc: [0.4, 0.4, 0.385, 0], vf: [0.2, 0.2, 0.195, 0], cap: [0.09, 0.09, 0.09, 0], fib: [0.36, 0.36, 0.35, 0.9],
+        vp: [0.06, 0.06, 0.06, 0], gran: [0.28, 0.28, 0.27, 0], shadow: [0.32, 0.2, 0, 8.5], line: [0.05, 0.05, 0.05, 0.13] },
+    { name: 'Darkfield', exposure: 1.25,
+        bg: [0.013, 0.013, 0.015, 0], floor: [0.016, 0.016, 0.018, 0.5], grid: [0.034, 0.034, 0.038, 0.03],
+        cellAbs: [0.5, 0.5, 0.5, 0.035], cellScat: [0.045, 0.047, 0.05, 2.4], cellRim: [0.9, 0.9, 0.95, 0.25],
+        nuc: [0.2, 0.2, 0.21, 1], vf: [0.5, 0.5, 0.52, 1], cap: [1.1, 1.1, 1.1, 1], fib: [0.7, 0.71, 0.75, 0.5],
+        vp: [1.35, 1.35, 1.35, 1], gran: [0.55, 0.55, 0.57, 1], shadow: [0.5, 0.3, 0, 8.5], line: [0.9, 0.9, 0.9, 0.12] },
+    { name: 'Fluorescence', exposure: 1.35,
+        bg: [0.005, 0.006, 0.009, 0], floor: [0.007, 0.008, 0.012, 0.45], grid: [0.013, 0.016, 0.022, 0],
+        cellAbs: [0.12, 0.12, 0.12, 0.02], cellScat: [0.02, 0.028, 0.034, 1.5], cellRim: [0.06, 0.09, 0.11, 0.08],
+        nuc: [0.1, 0.22, 0.95, 1], vf: [0.22, 0.42, 1.6, 1], cap: [0.3, 1.25, 0.42, 1], fib: [0.12, 0.75, 0.28, 0.6],
+        vp: [1.4, 0.2, 0.75, 1], gran: [0.02, 0.03, 0.035, 1], shadow: [0.3, 0.2, 0, 8.5], line: [0.7, 0.8, 0.9, 0.11] },
+];
+function aces(x) { x = Math.max(0, x); return Math.min(1, (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14)); }
+function toCss(rgb, exp) { return '#' + rgb.slice(0, 3).map((c) => Math.round(Math.pow(aces(c * exp), 1 / 2.2) * 255).toString(16).padStart(2, '0')).join(''); }
+
+/* =============================================================
+   10. WGSL
+   ============================================================= */
+const PRELUDE = /* wgsl */`
+struct U {
+  viewProj: mat4x4f, invViewProj: mat4x4f, view: mat4x4f,
+  camPos: vec4f, screen: vec4f, misc: vec4f, host: vec4f, rupture: vec4f, lightDir: vec4f,
+  bg: vec4f, floorC: vec4f, gridC: vec4f, cellAbs: vec4f, cellScat: vec4f, cellRim: vec4f,
+  nucC: vec4f, vfC: vec4f, capC: vec4f, fibC: vec4f, vpC: vec4f, granC: vec4f, shadowP: vec4f, lineC: vec4f,
+};
+@group(0) @binding(0) var<uniform> u: U;
+const VSTAR = vec3f(0.0, 0.5257311, 0.8506508);
+
+fn hash31(p: vec3f) -> f32 {
+  var q = fract(p * vec3f(0.1031, 0.1030, 0.0973));
+  q += dot(q, q.yzx + 33.33);
+  return fract((q.x + q.y) * q.z);
+}
+fn vnoise(p: vec3f) -> f32 {
+  let i = floor(p); let f = fract(p); let w = f * f * (3.0 - 2.0 * f);
+  let n000 = hash31(i); let n100 = hash31(i + vec3f(1.0, 0.0, 0.0));
+  let n010 = hash31(i + vec3f(0.0, 1.0, 0.0)); let n110 = hash31(i + vec3f(1.0, 1.0, 0.0));
+  let n001 = hash31(i + vec3f(0.0, 0.0, 1.0)); let n101 = hash31(i + vec3f(1.0, 0.0, 1.0));
+  let n011 = hash31(i + vec3f(0.0, 1.0, 1.0)); let n111 = hash31(i + vec3f(1.0, 1.0, 1.0));
+  return mix(mix(mix(n000, n100, w.x), mix(n010, n110, w.x), w.y), mix(mix(n001, n101, w.x), mix(n011, n111, w.x), w.y), w.z);
+}
+fn tonemap(c: vec3f) -> vec3f {
+  let x = max(c * u.misc.z, vec3f(0.0));
+  let t = clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), vec3f(0.0), vec3f(1.0));
+  return pow(t, vec3f(1.0 / 2.2));
+}
+fn filmGrain(px: vec2f) -> f32 {
+  return (hash31(vec3f(px, fract(u.misc.x * 7.31) * 97.0)) - 0.5) * 0.012;
+}
+fn qrot(q: vec4f, v: vec3f) -> vec3f {
+  let t = 2.0 * cross(q.xyz, v);
+  return v + q.w * t + cross(q.xyz, t);
+}
+fn envLight(r: vec3f) -> vec3f {
+  let sky = mix(vec3f(0.3), vec3f(1.0), smoothstep(-0.3, 0.9, r.y));
+  let key = smoothstep(0.955, 0.985, dot(r, normalize(u.lightDir.xyz))) * 1.3;
+  let fill = smoothstep(0.96, 0.99, dot(r, normalize(vec3f(0.85, 0.5, -0.3)))) * 0.5;
+  var c = sky * 0.55 + vec3f(key + fill);
+  if (u.misc.y > 0.5) { c = c * 0.12; }
+  return c;
+}
+fn ggx(ndh: f32, rough: f32) -> f32 {
+  let a = rough * rough; let a2 = a * a;
+  let d = ndh * ndh * (a2 - 1.0) + 1.0;
+  return a2 / (3.14159 * d * d);
+}
+`;
+
+const WGSL_SKIN = PRELUDE + /* wgsl */`
+@group(1) @binding(0) var<storage, read> nodes: array<vec4f>;
+@group(1) @binding(1) var<storage, read> cofs: array<vec4f>;
+@group(1) @binding(2) var<storage, read> tets: array<vec4u>;
+@group(1) @binding(3) var<storage, read> edges: array<u32>;
+@group(2) @binding(0) var samp: sampler;
+@group(2) @binding(1) var sceneTex: texture_2d<f32>;
+@group(2) @binding(2) var thickTex: texture_2d<f32>;
+
+struct SIn { @location(0) rp: vec3f, @location(1) rn: vec3f, @location(2) bary: vec3f, @location(3) tet: u32 };
+struct SOut { @builtin(position) pos: vec4f, @location(0) wp: vec3f, @location(1) wn: vec3f, @location(2) rp: vec3f, @location(3) vd: f32 };
+
+fn skin(v: SIn) -> SOut {
+  let t = tets[v.tet];
+  let b = vec4f(1.0 - v.bary.x - v.bary.y - v.bary.z, v.bary.x, v.bary.y, v.bary.z);
+  var p = vec3f(0.0);
+  var n = vec3f(0.0);
+  for (var k = 0u; k < 4u; k++) {
+    let id = t[k];
+    p += nodes[id].xyz * b[k];
+    n += (cofs[id * 3u].xyz * v.rn.x + cofs[id * 3u + 1u].xyz * v.rn.y + cofs[id * 3u + 2u].xyz * v.rn.z) * b[k];
+  }
+  var o: SOut;
+  o.wp = p;
+  o.wn = normalize(n + vec3f(0.0, 1e-6, 0.0));
+  o.rp = v.rp;
+  o.vd = length(p - u.camPos.xyz) - u.camPos.w;
+  o.pos = u.viewProj * vec4f(p, 1.0);
+  return o;
+}
+fn tear(rp: vec3f) -> f32 {
+  if (u.host.w < 0.5) { return 1.0; }
+  let d = distance(rp, u.rupture.xyz);
+  let rag = vnoise(rp * 7.0 + 3.1) * 0.3 + vnoise(rp * 19.0) * 0.12;
+  return d - u.host.y * (0.78 + rag);
+}
+
+@vertex fn vsCell(v: SIn) -> SOut { return skin(v); }
+@vertex fn vsShadowCell(v: SIn) -> SOut {
+  var o = skin(v);
+  o.pos = vec4f(o.wp.x / 4.0, -o.wp.z / 4.0, 0.5, 1.0);
+  return o;
+}
+@fragment fn fsShadowCell(i: SOut) -> @location(0) vec4f {
+  if (tear(i.rp) < 0.0) { discard; }
+  let low = clamp(1.0 - i.wp.y / 1.2, 0.0, 1.0);
+  return vec4f(u.host.x, u.host.x * low, 0.0, 0.0);
+}
+@fragment fn fsThick(i: SOut, @builtin(front_facing) ff: bool) -> @location(0) vec4f {
+  if (tear(i.rp) < 0.0) { discard; }
+  return vec4f(select(i.vd, -i.vd, ff), 0.0, 0.0, 0.0);
+}
+@fragment fn fsCell(i: SOut, @builtin(front_facing) ff: bool) -> @location(0) vec4f {
+  let m = tear(i.rp);
+  if (m < 0.0) { discard; }
+  let uv = i.pos.xy * u.screen.zw;
+  var N = normalize(i.wn);
+  if (!ff) { N = -N; }
+  let V = normalize(u.camPos.xyz - i.wp);
+  let ndv = clamp(dot(N, V), 0.0, 1.0);
+  let T = clamp(textureSampleLevel(thickTex, samp, uv, 0.0).r, 0.0, 2.0);
+  let nDev = N - vec3f(0.0, 1.0, 0.0) * max(dot(N, vec3f(0.0, 1.0, 0.0)), 0.0) * 0.9;
+  let nv = (u.view * vec4f(nDev, 0.0)).xyz;
+  let k = u.cellAbs.w * (0.5 + 0.5 * min(T, 0.7));
+  let ruv = clamp(uv + vec2f(-nv.x, nv.y) * k, vec2f(0.001), vec2f(0.999));
+  let refr = textureSampleLevel(sceneTex, samp, ruv, 0.0).rgb;
+  let clean = textureSampleLevel(sceneTex, samp, uv, 0.0).rgb;
+  let grain = vnoise(i.rp * 26.0) * 0.6 + vnoise(i.rp * 61.0) * 0.4;
+  let trans = exp(-u.cellAbs.rgb * T * (0.8 + 0.4 * grain));
+  let scat = u.cellScat.rgb * (1.0 - exp(-T * u.cellScat.w)) * (0.75 + 0.5 * grain);
+  let L = normalize(u.lightDir.xyz);
+  let H = normalize(L + V);
+  let ndl = max(dot(N, L), 0.0);
+  let spec = min(ggx(max(dot(N, H), 0.0), 0.3) * 0.02, 1.2) * ndl * u.cellRim.w;
+  let F = 0.03 + 0.97 * pow(1.0 - ndv, 5.0);
+  let refl = envLight(reflect(-V, N)) * F;
+  let thin = exp(-T * 3.0);
+  let rim = u.cellRim.rgb * pow(1.0 - ndv, 2.2) * (0.3 + 0.7 * thin);
+  var col = refr * trans + scat * (0.55 + 0.45 * ndl) + refl + vec3f(spec) + rim;
+  if (!ff) { col = refr * mix(vec3f(1.0), trans, 0.5) + scat * 0.4; }
+  let edgeGlow = (1.0 - smoothstep(0.0, 0.035, m)) * u.host.w;
+  col += u.cellRim.rgb * edgeGlow * 0.9;
+  col = mix(clean, col, u.host.x);
+  return vec4f(tonemap(col) + filmGrain(i.pos.xy), 1.0);
+}
+
+struct LOut { @builtin(position) pos: vec4f };
+@vertex fn vsLine(@builtin(vertex_index) vi: u32) -> LOut {
+  var o: LOut;
+  o.pos = u.viewProj * vec4f(nodes[edges[vi]].xyz, 1.0);
+  return o;
+}
+@fragment fn fsLine() -> @location(0) vec4f {
+  let a = u.lineC.w * u.host.x;
+  return vec4f(u.lineC.rgb * a, a);
+}
+`;
+
+const WGSL_FLOOR = PRELUDE + /* wgsl */`
+@group(1) @binding(0) var samp: sampler;
+@group(1) @binding(1) var shadowTex: texture_2d<f32>;
+struct FOut { @builtin(position) pos: vec4f, @location(0) ndc: vec2f };
+@vertex fn vsFull(@builtin(vertex_index) i: u32) -> FOut {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u)) * 2.0 - 1.0;
+  var o: FOut;
+  o.pos = vec4f(p, 0.0, 1.0);
+  o.ndc = p;
+  return o;
+}
+fn shade2(xz: vec2f, rad: f32) -> vec2f {
+  let uv = (xz + 4.0) / 8.0;
+  var acc = vec2f(0.0);
+  for (var k = 0; k < 12; k++) {
+    let a = f32(k) * 2.39996;
+    let r = sqrt((f32(k) + 0.5) / 12.0) * rad / 8.0;
+    acc += textureSampleLevel(shadowTex, samp, uv + vec2f(cos(a), sin(a)) * r, 0.0).rg;
+  }
+  return acc / 12.0;
+}
+fn gridLines(p: vec2f, s: f32, fw: vec2f, w: f32) -> f32 {
+  let g = abs(fract(p / s + 0.5) - 0.5) * s;
+  let l = vec2f(1.0) - smoothstep(fw * (w * 0.5), fw * (w * 0.5 + 1.0), g);
+  let lod = 1.0 - smoothstep(s * 0.05, s * 0.18, max(fw.x, fw.y));
+  return max(l.x, l.y) * lod;
+}
+@fragment fn fsFloor(i: FOut) -> @location(0) vec4f {
+  let a = u.invViewProj * vec4f(i.ndc, 0.0, 1.0);
+  let b = u.invViewProj * vec4f(i.ndc, 1.0, 1.0);
+  let ro = a.xyz / a.w;
+  let rd = normalize(b.xyz / b.w - ro);
+  let hit = rd.y < -1e-4;
+  let t = select(1e3, -ro.y / min(rd.y, -1e-4), hit);
+  let P = ro + rd * t;
+  let fw = fwidth(P.xz);
+  let chamber = 1.0 - smoothstep(3.0, 3.6, max(abs(P.x), abs(P.z)));
+  let g = max(gridLines(P.xz, 0.2326, fw, 1.0) * 0.4, gridLines(P.xz, 1.1628, fw, 1.35)) * chamber * u.floorC.w;
+  let s1 = shade2(P.xz, 0.06);
+  let s2 = shade2(P.xz, 0.4);
+  var col = mix(u.floorC.rgb, u.gridC.rgb, g);
+  let occ = clamp(s1.y * u.shadowP.x + s2.x * u.shadowP.y, 0.0, 0.92);
+  col = col * (1.0 - occ);
+  let halo = clamp(s2.x * 1.5 - s1.x * 2.4, 0.0, 1.0) * u.gridC.w;
+  col += vec3f(halo * 0.35);
+  let fade = select(1.0, smoothstep(u.shadowP.w * 0.42, u.shadowP.w, length(P.xz - u.camPos.xz * 0.2)), hit);
+  let top = u.bg.rgb * (1.0 - u.bg.w * clamp(i.ndc.y * 0.5 + 0.5, 0.0, 1.0));
+  col = mix(col, top, fade);
+  return vec4f(col, 1.0);
+}
+
+struct QOut { @builtin(position) pos: vec4f, @location(0) q: vec2f, @location(1) h: vec2f };
+@vertex fn vsShadowCap(@builtin(vertex_index) vi: u32, @location(0) ip: vec4f, @location(1) ia: vec4f) -> QOut {
+  var c = array<vec2f, 6>(vec2f(-1.0, -1.0), vec2f(1.0, -1.0), vec2f(1.0, 1.0), vec2f(-1.0, -1.0), vec2f(1.0, 1.0), vec2f(-1.0, 1.0));
+  let q = c[vi];
+  let r = ip.w * 2.0;
+  var o: QOut;
+  o.pos = vec4f((ip.x + q.x * r) / 4.0, -(ip.z + q.y * r) / 4.0, 0.5, 1.0);
+  o.q = q;
+  o.h = vec2f(ip.y, ia.w);
+  return o;
+}
+@fragment fn fsShadowCap(i: QOut) -> @location(0) vec4f {
+  let d = length(i.q);
+  if (d > 1.0) { discard; }
+  let a = (1.0 - d * d) * i.h.y;
+  let low = clamp(1.0 - i.h.x / 1.0, 0.0, 1.0);
+  return vec4f(a * 0.8, a * low * 0.9, 0.0, 0.0);
+}
+`;
+
+const WGSL_OBJ = PRELUDE + /* wgsl */`
+struct CapV {
+  @location(0) pos: vec3f, @location(1) nrm: vec3f, @location(2) flags: vec2f, @location(3) bmid: vec3f,
+  @location(4) ip: vec4f, @location(5) iq: vec4f, @location(6) ia: vec4f,
+};
+struct ObjO { @builtin(position) pos: vec4f, @location(0) wn: vec3f, @location(1) wp: vec3f, @location(2) op: vec3f, @location(3) @interpolate(flat) info: vec4f };
+
+@vertex fn vsCap(v: CapV) -> ObjO {
+  var p = v.pos;
+  var n = v.nrm;
+  let gate = v.ia.y;
+  if (v.flags.x > 0.5 && gate > 0.001) {
+    let th = gate * 1.2;
+    let r = VSTAR - v.bmid;
+    let rl = length(r);
+    if (v.flags.y > 0.5) { p = v.bmid + r * cos(th) + v.nrm * (rl * sin(th)); }
+    n = v.nrm * cos(th) - (r / rl) * sin(th);
+  }
+  var sc = vec3f(1.0);
+  if (v.ia.x > 0.5) { sc = vec3f(1.14, 0.84, 1.05); }
+  let wp = v.ip.xyz + qrot(v.iq, p * sc * v.ip.w);
+  var o: ObjO;
+  o.pos = u.viewProj * vec4f(wp, 1.0);
+  o.wp = wp;
+  o.wn = qrot(v.iq, normalize(n / sc));
+  o.op = p;
+  o.info = vec4f(v.flags.x, v.ia.x, gate, v.ia.w);
+  return o;
+}
+fn armMask(op: vec3f) -> f32 {
+  var nb = array<vec3f, 5>(vec3f(-0.5257311, 0.8506508, 0.0), vec3f(0.5257311, 0.8506508, 0.0),
+    vec3f(0.0, -0.5257311, 0.8506508), vec3f(0.8506508, 0.0, 0.5257311), vec3f(-0.8506508, 0.0, 0.5257311));
+  var m = 0.0;
+  for (var k = 0; k < 5; k++) {
+    let ab = (nb[k] - VSTAR) * 0.8;
+    let t = clamp(dot(op - VSTAR, ab) / dot(ab, ab), 0.0, 1.0);
+    let d = length(op - (VSTAR + ab * t));
+    let w = mix(0.1, 0.028, t);
+    m = max(m, 1.0 - smoothstep(w * 0.55, w, d));
+  }
+  return max(m, 1.0 - smoothstep(0.1, 0.17, length(op - VSTAR)));
+}
+@fragment fn fsCap(i: ObjO, @builtin(front_facing) ff: bool) -> @location(0) vec4f {
+  var n = normalize(i.wn);
+  if (!ff) { n = -n; }
+  let V = normalize(u.camPos.xyz - i.wp);
+  let L = normalize(u.lightDir.xyz);
+  let ndl = max(dot(n, L), 0.0);
+  let ndv = max(dot(n, V), 0.0);
+  let spec = min(ggx(max(dot(n, normalize(L + V)), 0.0), 0.32) * 0.025, 1.5) * ndl;
+  var arm = 0.0;
+  if (i.info.x > 0.5) { arm = armMask(i.op) * (1.0 - i.info.z); }
+  let md = u.misc.y;
+  var base = u.capC.rgb;
+  if (i.info.y > 0.5) { base = base * select(1.6, 0.55, md > 0.5); }
+  var col: vec3f;
+  if (md > 1.5) {
+    col = base * (0.45 + 0.55 * ndl) + base * arm * 0.7;
+  } else if (md > 0.5) {
+    col = base * (0.2 + 0.8 * ndl + 0.6 * pow(1.0 - ndv, 2.0)) + vec3f(spec * 0.5) + base * arm * 0.5;
+  } else {
+    col = base * (0.5 + 0.8 * ndl) + vec3f(spec * 0.3) + vec3f(0.42) * arm;
+  }
+  if (!ff) { col = base * 0.15; }
+  return vec4f(col, i.info.w);
+}
+
+struct VpV { @location(0) pos: vec3f, @location(1) nrm: vec3f, @location(2) a: vec4f, @location(3) b: vec4f };
+@vertex fn vsVp(v: VpV) -> ObjO {
+  let s = v.b.y;
+  let ax = normalize(vec3f(fract(s * 12.9898) - 0.5, fract(s * 78.233) - 0.5, fract(s * 37.719) - 0.5) + vec3f(0.001, 0.0, 0.0));
+  let ang = s * 6.2831 + u.misc.x * 0.4 * (fract(s * 3.3) - 0.5);
+  let q = vec4f(ax * sin(ang * 0.5), cos(ang * 0.5));
+  let wp = v.a.xyz + qrot(q, v.pos * v.a.w);
+  var o: ObjO;
+  o.pos = u.viewProj * vec4f(wp, 1.0);
+  o.wp = wp;
+  o.wn = qrot(q, v.nrm);
+  o.op = v.pos;
+  o.info = vec4f(v.b.x, 0.0, 0.0, 0.0);
+  return o;
+}
+@fragment fn fsVp(i: ObjO) -> @location(0) vec4f {
+  let n = normalize(i.wn);
+  let ndl = max(dot(n, normalize(u.lightDir.xyz)), 0.0);
+  let ndv = max(dot(n, normalize(u.camPos.xyz - i.wp)), 0.0);
+  var col = u.vpC.rgb * (0.5 + 0.6 * ndl);
+  if (u.misc.y > 0.5) { col = u.vpC.rgb * (0.55 + 0.45 * ndl + 0.4 * (1.0 - ndv)); }
+  return vec4f(col, i.info.x);
+}
+
+struct SphV { @location(0) pos: vec3f, @location(1) a: vec4f, @location(2) b: vec4f };
+struct SphO { @builtin(position) pos: vec4f, @location(0) wn: vec3f, @location(1) wp: vec3f, @location(2) od: vec3f, @location(3) @interpolate(flat) b: vec4f };
+@vertex fn vsGran(v: SphV) -> SphO {
+  let wp = v.a.xyz + v.pos * v.a.w;
+  var o: SphO;
+  o.pos = u.viewProj * vec4f(wp, 1.0);
+  o.wp = wp; o.wn = v.pos; o.od = v.pos; o.b = v.b;
+  return o;
+}
+@fragment fn fsGran(i: SphO) -> @location(0) vec4f {
+  let n = normalize(i.wn);
+  let ndl = max(dot(n, normalize(u.lightDir.xyz)), 0.0);
+  let rim = pow(1.0 - max(dot(n, normalize(u.camPos.xyz - i.wp)), 0.0), 2.0);
+  var col = u.granC.rgb * (0.5 + 0.6 * ndl) * i.b.x + vec3f(rim * 0.3);
+  if (u.misc.y > 0.5) { col = u.granC.rgb * (0.4 + 0.5 * ndl) * i.b.x + u.granC.rgb * rim * 0.8; }
+  return vec4f(col, i.b.y);
+}
+
+@vertex fn vsBlob(v: SphV) -> SphO {
+  let d = normalize(v.pos);
+  let ty = v.b.x;
+  var sc = vec3f(1.0, 0.82, 1.0);
+  var r = 1.0;
+  if (ty > 1.5 && ty < 2.5) {
+    sc = vec3f(1.0, 0.62, 1.0);
+    r = 1.0 + (vnoise(d * 2.6 + v.b.w) - 0.5) * 0.34 + (vnoise(d * 6.0 + v.b.w * 3.0) - 0.5) * 0.12;
+  }
+  if (ty > 2.5) { sc = vec3f(1.0, 0.86, 1.0); }
+  let wp = v.a.xyz + d * sc * (r * v.a.w);
+  var o: SphO;
+  o.pos = u.viewProj * vec4f(wp, 1.0);
+  o.wp = wp; o.wn = normalize(d / sc); o.od = d; o.b = v.b;
+  return o;
+}
+@fragment fn fsBlob(i: SphO) -> @location(0) vec4f {
+  let n = normalize(i.wn);
+  let V = normalize(u.camPos.xyz - i.wp);
+  let ndl = max(dot(n, normalize(u.lightDir.xyz)), 0.0);
+  let ndv = max(dot(n, V), 0.0);
+  let rim = pow(1.0 - ndv, 2.0);
+  let ty = i.b.x;
+  let md = u.misc.y;
+  var col = vec3f(0.0);
+  if (ty < 0.5) {
+    let chrom = vnoise(i.od * 9.0 + i.b.w) * 0.6 + vnoise(i.od * 23.0) * 0.4;
+    if (md > 1.5) { col = u.nucC.rgb * (0.45 + 0.7 * chrom) * (0.65 + 0.35 * ndv); }
+    else if (md > 0.5) { col = u.nucC.rgb * (0.4 + 0.6 * chrom) + vec3f(rim * 0.1); }
+    else { col = u.nucC.rgb * (0.7 + 0.3 * ndl) * (0.85 + 0.3 * chrom) - vec3f(rim * 0.28); }
+  } else if (ty < 1.5) {
+    col = u.nucC.rgb * select(0.26, 0.55, md > 0.5) * (0.6 + 0.4 * ndl);
+  } else if (ty < 2.5) {
+    let g = vnoise(i.od * 14.0 + i.b.w) * 0.55 + vnoise(i.od * 37.0) * 0.45;
+    if (md > 1.5) { col = u.vfC.rgb * (0.45 + 0.9 * g) * (0.7 + 0.3 * ndv); }
+    else if (md > 0.5) { col = u.vfC.rgb * (0.35 + 0.9 * g) + vec3f(rim * 0.2); }
+    else { col = u.vfC.rgb * (0.75 + 0.5 * ndl) * (0.65 + 0.7 * g) + vec3f(rim * 0.22); }
+  } else {
+    col = select(u.vfC.rgb * 0.6, u.vfC.rgb * 1.8, md > 0.5);
+  }
+  return vec4f(col * i.b.y, i.b.z);
+}
+@fragment fn fsBlobT(i: SphO) -> @location(0) vec4f {
+  let n = normalize(i.wn);
+  let ndv = abs(dot(n, normalize(u.camPos.xyz - i.wp)));
+  let rim = pow(1.0 - ndv, 3.0);
+  let md = u.misc.y;
+  var a = (0.05 + rim * 0.55) * i.b.z;
+  var c = vec3f(1.15);
+  if (md > 1.5) { c = vec3f(0.1, 0.14, 0.18); } else if (md > 0.5) { c = vec3f(0.75); a = a * 0.8; }
+  if (i.b.x > 4.5 && i.b.x < 5.5) { a = a * 0.75; }
+  return vec4f(c * a, a * select(1.0, 0.0, md > 0.5));
+}
+
+struct FibV { @location(0) pos: vec3f, @location(1) ip: vec4f, @location(2) iq: vec4f, @location(3) ia: vec4f };
+@vertex fn vsFib(v: FibV, @builtin(instance_index) ii: u32) -> SphO {
+  let d = normalize(v.pos);
+  let wp = v.ip.xyz + qrot(v.iq, d * v.ip.w * 1.5);
+  var o: SphO;
+  o.pos = u.viewProj * vec4f(wp, 1.0);
+  o.wp = wp; o.wn = qrot(v.iq, d); o.od = d;
+  o.b = vec4f(v.ia.z * v.ia.w * select(1.0, 0.0, v.ia.x > 0.5), f32(ii), 0.0, 0.0);
+  return o;
+}
+@fragment fn fsFib(i: SphO) -> @location(0) vec4f {
+  if (i.b.x < 0.01) { discard; }
+  let n = normalize(i.wn);
+  let ndv = abs(dot(n, normalize(u.camPos.xyz - i.wp)));
+  let edgeW = pow(1.0 - ndv, 1.1);
+  let s = i.b.y * 7.13;
+  let hair = vnoise(i.od * 34.0 + s) * vnoise(i.od * 73.0 - s);
+  var a = (0.14 + 0.95 * edgeW) * (0.35 + 1.7 * hair) * u.fibC.w * i.b.x;
+  a = clamp(a * (1.0 - smoothstep(0.84, 0.93, dot(i.od, VSTAR))), 0.0, 1.0);
+  return vec4f(u.fibC.rgb * a, a * select(1.0, 0.0, u.misc.y > 0.5));
+}
+`;
+
+const WGSL_BLIT = PRELUDE + /* wgsl */`
+@group(1) @binding(0) var samp: sampler;
+@group(1) @binding(1) var sceneTex: texture_2d<f32>;
+@group(1) @binding(2) var thickTex: texture_2d<f32>;
+struct FOut { @builtin(position) pos: vec4f, @location(0) ndc: vec2f };
+@vertex fn vsFull(@builtin(vertex_index) i: u32) -> FOut {
+  let p = vec2f(f32((i << 1u) & 2u), f32(i & 2u)) * 2.0 - 1.0;
+  var o: FOut;
+  o.pos = vec4f(p, 0.0, 1.0);
+  o.ndc = p;
+  return o;
+}
+@fragment fn fsBlit(i: FOut) -> @location(0) vec4f {
+  let c = textureSampleLevel(sceneTex, samp, i.pos.xy * u.screen.zw, 0.0).rgb;
+  return vec4f(tonemap(c) + filmGrain(i.pos.xy), 1.0);
+}
+`;
+
+/* =============================================================
+   11. Renderer
+   ============================================================= */
+const ui = {
+    status: $('.status'), statusText: $('.status-text'), stage: $('.stage'), panel: $('.panel'),
+    masthead: $('.masthead'), readout: $('.readout'), fallback: $('.fallback'),
+};
+function setStatus(text, live) { ui.statusText.textContent = text; ui.status.classList.toggle('is-idle', !live); }
+function fail(msg) {
+    ui.fallback.hidden = false;
+    $('#fallback-reason').textContent = msg;
+    setStatus('WebGPU · Unavailable', false);
+}
+
+let device, context, format, R = null, stopped = false;
+const UF = new Float32Array(128);
+
+async function initGPU() {
+    if (!navigator.gpu) { fail('This browser does not expose the WebGPU API (navigator.gpu is missing).'); return false; }
+    let adapter = null;
+    try { adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' }); } catch (e) { /* handled below */ }
+    if (!adapter) { fail('The browser has the WebGPU API but found no compatible graphics adapter.'); return false; }
+    try { device = await adapter.requestDevice(); } catch (e) { fail('The graphics adapter refused to create a WebGPU device: ' + e.message); return false; }
+    device.lost.then((info) => { stopped = true; if (info.reason !== 'destroyed') fail('The WebGPU device was lost: ' + (info.message || 'unknown reason') + '. Reload the page to try again.'); });
+    device.addEventListener('uncapturederror', (e) => console.error('[WebGPU]', e.error.message));
+    context = canvas.getContext('webgpu');
+    format = navigator.gpu.getPreferredCanvasFormat();
+    context.configure({ device, format, alphaMode: 'opaque' });
+
+    const buf = (data, usage) => {
+        const b = device.createBuffer({ size: Math.ceil(data.byteLength / 4) * 4, usage, mappedAtCreation: true });
+        new Uint8Array(b.getMappedRange()).set(new Uint8Array(data.buffer || data, data.byteOffset || 0, data.byteLength));
+        b.unmap();
+        return b;
+    };
+    const empty = (size, usage) => device.createBuffer({ size, usage: usage | GPUBufferUsage.COPY_DST });
+    const VB = GPUBufferUsage.VERTEX, IB = GPUBufferUsage.INDEX, SB = GPUBufferUsage.STORAGE;
+
+    const sph = [1, 2, 3].map((s) => { const ico = icosphere(s); return { vb: buf(flatPos(ico), VB), ib: buf(flatIdx(ico), IB), n: ico.F.length * 3 }; });
+    const r = {
+        ubuf: empty(512, GPUBufferUsage.UNIFORM),
+        nodeBuf: empty(NN * 16, SB), cofBuf: empty(NN * 48, SB),
+        tetBuf: buf(new Uint32Array(T4), SB), edgeBuf: buf(new Uint32Array(E2), SB),
+        surfVB: buf(new Uint8Array(SURF.data), VB), surfIB: buf(SURF.idx, IB),
+        capGeo: buf(CAPSID, VB),
+        capInst: empty(MAXG * 48, VB), vpInst: empty(MAXV * 32, VB), granInst: empty(NGRAN * 32, VB), blobInst: empty(MAXBLOB * 32, VB),
+        sph1: sph[0], sph2: sph[1], sph3: sph[2],
+        shadowTex: device.createTexture({ size: [512, 512], format: 'rg16float', usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING }),
+        samp: device.createSampler({ magFilter: 'linear', minFilter: 'linear', addressModeU: 'clamp-to-edge', addressModeV: 'clamp-to-edge' }),
+        w: 0, h: 0,
+    };
+    r.capF = new Float32Array(MAXG * 12); r.vpF = new Float32Array(MAXV * 8); r.granF = new Float32Array(NGRAN * 8); r.blobF = new Float32Array(MAXBLOB * 8);
+
+    const vis = GPUShaderStage;
+    const bglU = device.createBindGroupLayout({ entries: [{ binding: 0, visibility: vis.VERTEX | vis.FRAGMENT, buffer: { type: 'uniform' } }] });
+    const bglSkin = device.createBindGroupLayout({ entries: [0, 1, 2, 3].map((b) => ({ binding: b, visibility: vis.VERTEX, buffer: { type: 'read-only-storage' } })) });
+    const bglShadow = device.createBindGroupLayout({ entries: [{ binding: 0, visibility: vis.FRAGMENT, sampler: {} }, { binding: 1, visibility: vis.FRAGMENT, texture: {} }] });
+    r.bglComp = device.createBindGroupLayout({ entries: [{ binding: 0, visibility: vis.FRAGMENT, sampler: {} }, { binding: 1, visibility: vis.FRAGMENT, texture: {} }, { binding: 2, visibility: vis.FRAGMENT, texture: {} }] });
+    r.bgU = device.createBindGroup({ layout: bglU, entries: [{ binding: 0, resource: { buffer: r.ubuf } }] });
+    r.bgSkin = device.createBindGroup({ layout: bglSkin, entries: [r.nodeBuf, r.cofBuf, r.tetBuf, r.edgeBuf].map((b, i) => ({ binding: i, resource: { buffer: b } })) });
+    r.bgShadow = device.createBindGroup({ layout: bglShadow, entries: [{ binding: 0, resource: r.samp }, { binding: 1, resource: r.shadowTex.createView() }] });
+    r.shadowView = r.shadowTex.createView();
+
+    const L = (...g) => device.createPipelineLayout({ bindGroupLayouts: g });
+    const layU = L(bglU), laySkin = L(bglU, bglSkin), layFloor = L(bglU, bglShadow), layBlit = L(bglU, r.bglComp), layCell = L(bglU, bglSkin, r.bglComp);
+
+    const mod = async (code, label) => {
+        const m = device.createShaderModule({ code, label });
+        const info = await m.getCompilationInfo();
+        for (const msg of info.messages) if (msg.type === 'error') console.error(`[WGSL ${label}] ${msg.lineNum}:${msg.linePos} ${msg.message}`);
+        return m;
+    };
+    const [mSkin, mFloor, mObj, mBlit] = await Promise.all([mod(WGSL_SKIN, 'skin'), mod(WGSL_FLOOR, 'floor'), mod(WGSL_OBJ, 'obj'), mod(WGSL_BLIT, 'blit')]);
+
+    const f3 = 'float32x3', f4 = 'float32x4';
+    const SURF_L = [{ arrayStride: 40, attributes: [{ shaderLocation: 0, offset: 0, format: f3 }, { shaderLocation: 1, offset: 12, format: f3 }, { shaderLocation: 2, offset: 24, format: f3 }, { shaderLocation: 3, offset: 36, format: 'uint32' }] }];
+    const CAPGEO = { arrayStride: 44, attributes: [{ shaderLocation: 0, offset: 0, format: f3 }, { shaderLocation: 1, offset: 12, format: f3 }, { shaderLocation: 2, offset: 24, format: 'float32x2' }, { shaderLocation: 3, offset: 32, format: f3 }] };
+    const CAP_L = [CAPGEO, { arrayStride: 48, stepMode: 'instance', attributes: [{ shaderLocation: 4, offset: 0, format: f4 }, { shaderLocation: 5, offset: 16, format: f4 }, { shaderLocation: 6, offset: 32, format: f4 }] }];
+    const VP_L = [{ arrayStride: 44, attributes: [{ shaderLocation: 0, offset: 0, format: f3 }, { shaderLocation: 1, offset: 12, format: f3 }] },
+        { arrayStride: 32, stepMode: 'instance', attributes: [{ shaderLocation: 2, offset: 0, format: f4 }, { shaderLocation: 3, offset: 16, format: f4 }] }];
+    const SPH_L = [{ arrayStride: 12, attributes: [{ shaderLocation: 0, offset: 0, format: f3 }] },
+        { arrayStride: 32, stepMode: 'instance', attributes: [{ shaderLocation: 1, offset: 0, format: f4 }, { shaderLocation: 2, offset: 16, format: f4 }] }];
+    const FIB_L = [{ arrayStride: 12, attributes: [{ shaderLocation: 0, offset: 0, format: f3 }] },
+        { arrayStride: 48, stepMode: 'instance', attributes: [{ shaderLocation: 1, offset: 0, format: f4 }, { shaderLocation: 2, offset: 16, format: f4 }, { shaderLocation: 3, offset: 32, format: f4 }] }];
+    const SHCAP_L = [{ arrayStride: 48, stepMode: 'instance', attributes: [{ shaderLocation: 0, offset: 0, format: f4 }, { shaderLocation: 1, offset: 32, format: f4 }] }];
+
+    const PRE = { color: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' } };
+    const ADD = { color: { srcFactor: 'one', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one', operation: 'add' } };
+    const MAX = { color: { srcFactor: 'one', dstFactor: 'one', operation: 'max' }, alpha: { srcFactor: 'one', dstFactor: 'one', operation: 'max' } };
+    const DEPTH = (write, cmp = 'less') => ({ format: 'depth24plus', depthWriteEnabled: write, depthCompare: cmp });
+    const P = (o) => device.createRenderPipelineAsync({
+        layout: o.layout,
+        vertex: { module: o.module, entryPoint: o.vs, buffers: o.buffers || [] },
+        fragment: { module: o.module, entryPoint: o.fs, targets: [{ format: o.format, blend: o.blend }] },
+        primitive: { topology: o.topology || 'triangle-list', cullMode: o.cull || 'none', frontFace: 'ccw' },
+        depthStencil: o.depth,
+        multisample: { count: o.msaa || 1, alphaToCoverageEnabled: !!o.a2c },
+    });
+    const HDR = 'rgba16float';
+    const pl = await Promise.all([
+        P({ layout: laySkin, module: mSkin, vs: 'vsShadowCell', fs: 'fsShadowCell', buffers: SURF_L, format: 'rg16float', blend: MAX }),
+        P({ layout: layU, module: mFloor, vs: 'vsShadowCap', fs: 'fsShadowCap', buffers: SHCAP_L, format: 'rg16float', blend: MAX }),
+        P({ layout: laySkin, module: mSkin, vs: 'vsCell', fs: 'fsThick', buffers: SURF_L, format: 'r16float', blend: ADD }),
+        P({ layout: layFloor, module: mFloor, vs: 'vsFull', fs: 'fsFloor', format: HDR, depth: DEPTH(false, 'always'), msaa: 4 }),
+        P({ layout: layU, module: mObj, vs: 'vsBlob', fs: 'fsBlob', buffers: SPH_L, format: HDR, depth: DEPTH(true), msaa: 4, a2c: true, cull: 'back' }),
+        P({ layout: layU, module: mObj, vs: 'vsGran', fs: 'fsGran', buffers: SPH_L, format: HDR, depth: DEPTH(true), msaa: 4, a2c: true, cull: 'back' }),
+        P({ layout: layU, module: mObj, vs: 'vsCap', fs: 'fsCap', buffers: CAP_L, format: HDR, depth: DEPTH(true), msaa: 4, a2c: true }),
+        P({ layout: layU, module: mObj, vs: 'vsVp', fs: 'fsVp', buffers: VP_L, format: HDR, depth: DEPTH(true), msaa: 4, a2c: true, cull: 'back' }),
+        P({ layout: layU, module: mObj, vs: 'vsBlob', fs: 'fsBlobT', buffers: SPH_L, format: HDR, depth: DEPTH(false), msaa: 4, blend: PRE, cull: 'back' }),
+        P({ layout: layU, module: mObj, vs: 'vsFib', fs: 'fsFib', buffers: FIB_L, format: HDR, depth: DEPTH(false), msaa: 4, blend: PRE, cull: 'back' }),
+        P({ layout: layBlit, module: mBlit, vs: 'vsFull', fs: 'fsBlit', format, depth: DEPTH(false, 'always'), msaa: 4 }),
+        P({ layout: layCell, module: mSkin, vs: 'vsCell', fs: 'fsCell', buffers: SURF_L, format, depth: DEPTH(true), msaa: 4 }),
+        P({ layout: laySkin, module: mSkin, vs: 'vsLine', fs: 'fsLine', format, depth: DEPTH(false, 'always'), msaa: 4, blend: PRE, topology: 'line-list' }),
+    ]);
+    [r.pShadowCell, r.pShadowCap, r.pThick, r.pFloor, r.pBlob, r.pGran, r.pCap, r.pVp, r.pBlobT, r.pFib, r.pBlit, r.pCell, r.pLine] = pl;
+    R = r;
+    return true;
+}
+
+function resizeTargets(w, h) {
+    const r = R;
+    if (r.w === w && r.h === h) return;
+    for (const k of ['sceneMS', 'sceneTex', 'depth', 'colorMS', 'thickTex']) if (r[k]) r[k].destroy();
+    const RA = GPUTextureUsage.RENDER_ATTACHMENT, TB = GPUTextureUsage.TEXTURE_BINDING;
+    r.sceneMS = device.createTexture({ size: [w, h], format: 'rgba16float', sampleCount: 4, usage: RA });
+    r.sceneTex = device.createTexture({ size: [w, h], format: 'rgba16float', usage: RA | TB });
+    r.depth = device.createTexture({ size: [w, h], format: 'depth24plus', sampleCount: 4, usage: RA });
+    r.colorMS = device.createTexture({ size: [w, h], format, sampleCount: 4, usage: RA });
+    r.thickTex = device.createTexture({ size: [w, h], format: 'r16float', usage: RA | TB });
+    r.bgComp = device.createBindGroup({ layout: r.bglComp, entries: [{ binding: 0, resource: r.samp }, { binding: 1, resource: r.sceneTex.createView() }, { binding: 2, resource: r.thickTex.createView() }] });
+    r.v = { sceneMS: r.sceneMS.createView(), sceneTex: r.sceneTex.createView(), depth: r.depth.createView(), colorMS: r.colorMS.createView(), thick: r.thickTex.createView() };
+    r.w = w; r.h = h;
+}
+
+const counts = { cap: 0, vp: 0, gran: 0, blobO: 0, blobT: 0 };
+function fillInstances(time) {
+    const r = R;
+    let n = 0;
+    const cf = r.capF;
+    for (let i = 0; i < MAXG; i++) {
+        const st = G.st[i];
+        if (!st) continue;
+        const o = n * 12;
+        cf[o] = G.p[i * 3]; cf[o + 1] = G.p[i * 3 + 1]; cf[o + 2] = G.p[i * 3 + 2];
+        cf[o + 3] = RC * (st === GS.PROG ? 0.25 + 0.75 * G.sc[i] : 1);
+        cf[o + 4] = G.q[i * 4]; cf[o + 5] = G.q[i * 4 + 1]; cf[o + 6] = G.q[i * 4 + 2]; cf[o + 7] = G.q[i * 4 + 3];
+        cf[o + 8] = G.def[i]; cf[o + 9] = G.gate[i]; cf[o + 10] = G.fib[i];
+        cf[o + 11] = Math.max(0, G.fade[i]) * (st === GS.PROG ? Math.min(1, G.sc[i] * 3) : 1);
+        n++;
+    }
+    counts.cap = n;
+    n = 0;
+    const vf = r.vpF;
+    for (let j = 0; j < MAXV; j++) {
+        if (!Vp.st[j]) continue;
+        const o = n * 8;
+        vf[o] = Vp.p[j * 3]; vf[o + 1] = Vp.p[j * 3 + 1]; vf[o + 2] = Vp.p[j * 3 + 2];
+        vf[o + 3] = RV * (0.3 + 0.7 * Vp.sc[j]);
+        vf[o + 4] = Math.max(0, Vp.fade[j]); vf[o + 5] = Vp.seed[j];
+        n++;
+    }
+    counts.vp = n;
+    n = 0;
+    const alive = host.alive;
+    const orgFade = host.lysing ? 1 - sstep(0.2, 2.2, host.lysisT) : 1;
+    if (alive) {
+        const gf = r.granF;
+        for (let k = 0; k < NGRAN; k++) {
+            const o = n * 8;
+            gf[o] = GR.p[k * 3]; gf[o + 1] = GR.p[k * 3 + 1]; gf[o + 2] = GR.p[k * 3 + 2]; gf[o + 3] = GR.size[k];
+            gf[o + 4] = GR.shade[k]; gf[o + 5] = orgFade * host.opacity;
+            n++;
+        }
+    }
+    counts.gran = n;
+    // blobs: opaque first, then transparent
+    const bf = r.blobF;
+    let nb = 0;
+    const blob = (p, rad, type, p1, fade, seed) => {
+        if (nb >= MAXBLOB) return;
+        const o = nb * 8;
+        bf[o] = p[0]; bf[o + 1] = p[1]; bf[o + 2] = p[2]; bf[o + 3] = rad;
+        bf[o + 4] = type; bf[o + 5] = p1; bf[o + 6] = fade; bf[o + 7] = seed;
+        nb++;
+    };
+    const at = (name) => { const l = orgLoc[name]; embedInto(l[0], l[1], l[2], l[3], tmp3, 0); return [tmp3[0], tmp3[1], tmp3[2]]; };
+    if (alive) {
+        const f = orgFade * host.opacity;
+        blob(at('nuc'), ORG.nucR * (0.7 + 0.3 * orgFade), 0, 1, f, 1.7);
+        blob(at('nucleolus'), 0.095 * (0.7 + 0.3 * orgFade), 1, 1, f, 0);
+        if (host.vfR > 0.01) blob(at('vf'), host.vfR * (0.6 + 0.4 * orgFade), 2, 1, f, 4.2);
+        for (const c of host.cores) {
+            const e = c.prog * c.prog * (3 - 2 * c.prog);
+            const p = embedRest([lerp(c.r0[0], ORG.vf[0], e), lerp(c.r0[1], ORG.vf[1], e), lerp(c.r0[2], ORG.vf[2], e)]);
+            if (p) blob([p[0], p[1], p[2]], 0.028, 6, 1, f, 0);
+        }
+    }
+    counts.blobO = nb;
+    if (alive) {
+        const f = orgFade * host.opacity;
+        const ph = host.cv;
+        const cvr = ph < 0.93 ? 0.05 + 0.12 * sstep(0, 0.9, ph) : 0.17 - 0.12 * sstep(0.93, 1, ph);
+        blob(at('cv'), cvr, 3, 1, f, 0);
+        for (let k = 0; k < ORG.food.length; k++) blob(at('food' + k), 0.085 + k * 0.012, 4, 1, f * 0.8, 0);
+        for (let i = 0; i < MAXG; i++) {
+            const st = G.st[i];
+            if (st === GS.PHAGO || st === GS.EMPTY || (st === GS.ENGULF && G.prog[i] > 0.35)) {
+                const pf = st === GS.EMPTY ? G.fade[i] : st === GS.ENGULF ? sstep(0.35, 0.8, G.prog[i]) : 1;
+                blob([G.p[i * 3], G.p[i * 3 + 1], G.p[i * 3 + 2]], RF * 1.45, 5, 1, pf * f, 0);
+            }
+        }
+    }
+    counts.blobT = nb - counts.blobO;
+    if (counts.cap) device.queue.writeBuffer(r.capInst, 0, cf, 0, counts.cap * 12);
+    if (counts.vp) device.queue.writeBuffer(r.vpInst, 0, vf, 0, counts.vp * 8);
+    if (counts.gran) device.queue.writeBuffer(r.granInst, 0, r.granF, 0, counts.gran * 8);
+    if (nb) device.queue.writeBuffer(r.blobInst, 0, bf, 0, nb * 8);
+}
+
+function writeUniforms(time, W, H) {
+    UF.set(VPm, 0); UF.set(IVP, 16); UF.set(VIEW, 32);
+    UF[48] = cam.eye[0]; UF[49] = cam.eye[1]; UF[50] = cam.eye[2]; UF[51] = cam.dist;
+    UF[52] = W; UF[53] = H; UF[54] = 1 / W; UF[55] = 1 / H;
+    UF[56] = time; UF[57] = settings.mode; UF[58] = MODES[settings.mode].exposure; UF[59] = settings.mesh ? 1 : 0;
+    UF[60] = host.alive ? host.opacity : 0; UF[61] = host.rupR; UF[62] = host.alive ? 1 : 0; UF[63] = host.lysing ? 1 : 0;
+    UF[64] = host.rupC[0]; UF[65] = host.rupC[1]; UF[66] = host.rupC[2]; UF[67] = 0;
+    UF[68] = -0.45; UF[69] = 1.0; UF[70] = 0.55; UF[71] = 0;
+    const m = MODES[settings.mode];
+    const keys = ['bg', 'floor', 'grid', 'cellAbs', 'cellScat', 'cellRim', 'nuc', 'vf', 'cap', 'fib', 'vp', 'gran', 'shadow', 'line'];
+    keys.forEach((k, i) => UF.set(m[k], 72 + i * 4));
+    device.queue.writeBuffer(R.ubuf, 0, UF);
+}
+
+function render(time) {
+    const r = R;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W = Math.max(1, Math.round(canvas.clientWidth * dpr)), H = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    const cap = 2.6e6;
+    if (W * H > cap) { const s = Math.sqrt(cap / (W * H)); W = Math.round(W * s); H = Math.round(H * s); }
+    if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+    resizeTargets(W, H);
+    updateCamera(W, H);
+    writeUniforms(time, W, H);
+    computeCofactors();
+    device.queue.writeBuffer(r.nodeBuf, 0, NODE4);
+    device.queue.writeBuffer(r.cofBuf, 0, COF);
+    fillInstances(time);
+
+    const showCell = host.alive;
+    const enc = device.createCommandEncoder();
+    const drawSurf = (p) => { p.setVertexBuffer(0, r.surfVB); p.setIndexBuffer(r.surfIB, 'uint32'); p.drawIndexed(SURF.count); };
+    const drawSph = (p, s, inst, n, first = 0) => { p.setVertexBuffer(0, s.vb); p.setVertexBuffer(1, inst); p.setIndexBuffer(s.ib, 'uint32'); p.drawIndexed(s.n, n, 0, 0, first); };
+
+    let p = enc.beginRenderPass({ colorAttachments: [{ view: r.shadowView, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] }] });
+    p.setBindGroup(0, r.bgU);
+    if (showCell) { p.setPipeline(r.pShadowCell); p.setBindGroup(1, r.bgSkin); drawSurf(p); }
+    if (counts.cap) { p.setPipeline(r.pShadowCap); p.setVertexBuffer(0, r.capInst); p.draw(6, counts.cap); }
+    p.end();
+
+    p = enc.beginRenderPass({ colorAttachments: [{ view: r.v.thick, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] }] });
+    if (showCell) { p.setPipeline(r.pThick); p.setBindGroup(0, r.bgU); p.setBindGroup(1, r.bgSkin); drawSurf(p); }
+    p.end();
+
+    p = enc.beginRenderPass({
+        colorAttachments: [{ view: r.v.sceneMS, resolveTarget: r.v.sceneTex, loadOp: 'clear', storeOp: 'discard', clearValue: [0, 0, 0, 1] }],
+        depthStencilAttachment: { view: r.v.depth, depthLoadOp: 'clear', depthClearValue: 1, depthStoreOp: 'store' },
+    });
+    p.setBindGroup(0, r.bgU);
+    p.setPipeline(r.pFloor); p.setBindGroup(1, r.bgShadow); p.draw(3);
+    if (counts.blobO) { p.setPipeline(r.pBlob); drawSph(p, r.sph3, r.blobInst, counts.blobO); }
+    if (counts.gran) { p.setPipeline(r.pGran); drawSph(p, r.sph1, r.granInst, counts.gran); }
+    if (counts.cap) { p.setPipeline(r.pCap); p.setVertexBuffer(0, r.capGeo); p.setVertexBuffer(1, r.capInst); p.draw(60, counts.cap); }
+    if (counts.vp) { p.setPipeline(r.pVp); p.setVertexBuffer(0, r.capGeo); p.setVertexBuffer(1, r.vpInst); p.draw(60, counts.vp); }
+    if (counts.blobT) { p.setPipeline(r.pBlobT); drawSph(p, r.sph3, r.blobInst, counts.blobT, counts.blobO); }
+    if (counts.cap) { p.setPipeline(r.pFib); drawSph(p, r.sph2, r.capInst, counts.cap); }
+    p.end();
+
+    p = enc.beginRenderPass({
+        colorAttachments: [{ view: r.v.colorMS, resolveTarget: context.getCurrentTexture().createView(), loadOp: 'clear', storeOp: 'discard', clearValue: [0, 0, 0, 1] }],
+        depthStencilAttachment: { view: r.v.depth, depthLoadOp: 'load', depthStoreOp: 'discard' },
+    });
+    p.setBindGroup(0, r.bgU);
+    p.setPipeline(r.pBlit); p.setBindGroup(1, r.bgComp); p.draw(3);
+    if (showCell) {
+        p.setPipeline(r.pCell); p.setBindGroup(1, r.bgSkin); p.setBindGroup(2, r.bgComp); drawSurf(p);
+        if (settings.mesh) { p.setPipeline(r.pLine); p.setBindGroup(1, r.bgSkin); p.draw(NE * 2); }
+    }
+    p.end();
+    device.queue.submit([enc.finish()]);
+}
+
+/* =============================================================
+   12. Layout framing, input
+   ============================================================= */
+const canvas = $('#view');
+const narrowMQ = matchMedia('(max-width: 760px)');
+function frameLayout() {
+    const st = ui.stage.getBoundingClientRect();
+    const W = st.width, H = st.height;
+    let L = 0, Rr = W, T = 0, B = H;
+    if (!narrowMQ.matches) {
+        Rr = ui.panel.getBoundingClientRect().left - st.left - 16;
+        L = Math.max(ui.masthead.getBoundingClientRect().right, ui.readout.getBoundingClientRect().right) - st.left - 40;
+        T = H * 0.12; B = H * 0.97;
+    }
+    const cx = (L + Rr) / 2, cy = (T + B) / 2;
+    const halfW = (Rr - L) * 0.5, halfH = (B - T) * 0.5;
+    const px = Math.min(halfW / 1.75, halfH / (1.75 * Math.sin(cam.el) + 0.5));
+    cam.base = (H / 2) / Math.tan(cam.fov / 2) / px;
+    cam.ox = cx / W * 2 - 1; cam.oy = 1 - cy / H * 2;
+}
+window.addEventListener('resize', frameLayout);
+
+const pointers = new Map();
+let pinch = null, hoverXY = null, lastPick = 0;
+function evXY(e) { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top, r.width, r.height]; }
+function cssRay(x, y, w, h) { return ray(x, y, w, h); }
+
+function pickGiant(o, d) {
+    let best = -1, bt = 1e9;
+    for (let i = 0; i < MAXG; i++) {
+        if (G.st[i] !== GS.FREE) continue;
+        const cx = G.p[i * 3] - o[0], cy = G.p[i * 3 + 1] - o[1], cz = G.p[i * 3 + 2] - o[2];
+        const t = cx * d[0] + cy * d[1] + cz * d[2];
+        if (t < 0) continue;
+        const d2 = cx * cx + cy * cy + cz * cz - t * t, rr = RF * 2.4;
+        if (d2 < rr * rr && t < bt) { bt = t; best = i; }
+    }
+    return [best, bt];
+}
+const SKALL = new Float32Array(SURF.n * 3);
+function pickCell(o, d) {
+    if (!host.alive || host.lysing) return [null, 1e9];
+    const f = SURF.f, u = SURF.u;
+    for (let i = 0; i < SURF.n; i++) embedInto(u[i * 10 + 9], f[i * 10 + 6], f[i * 10 + 7], f[i * 10 + 8], SKALL, i * 3);
+    const I = SURF.idx, P = SKALL;
+    let bt = 1e9;
+    for (let t = 0; t < SURF.count; t += 3) {
+        const a = I[t] * 3, b = I[t + 1] * 3, c = I[t + 2] * 3;
+        const e1x = P[b] - P[a], e1y = P[b + 1] - P[a + 1], e1z = P[b + 2] - P[a + 2];
+        const e2x = P[c] - P[a], e2y = P[c + 1] - P[a + 1], e2z = P[c + 2] - P[a + 2];
+        const px = d[1] * e2z - d[2] * e2y, py = d[2] * e2x - d[0] * e2z, pz = d[0] * e2y - d[1] * e2x;
+        const det = e1x * px + e1y * py + e1z * pz;
+        if (Math.abs(det) < 1e-12) continue;
+        const inv = 1 / det;
+        const tx = o[0] - P[a], ty = o[1] - P[a + 1], tz = o[2] - P[a + 2];
+        const uu = (tx * px + ty * py + tz * pz) * inv;
+        if (uu < 0 || uu > 1) continue;
+        const qx = ty * e1z - tz * e1y, qy = tz * e1x - tx * e1z, qz = tx * e1y - ty * e1x;
+        const vv = (d[0] * qx + d[1] * qy + d[2] * qz) * inv;
+        if (vv < 0 || uu + vv > 1) continue;
+        const tt = (e2x * qx + e2y * qy + e2z * qz) * inv;
+        if (tt > 0 && tt < bt) bt = tt;
+    }
+    return bt < 1e9 ? [[o[0] + d[0] * bt, o[1] + d[1] * bt, o[2] + d[2] * bt], bt] : [null, 1e9];
+}
+const fwd = () => { const d = [cam.tgt[0] - cam.eye[0], cam.tgt[1] - cam.eye[1], cam.tgt[2] - cam.eye[2]]; const l = Math.hypot(...d); return [d[0] / l, d[1] / l, d[2] / l]; };
+function planeHit(o, d, p0, n) {
+    const den = d[0] * n[0] + d[1] * n[1] + d[2] * n[2];
+    if (Math.abs(den) < 1e-6) return null;
+    const t = ((p0[0] - o[0]) * n[0] + (p0[1] - o[1]) * n[1] + (p0[2] - o[2]) * n[2]) / den;
+    return [o[0] + d[0] * t, o[1] + d[1] * t, o[2] + d[2] * t];
+}
+
+function beginDrag(x, y, w, h) {
+    if (!VPm) return;
+    const { o, d } = cssRay(x, y, w, h);
+    const [gi, gt] = pickGiant(o, d);
+    const [hp, ht] = pickCell(o, d);
+    drag.moved = false;
+    if (gi >= 0 && gt < ht) {
+        drag.kind = 2; drag.gi = gi;
+        drag.p0 = [G.p[gi * 3], G.p[gi * 3 + 1], G.p[gi * 3 + 2]];
+        drag.tx = drag.p0[0]; drag.ty = drag.p0[1]; drag.tz = drag.p0[2];
+        drag.hist = [[performance.now(), ...drag.p0]];
+    } else if (hp) {
+        drag.kind = 1; drag.p0 = hp;
+        drag.tx = hp[0]; drag.ty = hp[1]; drag.tz = hp[2];
+        const R0 = 0.42;
+        drag.n = 0;
+        for (let i = 0; i < NN; i++) {
+            const dx = X[i * 3] - hp[0], dy = X[i * 3 + 1] - hp[1], dz = X[i * 3 + 2] - hp[2];
+            const dd = Math.hypot(dx, dy, dz);
+            if (dd < R0) {
+                drag.ids[drag.n] = i; drag.w[drag.n] = Math.pow(1 - dd / R0, 1.5);
+                drag.off[drag.n * 3] = dx; drag.off[drag.n * 3 + 1] = dy; drag.off[drag.n * 3 + 2] = dz;
+                drag.n++;
+            }
+        }
+        if (!drag.n) drag.kind = 0;
+    } else drag.kind = 0;
+    drag.fwd = drag.kind === 2 ? [0, 1, 0] : fwd();
+    if (drag.kind === 2) drag.p0[1] = Math.max(drag.p0[1], 0.14);
+    canvas.classList.toggle('is-grabbing', drag.kind > 0);
+    return drag.kind;
+}
+function moveDrag(x, y, w, h) {
+    if (!drag.kind) return;
+    const { o, d } = cssRay(x, y, w, h);
+    const p = planeHit(o, d, drag.p0, drag.fwd);
+    if (!p) return;
+    let dx = p[0] - drag.p0[0], dy = p[1] - drag.p0[1], dz = p[2] - drag.p0[2];
+    const l = Math.hypot(dx, dy, dz), lim = drag.kind === 1 ? 1.5 : 6;
+    if (l > lim) { dx *= lim / l; dy *= lim / l; dz *= lim / l; }
+    drag.tx = drag.p0[0] + dx; drag.ty = Math.max(drag.kind === 1 ? 0.02 : RF, drag.p0[1] + dy); drag.tz = drag.p0[2] + dz;
+    if (l > 0.02) drag.moved = true;
+    if (drag.kind === 2) { drag.hist.push([performance.now(), drag.tx, drag.ty, drag.tz]); if (drag.hist.length > 6) drag.hist.shift(); }
+}
+function endDrag() {
+    if (drag.kind === 2 && drag.gi >= 0 && G.st[drag.gi] === GS.FREE && drag.hist && drag.hist.length > 1) {
+        const a = drag.hist[0], b = drag.hist[drag.hist.length - 1], dt = Math.max(0.016, (b[0] - a[0]) / 1000);
+        const i = drag.gi;
+        let vx = (b[1] - a[1]) / dt, vy = (b[2] - a[2]) / dt, vz = (b[3] - a[3]) / dt;
+        const s = Math.hypot(vx, vy, vz);
+        if (s > 4) { vx *= 4 / s; vy *= 4 / s; vz *= 4 / s; }
+        G.v[i * 3] = vx; G.v[i * 3 + 1] = vy; G.v[i * 3 + 2] = vz;
+    }
+    drag.kind = 0; drag.gi = -1; drag.n = 0;
+    canvas.classList.remove('is-grabbing');
+}
+function inoculateAt(x, y, w, h) {
+    const { o, d } = cssRay(x, y, w, h);
+    if (d[1] >= -1e-4) return;
+    const t = -o[1] / d[1];
+    const px = o[0] + d[0] * t, pz = o[2] + d[2] * t;
+    if (Math.abs(px) > 4 || Math.abs(pz) > 3.3) return;
+    spawnFreeGiant(px, 0.85, pz, 0, -0.25, 0, poisson(settings.load));
+}
+function inoculateNear() {
+    if (!host.alive) { for (let k = 0; k < 2; k++) spawnFreeGiant((rand() - 0.5) * 2, 0.8, (rand() - 0.5) * 1.6, 0, -0.2, 0, poisson(settings.load)); return; }
+    for (let k = 0; k < 2; k++) {
+        const b = (rand() * NB) | 0, a = (b + 0.5) / NB * 2 * Math.PI - Math.PI, R = FP.R[b] + 0.3;
+        const x = FP.cx + Math.cos(a) * R, z = FP.cz + Math.sin(a) * R;
+        spawnFreeGiant(x, 0.14, z, -Math.cos(a) * 1.1, 0, -Math.sin(a) * 1.1, poisson(settings.load));
+    }
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    canvas.setPointerCapture(e.pointerId);
+    const [x, y, w, h] = evXY(e);
+    pointers.set(e.pointerId, { x, y, sx: x, sy: y });
+    if (pointers.size === 2) {
+        endDrag();
+        const [a, b] = [...pointers.values()];
+        pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), zoom: cam.zoom };
+        return;
+    }
+    if (pointers.size === 1) beginDrag(x, y, w, h);
+});
+canvas.addEventListener('pointermove', (e) => {
+    const [x, y, w, h] = evXY(e);
+    const pt = pointers.get(e.pointerId);
+    if (pt) { pt.x = x; pt.y = y; }
+    if (pinch && pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        zoomAbout((a.x + b.x) / 2, (a.y + b.y) / 2, w, h, clamp(pinch.zoom * pinch.d / Math.max(d, 1), 0.3, 1.3));
+        return;
+    }
+    if (drag.kind) moveDrag(x, y, w, h);
+    else if (!pt) hoverXY = [x, y, w, h];
+});
+function pointerEnd(e) {
+    const pt = pointers.get(e.pointerId);
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (!pt) return;
+    const [x, y, w, h] = evXY(e);
+    const wasTap = Math.hypot(pt.x - pt.sx, pt.y - pt.sy) < 6 && e.type === 'pointerup';
+    const hadDrag = drag.kind;
+    endDrag();
+    if (wasTap && !hadDrag && pointers.size === 0) inoculateAt(x, y, w, h);
+}
+canvas.addEventListener('pointerup', pointerEnd);
+canvas.addEventListener('pointercancel', pointerEnd);
+canvas.addEventListener('pointerleave', () => { hoverXY = null; });
+
+function zoomAbout(x, y, w, h, z) {
+    const { o, d } = cssRay(x, y, w, h);
+    const P = d[1] < -1e-4 ? planeHit(o, d, [0, cam.tgt[1], 0], [0, 1, 0]) : null;
+    const k = z / cam.zoom;
+    if (P) {
+        cam.tgt[0] = clamp(P[0] + (cam.tgt[0] - P[0]) * k, -2.6, 2.6);
+        cam.tgt[2] = clamp(P[2] + (cam.tgt[2] - P[2]) * k, -2.2, 2.2);
+    }
+    cam.zoom = z;
+    $('#fit').hidden = Math.abs(cam.zoom - 1) < 0.02 && Math.hypot(cam.tgt[0] - cam.baseT[0], cam.tgt[2] - cam.baseT[2]) < 0.02;
+}
+canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const [x, y, w, h] = evXY(e);
+    zoomAbout(x, y, w, h, clamp(cam.zoom * Math.exp(e.deltaY * (e.deltaMode ? 0.05 : 0.0012)), 0.3, 1.3));
+}, { passive: false });
+$('#fit').addEventListener('click', () => { cam.zoom = 1; cam.tgt = cam.baseT.slice(); $('#fit').hidden = true; });
+
+function hoverTest() {
+    if (!hoverXY || drag.kind || !VPm) return;
+    const [x, y, w, h] = hoverXY;
+    const { o, d } = cssRay(x, y, w, h);
+    let over = pickGiant(o, d)[0] >= 0;
+    if (!over && host.alive && !host.lysing && d[1] < 0) {
+        for (const yy of [FP.top * 0.6, 0.12]) {
+            const t = (yy - o[1]) / d[1];
+            const px = o[0] + d[0] * t, pz = o[2] + d[2] * t;
+            if (footprintContact(px, yy, pz, -0.04)) { over = true; break; }
+        }
+    }
+    canvas.classList.toggle('can-grab', over);
+    hoverXY = null;
+}
+
+/* =============================================================
+   13. UI wiring
+   ============================================================= */
+const STAGES = ['Uptake', 'Eclipse', 'Viral factory', 'Assembly', 'Lysis'];
+function setMode(m) {
+    settings.mode = m;
+    const M = MODES[m];
+    document.documentElement.dataset.mode = String(m);
+    const bg = toCss(M.bg, M.exposure);
+    document.documentElement.style.setProperty('--bg', bg);
+    if (m === 0) document.documentElement.style.setProperty('--veil', 'rgba(230, 229, 225, 0.74)'); else document.documentElement.style.removeProperty('--veil');
+    $('meta[name="theme-color"]').setAttribute('content', bg);
+    document.querySelectorAll('.preset').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.mode === m)));
+    $('#mode-name').textContent = M.name;
+}
+document.querySelectorAll('.preset').forEach((b) => b.addEventListener('click', () => setMode(+b.dataset.mode)));
+
+const load = $('#load'), stiff = $('#stiff'), visc = $('#visc');
+function applySliders() {
+    settings.load = +load.value;
+    $('#load-out').textContent = `${settings.load} / virion`;
+    const s = +stiff.value;
+    sim.edgeC = Math.pow(10, lerp(-4.4, -6.4, s));
+    $('#stiff-out').textContent = s.toFixed(2);
+    const v = +visc.value;
+    sim.damp = lerp(0.0004, 0.012, v);
+    $('#visc-out').textContent = v.toFixed(2);
+}
+[load, stiff, visc].forEach((el) => el.addEventListener('input', applySliders));
+$('#inoculate').addEventListener('click', inoculateNear);
+$('#newhost').addEventListener('click', () => { spawnHost(true); seedSlide(); });
+const slowBox = $('#slow'), meshBox = $('#mesh'), pauseBtn = $('#pause');
+slowBox.addEventListener('change', () => { sim.speed = slowBox.checked ? 0.25 : 1; });
+meshBox.addEventListener('change', () => { settings.mesh = meshBox.checked; });
+function setPaused(p) {
+    sim.paused = p;
+    pauseBtn.textContent = p ? 'Resume' : 'Pause';
+    pauseBtn.setAttribute('aria-pressed', String(p));
+    if (R) setStatus(p ? 'WebGPU · Paused' : 'WebGPU · Live', !p);
+}
+pauseBtn.addEventListener('click', () => setPaused(!sim.paused));
+if (REDUCE) { slowBox.checked = true; sim.speed = 0.25; }
+$('#n-tets').textContent = NT.toLocaleString('en-US');
+
+function currentStage() {
+    if (!host.alive) return host.lysedAt >= 0 ? 4 : -1;
+    if (host.lysing) return 4;
+    let engulfing = false;
+    for (let i = 0; i < MAXG; i++) if (G.st[i] === GS.ENGULF) { engulfing = true; break; }
+    if (!host.infected) return engulfing ? 0 : -1;
+    if (host.seedTau < 0) return host.tau < T_GATE ? 0 : 1;
+    return host.tau < host.seedTau + 3.8 ? 2 : 3;
+}
+const fmt = (n) => n.toLocaleString('en-US');
+const rd = { time: $('#r-time'), vol: $('#r-vol'), mass: $('#r-mass'), ke: $('#r-ke'), gv: $('#r-gv'), vp: $('#r-vp'), free: $('#r-free'), stage: $('#stage-name'), bar: $('#scale-bar'), barLabel: $('#scale-label') };
+const stageEls = [...document.querySelectorAll('.stages li')];
+let lastStage = -2;
+function updateReadouts() {
+    const stg = currentStage();
+    if (stg !== lastStage) {
+        lastStage = stg;
+        rd.stage.textContent = stg < 0 ? 'Uninfected' : STAGES[stg];
+        stageEls.forEach((li, k) => { li.classList.toggle('is-now', k === stg); li.classList.toggle('is-done', stg >= 0 && k < stg); });
+    }
+    if (host.alive && host.infected) rd.time.textContent = `≈ ${(host.lysing ? host.lastTau : host.tau).toFixed(1)} h`;
+    else if (!host.alive && host.lysedAt >= 0) rd.time.textContent = `lysed at ≈ ${host.lysedAt.toFixed(1)} h`;
+    else rd.time.textContent = '—';
+    if (host.alive && !host.lysing) {
+        let v = 0, v0 = 0;
+        for (let t = 0; t < NT; t++) {
+            const a = T4[t * 4] * 3, b = T4[t * 4 + 1] * 3, c = T4[t * 4 + 2] * 3, d = T4[t * 4 + 3] * 3;
+            const ax = X[b] - X[a], ay = X[b + 1] - X[a + 1], az = X[b + 2] - X[a + 2];
+            const bx = X[c] - X[a], by = X[c + 1] - X[a + 1], bz = X[c + 2] - X[a + 2];
+            const cx = X[d] - X[a], cy = X[d + 1] - X[a + 1], cz = X[d + 2] - X[a + 2];
+            v += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+            v0 += V0[t];
+        }
+        rd.vol.textContent = `${(v / v0).toFixed(2)}× rest`;
+        rd.mass.textContent = `≈ ${(SURF.vol * UM ** 3 * 1.05 / 1000).toFixed(1)} ng`;
+    } else { rd.vol.textContent = '—'; rd.mass.textContent = '—'; }
+    let ke = 0;
+    if (host.alive) for (let i = 0; i < NN; i++) ke += 0.5 * MASS[i] * (Vel[i * 3] ** 2 + Vel[i * 3 + 1] ** 2 + Vel[i * 3 + 2] ** 2);
+    rd.ke.textContent = (ke / NN).toFixed(4);
+    rd.gv.textContent = host.spawnedG ? `${fmt(host.spawnedG)} · ${Math.round(100 * host.defects / host.spawnedG)}% defective` : '0';
+    rd.vp.textContent = fmt(host.spawnedV);
+    let fg = 0, fv = 0;
+    for (let i = 0; i < MAXG; i++) if (G.st[i] === GS.FREE) fg++;
+    for (let j = 0; j < MAXV; j++) if (Vp.st[j] === VS.FREE || (Vp.st[j] === VS.ATT && G.st[Vp.g[j]] === GS.FREE)) fv++;
+    rd.free.textContent = `${fmt(fg)} GV · ${fmt(fv)} VP`;
+    const H = ui.stage.getBoundingClientRect().height;
+    const pxPerUnit = (H / 2) / Math.tan(cam.fov / 2) / cam.dist;
+    const um = [1, 2, 5, 10, 20].find((v) => v / UM * pxPerUnit >= 44) || 20;
+    rd.bar.style.width = `${Math.round(um / UM * pxPerUnit)}px`;
+    rd.barLabel.textContent = `${um} µm`;
+}
+
+function seedSlide() {
+    const cx = 0, cz = 0;
+    for (let k = 0; k < 6; k++) {
+        const a = k / 6 * 6.2831853 + rand() * 0.6, r = 2.0 + rand() * 0.9;
+        spawnFreeGiant(cx + Math.cos(a) * r, 0.1 + rand() * 0.5, cz + Math.sin(a) * r * 0.8, 0, 0, 0, poisson(settings.load));
+    }
+    for (let k = 0; k < 36; k++) spawnFreeVp((rand() - 0.5) * 6.5, 0.02 + rand() * 0.35, (rand() - 0.5) * 5);
+    // one virion already drifting towards the cell
+    spawnFreeGiant(1.95, 0.14, 0.55, -0.34, 0, -0.08, Math.max(2, poisson(settings.load)));
+}
+
+/* =============================================================
+   14. Main loop
+   ============================================================= */
+let last = performance.now(), acc = 0, uiT = 0;
+function frame(now) {
+    if (stopped) return;
+    const dtReal = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    let steps = 0;
+    if (!sim.paused) {
+        acc += dtReal * sim.speed;
+        if (host.alive) updateRestLengths();
+        while (acc >= DT && steps < MAX_STEPS) {
+            if (host.alive) stepSoft(DT);
+            acc -= DT; steps++;
+        }
+        if (steps === MAX_STEPS) acc = 0;
+        let bad = false;
+        for (let i = 0; i < NN * 3; i += 31) if (!Number.isFinite(X[i])) { bad = true; break; }
+        if (bad || !Number.isFinite(X[NN * 3 - 1])) { console.warn('soft body reset (non-finite state)'); spawnHost(false); }
+    }
+    const simDt = steps * DT;
+    if (host.alive) computeFootprint();
+    if (simDt > 0) { updateHost(simDt); updateParticles(simDt); }
+    hoverTest();
+    render(now / 1000);
+    if ((uiT += dtReal) > 0.12) { uiT = 0; updateReadouts(); }
+    requestAnimationFrame(frame);
+}
+
+// Start in the visitor's site theme
+let startMode = 0;
+try { if (localStorage.getItem('theme') === 'dark') startMode = 1; } catch (e) { /* storage unavailable */ }
+setMode(startMode);
+applySliders();
+spawnHost(true);
+seedSlide();
+frameLayout();
+cam.baseT = cam.tgt.slice();
+
+initGPU().then((ok) => {
+    if (!ok) return;
+    setStatus('WebGPU · Live', true);
+    frameLayout();
+    if (document.fonts) document.fonts.ready.then(frameLayout);
+    requestAnimationFrame((t) => { last = t; frame(t); });
+}).catch((e) => { console.error(e); fail('WebGPU failed to start: ' + e.message); });
+
+// Expose a small hook for automated checks: state, plus a way to fast-forward
+window.__specimen = {
+    host, G, Vp, GS, VS, sim, settings, drag, X,
+    stats: () => ({ NN, NT, NE, surf: SURF.n }),
+    project(x, y, z) {
+        const m = VPm, w = m[3] * x + m[7] * y + m[11] * z + m[15];
+        const r = canvas.getBoundingClientRect();
+        return [((m[0] * x + m[4] * y + m[8] * z + m[12]) / w * 0.5 + 0.5) * r.width + r.left, (0.5 - (m[1] * x + m[5] * y + m[9] * z + m[13]) / w * 0.5) * r.height + r.top];
+    },
+    advance(sec) {
+        const n = Math.round(sec / DT);
+        for (let k = 0; k < n; k++) {
+            if (host.alive) { updateRestLengths(); stepSoft(DT); computeFootprint(); }
+            updateHost(DT); updateParticles(DT);
+        }
+    },
+};
+})();
+</script>
+</body>
+</html>
