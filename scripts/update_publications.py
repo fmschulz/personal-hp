@@ -11,7 +11,8 @@ Sources:
   ORCID           title, venue and date of each paper, and the newest journal
                   articles for the Recent group
   Crossref        fallback metadata for a pinned DOI that is not on the ORCID record
-  OpenAlex        author lists and work types (to drop errata and preprints)
+  OpenAlex        author lists, work types (to drop errata and preprints) and
+                  citation counts (to order Highlights)
 
 The script only writes index.html when every source answered and every pinned
 DOI resolved, so a failed run never publishes a half-built list.
@@ -95,15 +96,16 @@ def crossref_work(doi: str) -> dict:
 
 
 def openalex_info(dois: list[str]) -> dict[str, dict]:
-    """Map DOI -> {type, authors} for the DOIs OpenAlex knows."""
+    """Map DOI -> {type, authors, cited_by} for the DOIs OpenAlex knows."""
     info = {}
     for i in range(0, len(dois), 40):
-        query = urllib.parse.urlencode({"filter": "doi:" + "|".join(dois[i:i + 40]), "per-page": 50, "select": "doi,type,authorships"})
+        query = urllib.parse.urlencode({"filter": "doi:" + "|".join(dois[i:i + 40]), "per-page": 50, "select": "doi,type,authorships,cited_by_count"})
         for w in get_json("https://api.openalex.org/works?" + query)["results"]:
             if w.get("doi"):
                 info[norm_doi(w["doi"])] = {
                     "type": w.get("type"),
                     "authors": [a["author"]["display_name"] for a in w.get("authorships", [])],
+                    "cited_by": w.get("cited_by_count") or 0,
                 }
     return info
 
@@ -209,7 +211,10 @@ def build(config: dict, orcid: list[dict], fetch_crossref, info: dict[str, dict]
         meta = by_doi.get(doi) or fetch_crossref(doi)
         if not meta["title"] or not meta["venue"] or not meta["year"]:
             raise SystemExit(f"incomplete metadata for pinned DOI {doi}: {meta}")
-        selected.append({"title": meta["title"], "href": f"https://doi.org/{doi}", "desc": pin["desc"], "venue": meta["venue"], "year": meta["year"]})
+        selected.append({"title": meta["title"], "href": f"https://doi.org/{doi}", "desc": pin["desc"], "venue": meta["venue"], "year": meta["year"],
+                         "top": pin.get("top", False), "cited_by": info.get(doi, {}).get("cited_by", 0)})
+    # entries marked "top" keep their file order; the rest follow by citation count
+    selected = [e for e in selected if e["top"]] + sorted((e for e in selected if not e["top"]), key=lambda e: -e["cited_by"])
     pinned = {norm_doi(p["doi"]) for p in config["selected"]}
     recent = [
         {"title": w["title"], "href": f"https://doi.org/{w['doi']}", "desc": author_line(info.get(w["doi"], {}).get("authors", [])), "venue": w["venue"], "year": w["year"]}
@@ -229,7 +234,8 @@ def main() -> int:
     orcid = parse_orcid(get_json(f"https://pub.orcid.org/v3.0/{config['orcid']}/works"))
     if not orcid:
         raise SystemExit("ORCID returned no works; refusing to rewrite the list")
-    info = openalex_info(sorted({w["doi"] for w in orcid if w["doi"]}))
+    pinned = {norm_doi(p["doi"]) for p in config["selected"]}
+    info = openalex_info(sorted({w["doi"] for w in orcid if w["doi"]} | pinned))
     groups = build(config, orcid, crossref_work, info)
 
     page = INDEX.read_text(encoding="utf-8")

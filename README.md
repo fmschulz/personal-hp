@@ -45,9 +45,11 @@ tab), commits `index.html` only when the list changed, and requests a Pages buil
 | `data/work.json` | pinned papers for Highlights (DOI and a one-line description); software, group and lab entries |
 | ORCID `0000-0002-4932-4677` | title, venue and year of each paper; the five newest journal articles for "Recent papers" |
 | Crossref | metadata for a pinned DOI that is not on the ORCID record |
-| OpenAlex | author lists; work types that identify errata and preprints |
+| OpenAlex | author lists; work types that identify errata and preprints; citation counts for ordering Highlights |
 
-If a source fails or a pinned DOI does not resolve, the script exits without writing. Edits made by
+Highlights lists entries marked `"top": true` first, in file order, then the other pinned papers
+by OpenAlex citation count, highest first. If a source fails or a pinned DOI does not resolve, the
+script exits without writing. Edits made by
 hand inside the generated block are overwritten on the next run.
 
 ### Pin a paper
