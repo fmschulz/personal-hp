@@ -10,7 +10,7 @@ metadata.
 
 - **Lab Monochrome** — zero color by design; black on white, with a dark mode toggle
 - **Typography** — Space Grotesk (display), Instrument Serif italic (accents), Instrument Sans (body), Space Mono (metadata)
-- **Selected work** — a numbered index (selected papers, recent papers, software, group & venture, lab) with venue and year columns; papers link to their DOIs
+- **Selected work** — a numbered index (highlights, recent papers, software, group, lab) with venue and year columns; papers link to their DOIs
 - **Signature motif** — faint icosahedral capsids drift behind the masthead; click to add one
 - **Lab** — `lab/virophage/` is an interactive WebGPU simulation, linked from the Work index
 - **Motion** — masked headline reveals, hairline draws, GSAP + Lenis smooth scroll
@@ -42,7 +42,7 @@ tab), commits `index.html` only when the list changed, and requests a Pages buil
 
 | Source | Supplies |
 |--------|----------|
-| `data/work.json` | pinned papers (DOI and a one-line description); software, group, venture and lab entries |
+| `data/work.json` | pinned papers for Highlights (DOI and a one-line description); software, group and lab entries |
 | ORCID `0000-0002-4932-4677` | title, venue and year of each paper; the five newest journal articles for "Recent papers" |
 | Crossref | metadata for a pinned DOI that is not on the ORCID record |
 | OpenAlex | author lists; work types that identify errata and preprints |
@@ -66,7 +66,7 @@ hand inside the generated block are overwritten on the next run.
    uv run scripts/update_publications.py
    ```
 
-Software, group, venture and lab entries live in the same file under `groups`.
+Software, group and lab entries live in the same file under `groups`.
 
 ### Test the updater
 

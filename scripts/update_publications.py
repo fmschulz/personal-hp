@@ -215,7 +215,7 @@ def build(config: dict, orcid: list[dict], fetch_crossref, info: dict[str, dict]
         {"title": w["title"], "href": f"https://doi.org/{w['doi']}", "desc": author_line(info.get(w["doi"], {}).get("authors", [])), "venue": w["venue"], "year": w["year"]}
         for w in pick_recent(orcid, pinned, info, config["recent_count"])
     ]
-    groups = [("Selected papers", "", selected), ("Recent papers", "updated weekly from ORCID", recent)]
+    groups = [("Highlights", "", selected), ("Recent papers", "updated weekly from ORCID", recent)]
     groups += [(g["label"], "", g["items"]) for g in config["groups"]]
     return groups
 
