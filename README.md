@@ -11,7 +11,8 @@ metadata.
 - **Lab Monochrome** — zero color by design; black on white, with a dark mode toggle
 - **Typography** — Space Grotesk (display), Instrument Serif italic (accents), Instrument Sans (body), Space Mono (metadata)
 - **Selected work** — a numbered index (selected papers, recent papers, software, group & venture, lab) with venue and year columns; papers link to their DOIs
-- **Signature motif** — Fig. 01, a still from the live WebGPU study in `lab/virophage/` (phase contrast in light mode, darkfield in dark mode), over faint drifting icosahedral capsids
+- **Signature motif** — faint icosahedral capsids drift behind the masthead; click to add one
+- **Lab** — `lab/virophage/` is an interactive WebGPU simulation, linked from the Work index
 - **Motion** — masked headline reveals, hairline draws, GSAP + Lenis smooth scroll
 - **Accessible** — respects `prefers-reduced-motion`; keyboard-focusable; graceful no-JS fallback
 

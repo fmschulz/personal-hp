@@ -4,23 +4,23 @@
   "selected": [
     {
       "doi": "10.1038/s41579-022-00754-5",
-      "desc": "Comprehensive review synthesizing current understanding of giant virus diversity and evolution."
+      "desc": "Review of giant virus diversity and biology, from isolates to genome-resolved metagenomics."
     },
     {
       "doi": "10.1038/s41586-020-1957-x",
-      "desc": "Expanded known giant virus diversity 11-fold through global metagenomic analysis."
+      "desc": "2,074 giant virus genomes from global metagenomes, an 11-fold increase in known phylogenetic diversity."
     },
     {
       "doi": "10.1126/science.aal4657",
-      "desc": "Discovery of giant viruses encoding unprecedented translation machinery components."
+      "desc": "Klosneuviruses, giant viruses that encode aminoacyl-tRNA synthetases for all 20 amino acids."
     },
     {
       "doi": "10.1038/s41467-018-07335-2",
-      "desc": "Revealed extensive diversity of terrestrial giant viruses in soil environments."
+      "desc": "16 new giant viruses from forest soil, most recovered by mini-metagenomics."
     },
     {
       "doi": "10.1038/srep13381",
-      "desc": "Characterization of diverse bacterial symbionts in marine protists."
+      "desc": "Two new marine amoebae and their gammaproteobacterial symbionts, one living in the host's perinuclear space."
     }
   ],
   "groups": [
@@ -30,21 +30,21 @@
         {
           "title": "gvclass",
           "href": "https://github.com/NeLLi-team/gvclass",
-          "desc": "Classifies giant virus genomes and metagenome-assembled genomes with marker-gene trees, and reports taxonomy, completeness and contamination.",
+          "desc": "Classifies giant virus genomes with marker-gene trees.",
           "venue": "GitHub",
           "year": "2022"
         },
         {
           "title": "symclatron",
           "href": "https://github.com/NeLLi-team/symclatron",
-          "desc": "Classifies microbial genomes as free-living, host-associated symbiont or obligate intracellular symbiont.",
+          "desc": "Classifies microbial genomes as free-living, host-associated or obligate intracellular.",
           "venue": "GitHub",
           "year": "2025"
         },
         {
           "title": "nsgtree",
           "href": "https://github.com/NeLLi-team/nsgtree",
-          "desc": "New Simple Genome Tree: builds a phylogenomic tree from a folder of genome proteomes in one command.",
+          "desc": "Builds phylogenomic trees from genome proteomes in one command.",
           "venue": "GitHub",
           "year": "2023"
         }
@@ -56,15 +56,15 @@
         {
           "title": "New Lineages of Life",
           "href": "https://newlineages.com",
-          "desc": "Research group discovering novel microbial diversity through large-scale genomics and multi-omics.",
+          "desc": "Research group studying uncultivated microbes and their viruses.",
           "venue": "DOE JGI / LBNL",
           "year": "2023"
         },
         {
           "title": "SampleX",
           "href": "https://samplex.ai",
-          "desc": "AI-powered biological sample analysis for rapid pathogen identification and characterization.",
-          "venue": "AI startup",
+          "desc": "Pathogen identification and characterization from biological samples.",
+          "venue": "Company",
           "year": "2024"
         }
       ]
@@ -76,7 +76,7 @@
           "title": "Parasite’s Parasite",
           "href": "lab/virophage/",
           "internal": true,
-          "desc": "Interactive WebGPU study: a virophage rides a giant virus into an amoeba, replicates in the viral factory, and leaves when the cell bursts.",
+          "desc": "Interactive simulation of a virophage, a giant virus and their amoeba host.",
           "venue": "Infection Studies",
           "year": "2026"
         }
