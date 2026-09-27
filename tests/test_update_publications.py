@@ -82,6 +82,18 @@ class Build(unittest.TestCase):
         self.assertEqual(groups[0][2][0]["title"], "From Crossref")
         self.assertEqual(groups[0][2][0]["href"], "https://doi.org/10.1/pin")
 
+    def test_highlights_order_top_then_citations(self):
+        config = {"selected": [
+            {"doi": "10.1/low", "desc": "d"},
+            {"doi": "10.1/new", "desc": "d", "top": True},
+            {"doi": "10.1/high", "desc": "d"},
+            {"doi": "10.1/unknown", "desc": "d"},
+        ], "recent_count": 0, "groups": []}
+        crossref = lambda doi: work(doi, doi, "2020")
+        info = {"10.1/low": {"cited_by": 10}, "10.1/high": {"cited_by": 400}, "10.1/new": {"cited_by": 0}}
+        order = [e["href"].rsplit("/", 1)[1] for e in upd.build(config, [], crossref, info)[0][2]]
+        self.assertEqual(order, ["new", "high", "low", "unknown"])
+
     def test_incomplete_pinned_metadata_fails(self):
         config = {"selected": [{"doi": "10.1/pin", "desc": "why"}], "recent_count": 0, "groups": []}
         crossref = lambda doi: work(doi, "", "2015")
