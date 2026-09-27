@@ -522,10 +522,10 @@ html.js .loader { display: flex; }
     display: inline-block;
     font-family: var(--font-display);
     font-weight: 500;
-    font-size: clamp(1.6rem, 4.4vw, 3.2rem);
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: var(--r1);
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: var(--r2);
     position: relative;
     word-break: break-word;
 }

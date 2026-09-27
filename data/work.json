@@ -3,6 +3,10 @@
   "recent_count": 5,
   "selected": [
     {
+      "doi": "10.1038/s41587-026-03213-1",
+      "desc": "Lifestyle predictions for over 100,000 microbial genomes; 15–23% of uncultivated microbes are likely symbionts."
+    },
+    {
       "doi": "10.1038/s41579-022-00754-5",
       "desc": "Review of giant virus diversity and biology, from isolates to genome-resolved metagenomics."
     },
@@ -51,7 +55,7 @@
       ]
     },
     {
-      "label": "Group & venture",
+      "label": "Group",
       "items": [
         {
           "title": "New Lineages of Life",
@@ -59,13 +63,6 @@
           "desc": "Research group studying uncultivated microbes and their viruses.",
           "venue": "DOE JGI / LBNL",
           "year": "2023"
-        },
-        {
-          "title": "SampleX",
-          "href": "https://samplex.ai",
-          "desc": "Pathogen identification and characterization from biological samples.",
-          "venue": "Company",
-          "year": "2024"
         }
       ]
     },
